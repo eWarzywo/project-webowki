@@ -6,7 +6,7 @@ export default function Header() {
     <>
       <header className="flex justify-center items-center py-4 h-8">
         <div className="flex justify-start items-center w-[70%]">
-          <button className="flex justify-center items-center rounded-[6px] outline-2 outline-gray-500 outline w-[15%] h-7 p-1 mx-1 text-lg">
+          <button className="flex justify-center items-center rounded-[6px] outline-2 outline-gray-500 outline w-[15%] h-7 p-1 mx-1 text-lg text-white">
             Meow meow
             {/*Strasznie to psuje responsywność, a nie wiem po co imo do wywalenia ten element albo jak umiecie naprawić*/}
           </button>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "../components/ui/header";
+import Header from "../components/header";
 
 export const metadata: Metadata = {
   title: "FortTask",
@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-black text-white p-10 space-y-10 w-full h-screen">
+      <body className="bg-black text-[#FAFAFA] p-10 space-y-10 w-full h-screen">
         <Header />
         {children}
       </body>
