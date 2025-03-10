@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-black text-[#FAFAFA] p-10 space-y-10 w-full h-screen">
+      <body className="bg-[#09090B] text-[#FAFAFA] p-10 space-y-10 w-full h-screen">
         <Header />
         {children}
       </body>
