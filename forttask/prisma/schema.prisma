@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Household {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  joinCode  String   @unique @db.VarChar(10)
+  createdAt DateTime @default(now())
+
+  users    User[]
+  bills    Bill[]
+  chores   Chore[]
+  shopping ShoppingItem[]
+  events   Event[]
+  messages HouseholdDM[]
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(50)
+  email        String   @unique @db.VarChar(100)
+  passwordHash String   @db.VarChar(255)
+  createdAt    DateTime @default(now())
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+
+  billsCreated Bill[] @relation("CreatedBills")
+  billsPaid    Bill[] @relation("PaidBills")
+
+  choresCreated Chore[] @relation("ChoresCreated")
+  choresDone    Chore[] @relation("ChoresDone")
+
+  shoppingAdded  ShoppingItem[] @relation("ShoppingAdded")
+  shoppingBought ShoppingItem[] @relation("ShoppingBought")
+
+  eventsCreated  Event[]
+  eventsAttended EventAttendee[]
+
+  sentDMs     DM[] @relation("SentDMs")
+  receivedDMs DM[] @relation("ReceivedDMs")
+
+  householdMessages HouseholdDM[]
+}
+
+model Bill {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(255)
+  amount      Decimal
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById Int
+  createdBy   User @relation("CreatedBills", fields: [createdById], references: [id])
+
+  paidById Int?
+  paidBy   User? @relation("PaidBills", fields: [paidById], references: [id])
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+}
+
+model Chore {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById Int?
+  createdBy   User? @relation("ChoresCreated", fields: [createdById], references: [id])
+
+  doneById Int?
+  doneBy   User? @relation("ChoresDone", fields: [doneById], references: [id])
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+}
+
+model ShoppingItem {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(255)
+  quantity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById Int?
+  createdBy   User? @relation("ShoppingAdded", fields: [createdById], references: [id])
+
+  boughtById Int?
+  boughtBy   User? @relation("ShoppingBought", fields: [boughtById], references: [id])
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+}
+
+model DM {
+  id   Int      @id @default(autoincrement())
+  text String   @db.VarChar(255)
+  time DateTime @default(now())
+
+  sentById Int
+  sentBy   User @relation("SentDMs", fields: [sentById], references: [id])
+
+  sentToId Int
+  sentTo   User @relation("ReceivedDMs", fields: [sentToId], references: [id])
+}
+
+model HouseholdDM {
+  id   Int      @id @default(autoincrement())
+  text String   @db.VarChar(255)
+  time DateTime @default(now())
+
+  sentById Int
+  sentBy   User @relation(fields: [sentById], references: [id])
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  description String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById Int?
+  createdBy   User? @relation(fields: [createdById], references: [id])
+
+  householdId Int
+  household   Household @relation(fields: [householdId], references: [id])
+
+  attendees EventAttendee[]
+}
+
+model EventAttendee {
+  eventId Int
+  userId  Int
+
+  event Event @relation(fields: [eventId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@id([eventId, userId])
+}
