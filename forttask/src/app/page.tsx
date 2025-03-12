@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Dashboard() {
   return (
     <div className="flex flex-col justify-center items-center w-full pt-6 pb-8 px-8">
@@ -46,15 +48,47 @@ function Card({
   dataType: string;
   data: string[];
 }) {
+  const last3DataRecords = () => {
+    data.slice(Math.max(data.length - 3, 0));
+    if (dataType == "events" || dataType == "chores") {
+      return data.map((record) => {
+        return (
+          <>
+            <div className="flex justify-center items-center w-full">
+              <div className="w-1/2 flex justify-start items-center">
+                <h2 className="text-sm font-medium text-[#FAFAFA]">{record}</h2>
+              </div>
+              <div className="w-1/2 flex justify-end items-center">
+                <Image
+                  src="/ArrowDown.svg"
+                  alt="Arrow down icon"
+                  width={8}
+                  height={4}
+                />
+              </div>
+            </div>
+            <hr className="border-[#27272A] border" />
+          </>
+        );
+        {
+          /*Tutaj klucze trzeba dodać przy pobieraniu daty po prostu id z danych pododwać*/
+        }
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-start w-[30%] rounded-xl border border-[#27272A]">
       <div className="flex flex-col justify-center items-start p-6">
         <h1 className="text-2xl text-[#FAFAFA] font-semibold gap-[10px]">
           {title}
         </h1>
-        <h3 className="gap-[10px] mt-1.5 font-normal text-[#A1A1AA]">
+        <h3 className="gap-[10px] mt-1.5 font-normal text-[#A1A1AA] text-sm">
           {subtitle}
         </h3>
+      </div>
+      <div className="w-full flex flex-col px-6 pb-6 space-y-4">
+        {last3DataRecords()}
       </div>
     </div>
   );
