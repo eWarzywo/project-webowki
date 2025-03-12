@@ -11,8 +11,8 @@ export default function Dashboard() {
         </h1>
       </div>
       <main className="flex justify-center items-center w-full pt-6 pb-8 px-8">
-        <div className="flex flex-col w-full justify-center items-center mt-4">
-          <div className="mt-4 space-x-4 flex justify-between items-center w-full">
+        <div className="flex flex-col w-full justify-center items-center ">
+          <div className=" space-x-4 flex justify-between items-center w-full">
             <Card
               title="Upcoming events"
               subtitle="What's the next step in the operation?"
@@ -29,13 +29,32 @@ export default function Dashboard() {
               title="Upcoming bills"
               subtitle="What's the next step in the operation?"
               dataType={DataType.bills}
-              data={
-                [] /*[["Baby oil", 100], ["Night with emati", 2], ["Milion piw", 10000]]*/
-              }
+              data={[
+                ["Baby oil", 100, new Date("11.17.2025")],
+                ["Night with emati", 2, null],
+                ["Milion piw", 10000, new Date("07.06.2025")],
+              ]}
             />
             {/* Przy pobieraniu danych to można wsm zrobić tablice samych idków ostatnich 3 recordów according type i potem pobierać dane */}
           </div>
-          <div className="flex justify-around items-center w-full"></div>
+          <div className="flex justify-around items-center w-full mt-2">
+            <Card
+              title="Messages"
+              subtitle="What's the next step in the operation?"
+              dataType={DataType.messages}
+              data={[
+                ["Jake", "Jakeing it"],
+                ["Jake", "Jakeing it"],
+                ["Jake", "Jakeing it"],
+              ]}
+            />
+            <Card
+              title="Shopping list"
+              subtitle="What's the next step in the operation?"
+              dataType={DataType.shopping}
+              data={[["Beer"], ["Vodka"], ["Cigarettes"]]}
+            />
+          </div>
         </div>
       </main>
     </div>

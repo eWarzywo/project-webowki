@@ -13,7 +13,7 @@ export default function Header() {
           </div>
         </div>
         <div className="flex flex-row-reverse items-center w-[30%]">
-          <div className=" rounded-3xl w-[40px] h-[40px] mx-2 bg-white text-black flex justify-center items-center">
+          <div className="hover:cursor-pointer rounded-3xl w-[40px] h-[40px] mx-2 bg-white text-black flex justify-center items-center">
             pfp
             {/*Do zmiany na ikonke*/}
           </div>{" "}

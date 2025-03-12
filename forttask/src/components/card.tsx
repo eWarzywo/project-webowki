@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export enum DataType {
   events,
@@ -27,11 +28,11 @@ export function Card({
       return data.map((record) => {
         return (
           <>
-            <div className="flex justify-center items-center w-full">
-              <div className="w-1/2 flex justify-start items-center">
+            <Link href="#" className="flex justify-center items-center w-full">
+              <div className="w-3/4 flex justify-start items-center">
                 <h2 className="text-sm font-medium text-[#FAFAFA]">{record}</h2>
               </div>
-              <div className="w-1/2 flex justify-end items-center">
+              <div className="w-1/4 flex justify-end items-center">
                 <Image
                   src="/ArrowDown.svg"
                   alt="Arrow down icon"
@@ -39,7 +40,7 @@ export function Card({
                   height={4}
                 />
               </div>
-            </div>
+            </Link>
             {hr}
           </>
         );
@@ -48,7 +49,54 @@ export function Card({
       return data.map((record) => {
         return (
           <>
-            <div className="flex justify-center items-center w-full"></div>
+            <Link
+              href="#"
+              className="flex flex-wrap justify-between items-center w-full"
+            >
+              <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2 hover:bg-[#FAFAFA]"></div>
+              <div className="flex justify-start items-start space-y-1.5 flex-grow">
+                <h2 className="text-sm font-medium text-[#FAFAFA]">
+                  {record[0]}
+                  {dataType == DataType.bills ? " - " + record[1] + "$" : ""}
+                </h2>
+              </div>
+              <div className="text-sm font-normal text-[#A1A1AA] text-truncate">
+                {record[2]
+                  ? "Due " +
+                    record[2]
+                      .toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                      .replace(",", ".")
+                  : dataType == DataType.shopping
+                    ? ""
+                    : "No due date"}
+              </div>
+            </Link>
+            {hr}
+          </>
+        );
+      });
+    } else if (dataType == DataType.messages) {
+      return data.map((record) => {
+        return (
+          <>
+            <Link
+              href="#"
+              className="flex flex-wrap justify-between items-center w-full"
+            >
+              <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2 hover:bg-[#FAFAFA]"></div>
+              <div className="flex justify-start items-start space-y-1.5 flex-grow">
+                <h2 className="text-sm font-medium text-[#FAFAFA]">
+                  {record[0]}
+                </h2>
+              </div>
+              <div className="text-sm font-normal text-[#A1A1AA] text-truncate">
+                {record[1]}
+              </div>
+            </Link>
             {hr}
           </>
         );
