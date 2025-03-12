@@ -1,4 +1,6 @@
-import Image from "next/image";
+//Dane do pobrania jak matuś zrobi api
+
+import { Card, DataType } from "@/components/card";
 
 export default function Dashboard() {
   return (
@@ -14,9 +16,24 @@ export default function Dashboard() {
             <Card
               title="Upcoming events"
               subtitle="What's the next step in the operation?"
-              dataType="events"
+              dataType={DataType.events}
               data={["Jakeing it", "Jakeing it", "Jakeing it"]}
             />
+            <Card
+              title="Chores"
+              subtitle="What's the next step in the operation?"
+              dataType={DataType.chores}
+              data={["Jakeing it", "Jakeing it", "Jakeing it"]}
+            />
+            <Card
+              title="Upcoming bills"
+              subtitle="What's the next step in the operation?"
+              dataType={DataType.bills}
+              data={
+                [] /*[["Baby oil", 100], ["Night with emati", 2], ["Milion piw", 10000]]*/
+              }
+            />
+            {/* Przy pobieraniu danych to można wsm zrobić tablice samych idków ostatnich 3 recordów according type i potem pobierać dane */}
           </div>
           <div className="flex justify-around items-center w-full"></div>
         </div>
@@ -32,63 +49,6 @@ function Calendar() {
         <h1 className="text-4xl text-white w-full justify-center items-center font-semibold">
           Calendar
         </h1>
-      </div>
-    </div>
-  );
-}
-
-function Card({
-  title,
-  subtitle,
-  dataType,
-  data,
-}: {
-  title: string;
-  subtitle: string;
-  dataType: string;
-  data: string[];
-}) {
-  const last3DataRecords = () => {
-    data.slice(Math.max(data.length - 3, 0));
-    if (dataType == "events" || dataType == "chores") {
-      return data.map((record) => {
-        return (
-          <>
-            <div className="flex justify-center items-center w-full">
-              <div className="w-1/2 flex justify-start items-center">
-                <h2 className="text-sm font-medium text-[#FAFAFA]">{record}</h2>
-              </div>
-              <div className="w-1/2 flex justify-end items-center">
-                <Image
-                  src="/ArrowDown.svg"
-                  alt="Arrow down icon"
-                  width={8}
-                  height={4}
-                />
-              </div>
-            </div>
-            <hr className="border-[#27272A] border" />
-          </>
-        );
-        {
-          /*Tutaj klucze trzeba dodać przy pobieraniu daty po prostu id z danych pododwać*/
-        }
-      });
-    }
-  };
-
-  return (
-    <div className="flex flex-col justify-center items-start w-[30%] rounded-xl border border-[#27272A]">
-      <div className="flex flex-col justify-center items-start p-6">
-        <h1 className="text-2xl text-[#FAFAFA] font-semibold gap-[10px]">
-          {title}
-        </h1>
-        <h3 className="gap-[10px] mt-1.5 font-normal text-[#A1A1AA] text-sm">
-          {subtitle}
-        </h3>
-      </div>
-      <div className="w-full flex flex-col px-6 pb-6 space-y-4">
-        {last3DataRecords()}
       </div>
     </div>
   );
