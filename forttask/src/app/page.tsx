@@ -1,6 +1,7 @@
 //Dane do pobrania jak matuś zrobi api
 
 import { Card, DataType } from "@/components/card";
+import Calendar from "@/components/calendar";
 
 export default function Dashboard() {
   return (
@@ -37,7 +38,7 @@ export default function Dashboard() {
             />
             {/* Przy pobieraniu danych to można wsm zrobić tablice samych idków ostatnich 3 recordów according type i potem pobierać dane */}
           </div>
-          <div className="flex justify-around items-center w-full mt-2">
+          <div className="flex justify-center gap-x-3 items-start w-full mt-4">
             <Card
               title="Messages"
               subtitle="What's the next step in the operation?"
@@ -48,6 +49,7 @@ export default function Dashboard() {
                 ["Jake", "Jakeing it"],
               ]}
             />
+            <Calendar />
             <Card
               title="Shopping list"
               subtitle="What's the next step in the operation?"
@@ -57,18 +59,6 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
-    </div>
-  );
-}
-
-function Calendar() {
-  return (
-    <div className="flex flex-col justify-center items-center w-[15%] p-3 space-x-4 rounded-xl border border-[#27272A]">
-      <div>
-        <h1 className="text-4xl text-white w-full justify-center items-center font-semibold">
-          Calendar
-        </h1>
-      </div>
     </div>
   );
 }
