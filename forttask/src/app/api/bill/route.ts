@@ -7,7 +7,7 @@ export async function POST(req: Request) {
         const body = await req.json() as {
             name: string,
             amount: number,
-            date: string,
+            dueDate: string,
             description?: string,
             householdId: number,
             createdById: number,
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
             data: {
                 name: body.name,
                 amount: body.amount,
-                date: new Date(body.date),
+                dueDate: new Date(body.dueDate),
                 description: body.description || "",
                 householdId: body.householdId,
                 createdById: body.createdById,
@@ -34,5 +34,36 @@ export async function POST(req: Request) {
             status: 400,
             headers: { "Content-Type" : "application/json" },
         })
+    }
+}
+
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const householdId = searchParams.get('householdId');
+
+        if (!householdId) {
+            return new Response(JSON.stringify({ error: "Missing householdId parameter" }), {
+                status: 400,
+                headers: { "Content-Type" : "application/json" },
+            });
+        }
+
+        const bills = await prisma.bill.findMany({
+            where: {
+                householdId: parseInt(householdId),
+            },
+        });
+
+        return new Response(JSON.stringify(bills), {
+            status: 200,
+            headers: { "Content-Type" : "application/json" },
+        });
+    } catch (error) {
+        console.error(error);
+        return new Response(JSON.stringify({ error: "Invalid request" }), {
+            status: 400,
+            headers: { "Content-Type" : "application/json" },
+        });
     }
 }
