@@ -4,27 +4,23 @@ import Link from "next/link";
 export default function Header() {
   return (
     <>
-      <header className="flex justify-center items-center py-4 h-8">
+      <header className="flex justify-center items-center py-4 h-8 sticky top-2 bg-[#09090B]">
         <div className="flex justify-start items-center w-[70%]">
-          <button className="flex justify-center items-center rounded-[6px] outline-2 outline-gray-500 outline w-[15%] h-7 p-1 mx-1 text-lg">
-            Meow meow
-            {/*Strasznie to psuje responsywność, a nie wiem po co imo do wywalenia ten element albo jak umiecie naprawić*/}
-          </button>
-          <div className="w-[50%] p-0 flex justify-start items-center">
-            <nav className="flex justify-center items-center w-full">
+          <div className="w-full p-0 flex justify-start items-center">
+            <nav className="flex justify-start pl-4 items-center w-full">
               <NavMenu />
             </nav>
           </div>
         </div>
         <div className="flex flex-row-reverse items-center w-[30%]">
-          <div className=" rounded-3xl w-[40px] h-[40px] mx-2 bg-white text-black flex justify-center items-center">
+          <div className="hover:cursor-pointer rounded-3xl w-[40px] h-[40px] mx-2 bg-white text-black flex justify-center items-center">
             pfp
             {/*Do zmiany na ikonke*/}
           </div>{" "}
           <SearchBar />
         </div>
       </header>
-      <hr className=" border-gray-500" />
+      <hr className=" border-[#27272A]" />
     </>
   );
 }
@@ -76,7 +72,7 @@ function SearchBar() {
     <input
       type="text"
       placeholder="Search..."
-      className="w-1/2 h-8 p-2 mx-3 bg-black rounded-[6px] outline-2 outline-gray-600 outline text-sm text-gray-300"
+      className="w-1/2 h-8 p-2 mx-3 bg-[#09090B] rounded-[6px] border border-[#27272A] text-sm text-gray-300 placeholder:text-[#A1A1AA]"
     />
   );
 }
