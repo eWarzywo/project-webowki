@@ -56,7 +56,7 @@ export default function Calendar() {
             key={day.toString()}
             className={`p-2 rounded-xl flex items-center justify-center h-10 w-10 text-lg cursor-pointer
               ${isToday(day) ? "bg-[#FAFAFA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]" : ""} 
-              ${isBefore(day, today) && !isToday(day) ? "text-[#A1A1AA]" : "text-[#FAFAFA]"} 
+              ${isBefore(day, today) && !isToday(day) ? "text-[#A1A1AA]" : ""} 
               ${!isSameMonth(day, monthStart) ? "opacity-40" : !isToday(day) ? "hover:bg-[#18181B]" : ""}`}
           >
             {format(day, "d")}

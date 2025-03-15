@@ -61,40 +61,20 @@ export function Card({
                 </h2>
               </div>
               <div className="text-sm font-normal text-[#A1A1AA] overflow-hidden">
-                {record[2]
-                  ? "Due " +
-                    record[2]
-                      .toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })
-                      .replace(",", ".")
-                  : dataType == DataType.shopping
-                    ? ""
-                    : "No due date"}
-              </div>
-            </Link>
-            {hr}
-          </>
-        );
-      });
-    } else if (dataType == DataType.messages) {
-      return data.map((record) => {
-        return (
-          <>
-            <Link
-              href="#"
-              className="flex flex-wrap justify-start items-center w-full"
-            >
-              <div className="rounded-full w-10 h-10 bg-white text-black flex justify-center items-center mr-2">
-                pfp
-              </div>
-              <div className="flex justify-start items-center ml-2 overflow-hidden">
-                {record[0]}
-                <h2 className="ml-2 text-sm font-medium text-[#A1A1AA]">
-                  {record[1]}
-                </h2>
+                {dataType == DataType.bills
+                  ? record[2]
+                    ? "Due " +
+                      record[2]
+                        .toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                        .replace(",", ".")
+                    : "Optional"
+                  : record[1]
+                    ? record[1]
+                    : "Quantity not specified"}
               </div>
             </Link>
             {hr}

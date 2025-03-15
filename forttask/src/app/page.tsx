@@ -40,22 +40,16 @@ export default function Dashboard() {
           </div>
           <div className="flex justify-center gap-x-3 items-start w-full mt-4">
             <Card
-              title="Messages"
-              subtitle="What's the next step in the operation?"
-              dataType={DataType.messages}
-              data={[
-                ["Jake", "Jakeing it"],
-                ["Jake", "Jakeing it"],
-                ["Jake", "Jakeing it"],
-              ]}
-            />
-            <Calendar />
-            <Card
               title="Shopping list"
               subtitle="What's the next step in the operation?"
               dataType={DataType.shopping}
-              data={[["Beer"], ["Vodka"], ["Cigarettes"]]}
+              data={[
+                ["Beer", "24 bottles"],
+                ["Vodka"],
+                ["Cigarettes", "10 packs"],
+              ]}
             />
+            <Calendar />
           </div>
         </div>
       </main>
