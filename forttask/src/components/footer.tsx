@@ -1,4 +1,4 @@
-import Image from "next/image";
+import MessageLink from "./messageLink";
 
 export default function Footer() {
   return (
@@ -9,14 +9,7 @@ export default function Footer() {
             © 2025 FortTask. All rights reserved.
           </p>
         </div>
-        <div className="sticky left-0 bottom-0 bg-[#FAFAFA] rounded-xl p-3 mt-3">
-          <Image
-            src="/Messages.svg"
-            alt="FortTask logo"
-            width={32}
-            height={20}
-          />
-        </div>
+        <MessageLink />
       </footer>
     </>
   );

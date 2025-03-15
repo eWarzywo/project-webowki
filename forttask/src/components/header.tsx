@@ -29,37 +29,32 @@ function NavMenu() {
   return (
     <ul className="flex justify-around items-center space-x-5 text-gray-400">
       <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/" className="hover:text-white">
           Overview
         </Link>
       </li>
       <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/events" className="hover:text-white">
           Events
         </Link>
       </li>
       <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/chores" className="hover:text-white">
           Chores
         </Link>
       </li>
       <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/bills" className="hover:text-white">
           Bills
         </Link>
       </li>
       <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/shopping" className="hover:text-white">
           Shopping list
         </Link>
       </li>
       <li>
-        <Link href="#" className="hover:text-white">
-          Messages
-        </Link>
-      </li>
-      <li>
-        <Link href="#" className="hover:text-white">
+        <Link href="/managment" className="hover:text-white">
           Managment
         </Link>
       </li>
