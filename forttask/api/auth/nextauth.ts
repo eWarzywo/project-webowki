@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
             name: 'Credentials',
             credentials: {
                 username: { label: 'Username', type: 'text' },
-                password: { label: 'Password', type: 'password' }
+                password: { label: 'Password', type: 'password' },
             },
             async authorize(credentials) {
                 if (!credentials?.username || !credentials?.password) {
@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
                     // Find user by username
                     const user = await prisma.user.findUnique({
                         where: { username: credentials.username },
-                        include: { household: true }
+                        include: { household: true },
                     });
 
                     if (!user) {
@@ -42,15 +42,15 @@ export const authOptions: NextAuthOptions = {
                         name: user.username,
                         email: user.email,
                         householdId: user.householdId.toString(),
-                        householdName: user.household.name
+                        householdName: user.household.name,
                     };
                 } catch (error) {
-                    console.error("Authentication error:", error);
+                    console.error('Authentication error:', error);
                     return null;
                 } finally {
                     await prisma.$disconnect();
                 }
-            }
+            },
         }),
     ],
     pages: {
@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
                 session.user.householdName = token.householdName;
             }
             return session;
-        }
+        },
     },
     secret: process.env.NEXTAUTH_SECRET,
     debug: process.env.NODE_ENV === 'development',

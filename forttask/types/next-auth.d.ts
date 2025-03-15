@@ -1,7 +1,6 @@
-import "next-auth"
-import { JWT } from "next-auth/jwt"
+import 'next-auth';
 
-declare module "next-auth" {
+declare module 'next-auth' {
     interface User {
         householdId: string;
         householdName: string;
@@ -15,11 +14,11 @@ declare module "next-auth" {
             image?: string | null;
             householdId: string;
             householdName: string;
-        }
+        };
     }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
     interface JWT {
         id: string;
         householdId: string;
