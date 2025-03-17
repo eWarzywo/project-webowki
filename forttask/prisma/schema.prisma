@@ -19,7 +19,10 @@ model Household {
   joinCode  String   @unique @db.VarChar(10)
   createdAt DateTime @default(now())
 
-  users    User[]
+  ownerId Int  @unique
+  owner   User @relation("HouseholdOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  users    User[]         @relation("HouseholdMembers")
   bills    Bill[]
   chores   Chore[]
   shopping ShoppingItem[]
@@ -35,7 +38,7 @@ model User {
   createdAt    DateTime @default(now())
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: Cascade)
 
   billsCreated Bill[] @relation("CreatedBills")
   billsPaid    Bill[] @relation("PaidBills")
@@ -53,94 +56,102 @@ model User {
   receivedDMs DM[] @relation("ReceivedDMs")
 
   householdMessages HouseholdDM[]
+  householdOwner    Household?    @relation("HouseholdOwner")
 }
 
 model Bill {
   id          Int      @id @default(autoincrement())
-  description String   @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  description String   @db.Text
   amount      Decimal
-  date        DateTime @default(now())
+  dueDate     DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   createdById Int
-  createdBy   User @relation("CreatedBills", fields: [createdById], references: [id])
+  createdBy   User @relation("CreatedBills", fields: [createdById], references: [id], onDelete: Cascade)
 
   paidById Int?
-  paidBy   User? @relation("PaidBills", fields: [paidById], references: [id])
+  paidBy   User? @relation("PaidBills", fields: [paidById], references: [id], onDelete: SetNull)
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
 model Chore {
   id          Int      @id @default(autoincrement())
-  description String   @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  description String   @db.Text
+  priority    Int      @default(1)
+  dueDate     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdById Int?
-  createdBy   User? @relation("ChoresCreated", fields: [createdById], references: [id])
+  createdById Int
+  createdBy   User @relation("ChoresCreated", fields: [createdById], references: [id], onDelete: Cascade)
 
   doneById Int?
-  doneBy   User? @relation("ChoresDone", fields: [doneById], references: [id])
+  doneBy   User? @relation("ChoresDone", fields: [doneById], references: [id], onDelete: SetNull)
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
 model ShoppingItem {
   id          Int      @id @default(autoincrement())
-  description String   @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  description String   @db.Text
   quantity    Int
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @default(now())
 
-  createdById Int?
-  createdBy   User? @relation("ShoppingAdded", fields: [createdById], references: [id])
+  createdById Int
+  createdBy   User @relation("ShoppingAdded", fields: [createdById], references: [id], onDelete: Cascade)
 
   boughtById Int?
-  boughtBy   User? @relation("ShoppingBought", fields: [boughtById], references: [id])
+  boughtBy   User? @relation("ShoppingBought", fields: [boughtById], references: [id], onDelete: SetNull)
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
 model DM {
   id   Int      @id @default(autoincrement())
-  text String   @db.VarChar(255)
+  text String   @db.Text
   time DateTime @default(now())
 
   sentById Int
-  sentBy   User @relation("SentDMs", fields: [sentById], references: [id])
+  sentBy   User @relation("SentDMs", fields: [sentById], references: [id], onDelete: Cascade)
 
   sentToId Int
-  sentTo   User @relation("ReceivedDMs", fields: [sentToId], references: [id])
+  sentTo   User @relation("ReceivedDMs", fields: [sentToId], references: [id], onDelete: Cascade)
 }
 
 model HouseholdDM {
   id   Int      @id @default(autoincrement())
-  text String   @db.VarChar(255)
+  text String   @db.Text
   time DateTime @default(now())
 
   sentById Int
-  sentBy   User @relation(fields: [sentById], references: [id])
+  sentBy   User @relation(fields: [sentById], references: [id], onDelete: Cascade)
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
 model Event {
   id          Int      @id @default(autoincrement())
-  description String   @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  description String   @db.Text
+  date        DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  createdById Int?
-  createdBy   User? @relation(fields: [createdById], references: [id])
+  createdById Int
+  createdBy   User @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   householdId Int
-  household   Household @relation(fields: [householdId], references: [id])
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 
   attendees EventAttendee[]
 }
@@ -149,8 +160,8 @@ model EventAttendee {
   eventId Int
   userId  Int
 
-  event Event @relation(fields: [eventId], references: [id])
-  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([eventId, userId])
 }
