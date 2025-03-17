@@ -69,3 +69,34 @@ export async function GET(req: Request) {
         });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const choreId = searchParams.get('choreId');
+
+        if (!choreId) {
+            return new Response(JSON.stringify({ error: "Missing choreId parameter" }), {
+                status: 400,
+                headers: { "Content-Type" : "application/json" },
+            });
+        }
+
+        await prisma.chore.delete({
+            where: {
+                id: parseInt(choreId),
+            },
+        });
+
+        return new Response(null, {
+            status: 204,
+            headers: { "Content-Type" : "application/json" },
+        });
+    } catch (error) {
+        console.error(error);
+        return new Response(JSON.stringify({ error: "Invalid request" }), {
+            status: 400,
+            headers: { "Content-Type" : "application/json" },
+        });
+    }
+}

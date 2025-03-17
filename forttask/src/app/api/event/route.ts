@@ -75,3 +75,32 @@ export async function GET(req: Request) {
         })
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const eventId = searchParams.get('eventId');
+
+        if (!eventId) {
+            return new Response(JSON.stringify({ error: "Missing eventId parameter" }), {
+                status: 400,
+                headers: {"Content-Type": "application/json"},
+            });
+        }
+
+        await prisma.event.delete({
+            where: { id: parseInt(eventId) }
+        });
+
+        return new Response(JSON.stringify({ success: true }), {
+            status: 200,
+            headers: {"Content-Type": "application/json"},
+        });
+    } catch (error) {
+        console.error(error);
+        return new Response(JSON.stringify({ error: "Invalid request" }), {
+            status: 400,
+            headers: {"Content-Type": "application/json"},
+        })
+    }
+}

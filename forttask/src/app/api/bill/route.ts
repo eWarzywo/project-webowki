@@ -67,3 +67,34 @@ export async function GET(req: Request) {
         });
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const billId = searchParams.get('billId');
+
+        if (!billId) {
+            return new Response(JSON.stringify({ error: "Missing billId parameter" }), {
+                status: 400,
+                headers: { "Content-Type" : "application/json" },
+            });
+        }
+
+        await prisma.bill.delete({
+            where: {
+                id: parseInt(billId),
+            },
+        });
+
+        return new Response(null, {
+            status: 204,
+            headers: { "Content-Type" : "application/json" },
+        });
+    } catch (error) {
+        console.error(error);
+        return new Response(JSON.stringify({ error: "Invalid request" }), {
+            status: 400,
+            headers: { "Content-Type" : "application/json" },
+        });
+    }
+}
