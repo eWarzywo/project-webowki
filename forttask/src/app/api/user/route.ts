@@ -4,11 +4,11 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json() as {
-            username: string,
-            email: string,
-            passwordHash: string,
-            householdId: number,
+        const body = (await req.json()) as {
+            username: string;
+            email: string;
+            passwordHash: string;
+            householdId: number;
         };
 
         const newUser = await prisma.user.create({
@@ -17,18 +17,18 @@ export async function POST(req: Request) {
                 email: body.email,
                 passwordHash: body.passwordHash,
                 householdId: body.householdId,
-            }
+            },
         });
 
         return new Response(JSON.stringify(newUser), {
             status: 201,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: "Invalid request" }), {
+        return new Response(JSON.stringify({ error: 'Invalid request' }), {
             status: 400,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 }
@@ -39,9 +39,9 @@ export async function GET(req: Request) {
         const userId = searchParams.get('userId');
 
         if (!userId) {
-            return new Response(JSON.stringify({ error: "Missing userId parameter" }), {
+            return new Response(JSON.stringify({ error: 'Missing userId parameter' }), {
                 status: 400,
-                headers: {"Content-Type": "application/json"},
+                headers: { 'Content-Type': 'application/json' },
             });
         }
 
@@ -53,24 +53,24 @@ export async function GET(req: Request) {
 
         return new Response(JSON.stringify(user), {
             status: 200,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: "Invalid request" }), {
+        return new Response(JSON.stringify({ error: 'Invalid request' }), {
             status: 400,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 }
 
 export async function PUT(req: Request) {
     try {
-        const body = await req.json() as {
-            id: number,
-            username?: string,
-            email?: string,
-            passwordHash?: string,
+        const body = (await req.json()) as {
+            id: number;
+            username?: string;
+            email?: string;
+            passwordHash?: string;
         };
 
         const updatedUser = await prisma.user.update({
@@ -81,18 +81,18 @@ export async function PUT(req: Request) {
                 username: body.username,
                 email: body.email,
                 passwordHash: body.passwordHash,
-            }
+            },
         });
 
         return new Response(JSON.stringify(updatedUser), {
             status: 200,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: "Invalid request" }), {
+        return new Response(JSON.stringify({ error: 'Invalid request' }), {
             status: 400,
-            headers: {"Content-Type": "application/json"},
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 }
@@ -104,9 +104,9 @@ export async function DELETE(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!userId || !householdId) {
-            return new Response(JSON.stringify({ error: "Missing userId or householdId parameter" }), {
+            return new Response(JSON.stringify({ error: 'Missing userId or householdId parameter' }), {
                 status: 400,
-                headers: { "Content-Type": "application/json" },
+                headers: { 'Content-Type': 'application/json' },
             });
         }
 
@@ -121,9 +121,9 @@ export async function DELETE(req: Request) {
         });
 
         if (!household) {
-            return new Response(JSON.stringify({ error: "Household not found" }), {
+            return new Response(JSON.stringify({ error: 'Household not found' }), {
                 status: 404,
-                headers: { "Content-Type": "application/json" },
+                headers: { 'Content-Type': 'application/json' },
             });
         }
 
@@ -141,9 +141,9 @@ export async function DELETE(req: Request) {
                 },
             });
 
-            return new Response(JSON.stringify({ message: "Household and users deleted successfully" }), {
+            return new Response(JSON.stringify({ message: 'Household and users deleted successfully' }), {
                 status: 200,
-                headers: { "Content-Type": "application/json" },
+                headers: { 'Content-Type': 'application/json' },
             });
         }
 
@@ -153,15 +153,15 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify({ message: "User deleted successfully" }), {
+        return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: { 'Content-Type': 'application/json' },
         });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: "Invalid request" }), {
+        return new Response(JSON.stringify({ error: 'Invalid request' }), {
             status: 400,
-            headers: { "Content-Type": "application/json" },
+            headers: { 'Content-Type': 'application/json' },
         });
     }
 }

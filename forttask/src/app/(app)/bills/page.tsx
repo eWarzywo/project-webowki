@@ -1,3 +1,3 @@
 export default function Events() {
-  return <>meow</>;
+    return <>meow</>;
 }
