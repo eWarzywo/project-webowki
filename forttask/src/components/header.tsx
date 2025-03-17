@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <>
-      <header className="flex justify-center items-center py-4 h-8 sticky top-2 bg-[#09090B]">
+    <span className="sticky top-0 z-50">
+      <header className="flex justify-center items-center py-8 h-8 bg-[#09090B]">
         <div className="flex justify-start items-center w-[70%]">
           <div className="w-full p-0 flex justify-start items-center">
             <nav className="flex justify-start pl-4 items-center w-full">
@@ -21,7 +21,7 @@ export default function Header() {
         </div>
       </header>
       <hr className=" border-[#27272A]" />
-    </>
+    </span>
   );
 }
 
