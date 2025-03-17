@@ -51,9 +51,6 @@ Contributions are welcome! Please follow these steps to contribute:
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact
-For any questions or feedback, please contact ewarzywo@example.com.
-
 ## Acknowledgements
 - Thanks to the open-source community for their valuable contributions.
 - Special thanks to the team members who worked on this project.
