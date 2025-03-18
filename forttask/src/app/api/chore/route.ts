@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -26,16 +27,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(newChore), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newChore, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -45,10 +40,7 @@ export async function GET(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!householdId) {
-            return new Response(JSON.stringify({ error: 'Missing householdId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
         const chores = await prisma.chore.findMany({
@@ -57,16 +49,10 @@ export async function GET(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(chores), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(chores);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -76,10 +62,7 @@ export async function DELETE(req: Request) {
         const choreId = searchParams.get('choreId');
 
         if (!choreId) {
-            return new Response(JSON.stringify({ error: 'Missing choreId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing choreId parameter' }, { status: 400 });
         }
 
         await prisma.chore.delete({
@@ -88,15 +71,9 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(null, {
-            status: 204,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }

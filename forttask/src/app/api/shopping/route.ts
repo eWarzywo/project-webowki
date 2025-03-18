@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
             householdId: number;
         };
 
-        const newEvent = await prisma.shoppingItem.create({
+        const newItem = await prisma.shoppingItem.create({
             data: {
                 name: body.name,
                 description: body.description || '',
@@ -22,16 +23,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(newEvent), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newItem, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -41,10 +36,7 @@ export async function GET(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!householdId) {
-            return new Response(JSON.stringify({ error: 'Missing householdId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
         const items = await prisma.shoppingItem.findMany({
@@ -53,16 +45,10 @@ export async function GET(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(items), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(items);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -72,10 +58,7 @@ export async function DELETE(req: Request) {
         const id = searchParams.get('id');
 
         if (!id) {
-            return new Response(JSON.stringify({ error: 'Missing id parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
         }
 
         await prisma.shoppingItem.delete({
@@ -84,14 +67,9 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(null, {
-            status: 204,
-        });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }

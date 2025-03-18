@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -29,16 +30,10 @@ export async function POST(req: Request) {
             include: { attendees: { include: { user: true } } },
         });
 
-        return new Response(JSON.stringify(newEvent), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newEvent, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -48,10 +43,7 @@ export async function GET(req: Request) {
         const userId = searchParams.get('userId');
 
         if (!userId) {
-            return new Response(JSON.stringify({ error: 'Missing userId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
         }
 
         const events = await prisma.event.findMany({
@@ -63,16 +55,10 @@ export async function GET(req: Request) {
             include: { attendees: { include: { user: true } } },
         });
 
-        return new Response(JSON.stringify(events), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(events);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -82,25 +68,16 @@ export async function DELETE(req: Request) {
         const eventId = searchParams.get('eventId');
 
         if (!eventId) {
-            return new Response(JSON.stringify({ error: 'Missing eventId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });
         }
 
         await prisma.event.delete({
             where: { id: parseInt(eventId) },
         });
 
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ success: true });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }

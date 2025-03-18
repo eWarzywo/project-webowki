@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -18,16 +19,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(newHousehold), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newHousehold, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -37,10 +32,7 @@ export async function GET(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!householdId) {
-            return new Response(JSON.stringify({ error: 'Missing householdId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
         const household = await prisma.household.findUnique({
@@ -49,16 +41,10 @@ export async function GET(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(household), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(household);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -80,16 +66,10 @@ export async function PUT(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(updatedHousehold), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(updatedHousehold);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -111,15 +91,9 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ success: true });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }

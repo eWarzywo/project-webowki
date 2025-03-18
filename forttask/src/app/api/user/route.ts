@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { NextResponse } from 'next/server';
 
 const prisma = new PrismaClient();
 
@@ -20,16 +21,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(newUser), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newUser, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -39,10 +34,7 @@ export async function GET(req: Request) {
         const userId = searchParams.get('userId');
 
         if (!userId) {
-            return new Response(JSON.stringify({ error: 'Missing userId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -51,16 +43,10 @@ export async function GET(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(user), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(user);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -84,16 +70,10 @@ export async function PUT(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(updatedUser), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(updatedUser);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -104,10 +84,7 @@ export async function DELETE(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!userId || !householdId) {
-            return new Response(JSON.stringify({ error: 'Missing userId or householdId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing userId or householdId parameter' }, { status: 400 });
         }
 
         const household = await prisma.household.findUnique({
@@ -121,10 +98,7 @@ export async function DELETE(req: Request) {
         });
 
         if (!household) {
-            return new Response(JSON.stringify({ error: 'Household not found' }), {
-                status: 404,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Household not found' }, { status: 404 });
         }
 
         if (household.ownerId === parseInt(userId)) {
@@ -141,10 +115,7 @@ export async function DELETE(req: Request) {
                 },
             });
 
-            return new Response(JSON.stringify({ message: 'Household and users deleted successfully' }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ message: 'Household and users deleted successfully' });
         }
 
         await prisma.user.delete({
@@ -153,15 +124,9 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ message: 'User deleted successfully' });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
