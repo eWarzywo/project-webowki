@@ -7,8 +7,12 @@ export default function MessageLink() {
     const path = usePathname();
     return (
         <>
-            {path !== '/messages' && (
-                <Link href="/messages" className="sticky left-0 bottom-0 bg-[#FAFAFA] rounded-xl p-3 mt-3">
+            {path !== '/messages' ? (
+                <Link href="/messages" className="sticky right-0 bottom-0 bg-[#FAFAFA] rounded-xl p-3">
+                    <Image src="/Messages.svg" alt="FortTask logo" width={32} height={20} />
+                </Link>
+            ) : (
+                <Link href="#" className="sticky right-0 bottom-0 bg-[#FAFAFA] rounded-xl p-3 opacity-0 cursor-default">
                     <Image src="/Messages.svg" alt="FortTask logo" width={32} height={20} />
                 </Link>
             )}
