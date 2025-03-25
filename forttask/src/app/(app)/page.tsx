@@ -1,7 +1,7 @@
 //Dane do pobrania jak matuś zrobi api
 
-import { Card, DataType } from '@/components/card';
-import Calendar from '@/components/calendar';
+import { Card, DataType } from '@/components/generalUI/card';
+import Calendar from '@/components/generalUI/calendar';
 
 export default function Dashboard() {
     return (

@@ -1,3 +1,3 @@
-export default function Events() {
+export default function Managment() {
     return <>meow</>;
 }
