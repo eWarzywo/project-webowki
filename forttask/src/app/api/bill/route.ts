@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../libs/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -61,6 +59,10 @@ export async function DELETE(req: Request) {
 
         if (!billId) {
             return NextResponse.json({ error: 'Missing billId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(billId))) {
+            return new NextResponse(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
         }
 
         await prisma.bill.delete({
