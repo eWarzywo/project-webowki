@@ -1,32 +1,32 @@
 import { expect, test, vi } from 'vitest';
-import { POST, GET, DELETE } from '../src/app/api/bill/route';
+import { POST, GET, DELETE } from '../src/app/api/chore/route';
 import prisma from '../libs/__mocks__/prisma';
 
 vi.mock('../libs/prisma');
 
-test('POST Bill with correct data should return new Bill and status 201', async () => {
-    const mockBill = {
-            name: 'Test Bill',
-            amount: 100,
-            dueDate: '2023-10-01',
-            description: 'Test Description',
-            householdId: 1,
-            createdById: 1,
+test('POST Chore with correct data should return new Chore and status 201', async () => {
+    const mockChore = {
+        name: 'Test Chore',
+        description: 'Test Description',
+        priority: 1,
+        dueDate: '2023-10-01',
+        householdId: 1,
+        createdById: 1,
     };
 
-    const req = new Request('http://localhost/api/bill', {
+    const req = new Request('http://localhost/api/chore', {
         method: 'POST',
-        body: JSON.stringify(mockBill),
+        body: JSON.stringify(mockChore),
         headers: {
             'Content-Type': 'application/json',
         },
     });
 
-    const mockResponse = { ...mockBill, id: 1 };
+    const mockResponse = { ...mockChore, id: 1 };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
-    prisma.bill.create.mockResolvedValue(mockResponse);
+    prisma.chore.create.mockResolvedValue(mockResponse);
 
     const response = await POST(req as Request);
     const data = await response.json();
@@ -35,8 +35,8 @@ test('POST Bill with correct data should return new Bill and status 201', async 
     expect(data).toStrictEqual(mockResponse);
 });
 
-test('POST Bill with missing fields should return 400', async () => {
-    const req = new Request('http://localhost/api/bill', {
+test('POST Chore with missing fields should return 400', async () => {
+    const req = new Request('http://localhost/api/chore', {
         method: 'POST',
         body: JSON.stringify({}),
         headers: {
@@ -51,25 +51,24 @@ test('POST Bill with missing fields should return 400', async () => {
     expect(data).toStrictEqual({ error: 'Invalid request' });
 });
 
-test('POST Bill with invalid data should return 400', async () => {
-    const mockInvalidBill = {
-        name: 'Test Bill',
-        amount: 'invalid_amount', // Not number
-        dueDate: '2023-10-01',
+test('POST Chore with invalid data should return 400', async () => {
+    const mockInvalidChore = {
+        name: 'Test Chore',
         description: 'Test Description',
+        priority: 'invalid_priority', // Not number
+        dueDate: '2023-10-01',
+        createdAt: '2023-09-01',
         householdId: 1,
         createdById: 1,
     };
 
-    const req = new Request('http://localhost/api/bill', {
+    const req = new Request('http://localhost/api/chore', {
         method: 'POST',
-        body: JSON.stringify(mockInvalidBill),
+        body: JSON.stringify(mockInvalidChore),
         headers: {
             'Content-Type': 'application/json',
         },
     });
-
-    prisma.bill.create.mockRejectedValue(new Error('Invalid data'));
 
     const response = await POST(req as Request);
     const data = await response.json();
@@ -78,35 +77,30 @@ test('POST Bill with invalid data should return 400', async () => {
     expect(data).toStrictEqual({ error: 'Invalid request' });
 });
 
-test('GET Bill with correct householdId should return all bills for household and status 200', async () => {
-    const mockBill = {
-        name: 'Test Bill',
-        amount: 100,
-        dueDate: '2023-10-01',
-        description: 'Test Description',
-        householdId: 1,
-        createdById: 1,
-    };
+test('GET Chore with correct householdId should return list of chores and status 200', async () => {
+    const mockChores = [
+        { id: 1, name: 'Chore 1', householdId: 1 },
+        { id: 2, name: 'Chore 2', householdId: 1 },
+    ];
 
-    const req = new Request('http://localhost/api/bill?householdId=1', {
+    const req = new Request('http://localhost/api/chore?householdId=1', {
         method: 'GET',
     });
 
-    const mockResponse = [mockBill];
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
-    prisma.bill.findMany.mockResolvedValue(mockResponse);
+    prisma.chore.findMany.mockResolvedValue(mockChores);
 
     const response = await GET(req as Request);
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data).toStrictEqual(mockResponse);
+    expect(data).toStrictEqual(mockChores);
 });
 
-test('GET Bill with missing householdId should return 400', async () => {
-    const req = new Request('http://localhost/api/bill', {
+test('GET Chore with missing householdId should return 400', async () => {
+    const req = new Request('http://localhost/api/chore', {
         method: 'GET',
     });
 
@@ -117,8 +111,8 @@ test('GET Bill with missing householdId should return 400', async () => {
     expect(data).toStrictEqual({ error: 'Missing householdId parameter' });
 });
 
-test('GET Bill with invalid householdId should return 400', async () => {
-    const req = new Request('http://localhost/api/bill?householdId=invalid', {
+test('GET Chore with invalid householdId should return 400', async () => {
+    const req = new Request('http://localhost/api/chore?householdId=invalid', {
         method: 'GET',
     });
 
@@ -129,12 +123,12 @@ test('GET Bill with invalid householdId should return 400', async () => {
     expect(data).toStrictEqual({ error: 'Invalid householdId parameter' });
 });
 
-test('GET Bill rejected by database should return 400', async () => {
-    const req = new Request('http://localhost/api/bill?householdId=1', {
+test('GET Chore rejected by database should return 400', async () => {
+    const req = new Request('http://localhost/api/chore?householdId=1', {
         method: 'GET',
     });
 
-    prisma.bill.findMany.mockRejectedValue(new Error('Database error'));
+    prisma.chore.findMany.mockRejectedValue(new Error('Database error'));
 
     const response = await GET(req as Request);
     const data = await response.json();
@@ -143,23 +137,23 @@ test('GET Bill rejected by database should return 400', async () => {
     expect(data).toStrictEqual({ error: 'Invalid request' });
 });
 
-test('DELETE Bill with correct billId should return 204', async () => {
-    const req = new Request('http://localhost/api/bill?billId=1', {
+test('DELETE Chore with correct choreId should return status 204', async () => {
+    const req = new Request('http://localhost/api/chore?choreId=1', {
         method: 'DELETE',
     });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
-    prisma.bill.delete.mockResolvedValue({});
+    prisma.chore.delete.mockResolvedValue({});
 
     const response = await DELETE(req as Request);
 
     expect(response.status).toBe(204);
 });
 
-test('DELETE Bill with missing billId should return 400', async () => {
-    const req = new Request('http://localhost/api/bill', {
+test('DELETE Chore with missing choreId should return 400', async () => {
+    const req = new Request('http://localhost/api/chore', {
         method: 'DELETE',
     });
 
@@ -167,11 +161,11 @@ test('DELETE Bill with missing billId should return 400', async () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Missing billId parameter' });
+    expect(data).toStrictEqual({ error: 'Missing choreId parameter' });
 });
 
-test('DELETE Bill with invalid billId should return 400', async () => {
-    const req = new Request('http://localhost/api/bill?billId=invalid', {
+test('DELETE Chore with invalid choreId should return 400', async () => {
+    const req = new Request('http://localhost/api/chore?choreId=invalid', {
         method: 'DELETE',
     });
 
@@ -179,5 +173,5 @@ test('DELETE Bill with invalid billId should return 400', async () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid billId parameter' });
+    expect(data).toStrictEqual({ error: 'Invalid choreId parameter' });
 });

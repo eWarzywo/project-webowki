@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../libs/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -10,7 +8,6 @@ export async function POST(req: Request) {
             description?: string;
             priority?: number;
             dueDate: string;
-            createdAt: string;
             householdId: number;
             createdById: number;
         };
@@ -21,7 +18,6 @@ export async function POST(req: Request) {
                 description: body.description || '',
                 priority: body.priority || 0,
                 dueDate: new Date(body.dueDate),
-                createdAt: new Date(body.createdAt),
                 householdId: body.householdId,
                 createdById: body.createdById,
             },
@@ -41,6 +37,10 @@ export async function GET(req: Request) {
 
         if (!householdId) {
             return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
         }
 
         const chores = await prisma.chore.findMany({
@@ -63,6 +63,10 @@ export async function DELETE(req: Request) {
 
         if (!choreId) {
             return NextResponse.json({ error: 'Missing choreId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(choreId))) {
+            return NextResponse.json({ error: 'Invalid choreId parameter' }, { status: 400 });
         }
 
         await prisma.chore.delete({

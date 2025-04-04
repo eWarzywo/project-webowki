@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const prisma = new PrismaClient();
+import prisma from '../../../../libs/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -46,6 +44,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
         }
 
+        if (isNaN(parseInt(userId))) {
+            return NextResponse.json({ error: 'Invalid userId parameter' }, { status: 400 });
+        }
+
         const events = await prisma.event.findMany({
             where: {
                 attendees: {
@@ -71,11 +73,15 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });
         }
 
+        if (isNaN(parseInt(eventId))) {
+            return NextResponse.json({ error: 'Invalid eventId parameter' }, { status: 400 });
+        }
+
         await prisma.event.delete({
             where: { id: parseInt(eventId) },
         });
 
-        return NextResponse.json({ success: true });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });

@@ -39,6 +39,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
+        if (isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
+        }
+
         const bills = await prisma.bill.findMany({
             where: {
                 householdId: parseInt(householdId),
@@ -62,7 +66,7 @@ export async function DELETE(req: Request) {
         }
 
         if (isNaN(Number(billId))) {
-            return new NextResponse(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
+            return NextResponse.json({ error: 'Invalid billId parameter' }, { status: 400 });
         }
 
         await prisma.bill.delete({
