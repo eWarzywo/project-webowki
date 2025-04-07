@@ -41,7 +41,7 @@ export default function Dashboard() {
                             title="Shopping list"
                             subtitle="What's the next step in the operation?"
                             dataType={DataType.shopping}
-                            data={[['Beer', '24 bottles'], ['Vodka'], ['Cigarettes', '10 packs']]}
+                            data={[['Beer', '24'], ['Vodka'], ['Cigarettes', '10']]}
                         />
                         <Calendar />
                     </div>

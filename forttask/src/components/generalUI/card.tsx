@@ -44,8 +44,8 @@ export function Card({
             return data.map((record) => {
                 return (
                     <>
-                        <Link href="#" className="flex flex-wrap justify-between items-center w-full">
-                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2 hover:bg-[#FAFAFA]"></div>
+                        <Link href="#" className="flex flex-wrap justify-between items-center w-full bghover">
+                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2"></div>
                             <div className="flex justify-start items-start space-y-1.5 flex-grow">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
                                     {record[0]}
@@ -65,8 +65,8 @@ export function Card({
                                               .replace(',', '.')
                                         : 'Optional'
                                     : record[1]
-                                      ? record[1]
-                                      : 'Quantity not specified'}
+                                      ? record[1] + '$'
+                                      : 'Cost not specified'}
                             </div>
                         </Link>
                         {hr}

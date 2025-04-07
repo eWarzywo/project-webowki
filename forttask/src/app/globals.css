@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bghover:hover div:first-of-type {
+    background-color: #f0f0f0;
+}
