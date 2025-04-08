@@ -6,24 +6,22 @@ export async function POST(req: Request) {
         const body = (await req.json()) as {
             name: string;
             description?: string;
-            priority?: number;
-            dueDate: string;
-            householdId: number;
+            quantity: number;
             createdById: number;
+            householdId: number;
         };
 
-        const newChore = await prisma.chore.create({
+        const newItem = await prisma.shoppingItem.create({
             data: {
                 name: body.name,
                 description: body.description || '',
-                priority: body.priority || 0,
-                dueDate: new Date(body.dueDate),
-                householdId: body.householdId,
+                quantity: body.quantity,
                 createdById: body.createdById,
+                householdId: body.householdId,
             },
         });
 
-        return NextResponse.json(newChore, { status: 201 });
+        return NextResponse.json(newItem, { status: 201 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -43,13 +41,13 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
         }
 
-        const chores = await prisma.chore.findMany({
+        const items = await prisma.shoppingItem.findMany({
             where: {
                 householdId: parseInt(householdId),
             },
         });
 
-        return NextResponse.json(chores);
+        return NextResponse.json(items);
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -59,19 +57,19 @@ export async function GET(req: Request) {
 export async function DELETE(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const choreId = searchParams.get('choreId');
+        const id = searchParams.get('id');
 
-        if (!choreId) {
-            return NextResponse.json({ error: 'Missing choreId parameter' }, { status: 400 });
+        if (!id) {
+            return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
         }
 
-        if (isNaN(Number(choreId))) {
-            return NextResponse.json({ error: 'Invalid choreId parameter' }, { status: 400 });
+        if (isNaN(Number(id))) {
+            return NextResponse.json({ error: 'Invalid id parameter' }, { status: 400 });
         }
 
-        await prisma.chore.delete({
+        await prisma.shoppingItem.delete({
             where: {
-                id: parseInt(choreId),
+                id: parseInt(id),
             },
         });
 
