@@ -35,6 +35,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
         }
 
+        if (isNaN(Number(userId))) {
+            return NextResponse.json({ error: 'Invalid userId parameter' }, { status: 400 });
+        }
+
         const user = await prisma.user.findUnique({
             where: {
                 id: parseInt(userId),
@@ -56,6 +60,14 @@ export async function PUT(req: Request) {
             email?: string;
             passwordHash?: string;
         };
+
+        if (!body.id) {
+            return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(body.id))) {
+            return NextResponse.json({ error: 'Invalid userId parameter' }, { status: 400 });
+        }
 
         const updatedUser = await prisma.user.update({
             where: {
@@ -83,6 +95,10 @@ export async function DELETE(req: Request) {
 
         if (!userId || !householdId) {
             return NextResponse.json({ error: 'Missing userId or householdId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(userId)) || isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid userId or householdId parameter' }, { status: 400 });
         }
 
         const household = await prisma.household.findUnique({
@@ -113,7 +129,7 @@ export async function DELETE(req: Request) {
                 },
             });
 
-            return NextResponse.json({ message: 'Household and users deleted successfully' });
+            return new NextResponse(null, { status: 204 });
         }
 
         await prisma.user.delete({
@@ -122,7 +138,7 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return NextResponse.json({ message: 'User deleted successfully' });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });

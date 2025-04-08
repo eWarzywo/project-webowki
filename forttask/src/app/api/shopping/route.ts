@@ -37,6 +37,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
+        if (isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
+        }
+
         const items = await prisma.shoppingItem.findMany({
             where: {
                 householdId: parseInt(householdId),
@@ -57,6 +61,10 @@ export async function DELETE(req: Request) {
 
         if (!id) {
             return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(id))) {
+            return NextResponse.json({ error: 'Invalid id parameter' }, { status: 400 });
         }
 
         await prisma.shoppingItem.delete({

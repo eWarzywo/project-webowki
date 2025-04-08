@@ -33,6 +33,10 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
         }
 
+        if (isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
+        }
+
         const household = await prisma.household.findUnique({
             where: {
                 id: parseInt(householdId),
@@ -50,9 +54,17 @@ export async function PUT(req: Request) {
     try {
         const body = (await req.json()) as {
             id: number;
-            name: string;
-            joinCode: string;
+            name?: string;
+            joinCode?: string;
         };
+
+        if (!body.id) {
+            return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(body.id))) {
+            return NextResponse.json({ error: 'Invalid id parameter' }, { status: 400 });
+        }
 
         const updatedHousehold = await prisma.household.update({
             where: {
@@ -73,23 +85,30 @@ export async function PUT(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
-        const body = (await req.json()) as {
-            id: number;
-        };
+        const { searchParams } = new URL(req.url);
+        const householdId = searchParams.get('householdId');
+
+        if (!householdId) {
+            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
+        }
 
         await prisma.user.deleteMany({
             where: {
-                householdId: body.id,
+                householdId: parseInt(householdId),
             },
         });
 
         await prisma.household.delete({
             where: {
-                id: body.id,
+                id: parseInt(householdId),
             },
         });
 
-        return NextResponse.json({ success: true });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
