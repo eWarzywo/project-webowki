@@ -1,3 +1,3 @@
 export default function ShoppingListHandler() {
-    return <></>;
+    return <div className="w-5/6"></div>;
 }

@@ -5,3 +5,21 @@
 .bghover:hover div:first-of-type {
     background-color: #f0f0f0;
 }
+
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinner {
+    -moz-appearance: textfield;
+}
+
+input:focus::placeholder {
+    color: transparent;
+}
+
+.costInput:has(.no-spinner:focus) {
+    border: 1px solid #a1a1aa;
+}
