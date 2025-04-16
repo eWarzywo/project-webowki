@@ -6,28 +6,39 @@ export enum DataType {
     chores,
     shopping,
     bills,
-    messages,
 }
 
-export function Card({
-    title,
-    subtitle,
-    dataType,
-    data,
-}: {
-    title: string;
-    subtitle: string;
-    dataType: DataType;
-    data: any[];
-}) {
+export function Card({ title, subtitle, dataType }: { title: string; subtitle: string; dataType: DataType }) {
+    function getData() {
+        if (dataType == DataType.events) {
+            return ['Jakeing it', 'Jakeing it', 'Jakeing it'];
+        }
+        if (dataType == DataType.chores) {
+            return ['Jakeing it', 'Jakeing it', 'Jakeing it'];
+        }
+        if (dataType == DataType.shopping) {
+            return [['Beer', '24'], ['Vodka'], ['Cigarettes', '10']];
+        }
+        if (dataType == DataType.bills) {
+            return [
+                ['Baby oil', 100, new Date('11.17.2025')],
+                ['Night with emati', 2, null],
+                ['Milion piw', 10000, new Date('07.06.2025')],
+            ];
+        }
+        return [];
+    }
+
+    const data: any[] = getData();
+
     const last3DataRecords = () => {
         const hr = <hr className="border-[#27272A] border" />;
         data.slice(Math.max(data.length - 3, 0));
         if (dataType == DataType.events || dataType == DataType.chores) {
-            //Do dodania klucze do mapowania z idków tych recordów
+            let c = 1;
             return data.map((record) => {
                 return (
-                    <>
+                    <span key={DataType[dataType].toString() + c++}>
                         <Link href="#" className="flex justify-center items-center w-full">
                             <div className="w-3/4 flex justify-start items-center">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">{record}</h2>
@@ -37,15 +48,16 @@ export function Card({
                             </div>
                         </Link>
                         {hr}
-                    </>
+                    </span>
                 );
             });
         } else if (dataType == DataType.shopping || dataType == DataType.bills) {
+            let c = 1;
             return data.map((record) => {
                 return (
-                    <>
-                        <Link href="#" className="flex flex-wrap justify-between items-center w-full">
-                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2 hover:bg-[#FAFAFA]"></div>
+                    <span key={DataType[dataType].toString() + c++}>
+                        <Link href="#" className="flex flex-wrap justify-between items-center w-full bghover">
+                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2"></div>
                             <div className="flex justify-start items-start space-y-1.5 flex-grow">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
                                     {record[0]}
@@ -65,12 +77,12 @@ export function Card({
                                               .replace(',', '.')
                                         : 'Optional'
                                     : record[1]
-                                      ? record[1]
-                                      : 'Quantity not specified'}
+                                      ? record[1] + '$'
+                                      : 'Cost not specified'}
                             </div>
                         </Link>
                         {hr}
-                    </>
+                    </span>
                 );
             });
         }
