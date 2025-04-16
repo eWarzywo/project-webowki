@@ -34,7 +34,7 @@ export default function ShoppingForm() {
                     />
                 </div>
                 <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                    <label className="text-zinc-50 text-sm" htmlFor="name">
+                    <label className="text-zinc-50 text-sm" htmlFor="cost">
                         Cost
                     </label>
                     <div className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between">
