@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { NextResponse } from 'next/server';
+import prisma from '../../../../libs/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -20,16 +19,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(newUser), {
-            status: 201,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(newUser, { status: 201 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -39,10 +32,11 @@ export async function GET(req: Request) {
         const userId = searchParams.get('userId');
 
         if (!userId) {
-            return new Response(JSON.stringify({ error: 'Missing userId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(userId))) {
+            return NextResponse.json({ error: 'Invalid userId parameter' }, { status: 400 });
         }
 
         const user = await prisma.user.findUnique({
@@ -51,16 +45,10 @@ export async function GET(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(user), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(user);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -73,6 +61,14 @@ export async function PUT(req: Request) {
             passwordHash?: string;
         };
 
+        if (!body.id) {
+            return NextResponse.json({ error: 'Missing userId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(body.id))) {
+            return NextResponse.json({ error: 'Invalid userId parameter' }, { status: 400 });
+        }
+
         const updatedUser = await prisma.user.update({
             where: {
                 id: body.id,
@@ -84,16 +80,10 @@ export async function PUT(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify(updatedUser), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(updatedUser);
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
 
@@ -104,10 +94,11 @@ export async function DELETE(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!userId || !householdId) {
-            return new Response(JSON.stringify({ error: 'Missing userId or householdId parameter' }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Missing userId or householdId parameter' }, { status: 400 });
+        }
+
+        if (isNaN(Number(userId)) || isNaN(Number(householdId))) {
+            return NextResponse.json({ error: 'Invalid userId or householdId parameter' }, { status: 400 });
         }
 
         const household = await prisma.household.findUnique({
@@ -121,10 +112,7 @@ export async function DELETE(req: Request) {
         });
 
         if (!household) {
-            return new Response(JSON.stringify({ error: 'Household not found' }), {
-                status: 404,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return NextResponse.json({ error: 'Household not found' }, { status: 404 });
         }
 
         if (household.ownerId === parseInt(userId)) {
@@ -141,10 +129,7 @@ export async function DELETE(req: Request) {
                 },
             });
 
-            return new Response(JSON.stringify({ message: 'Household and users deleted successfully' }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' },
-            });
+            return new NextResponse(null, { status: 204 });
         }
 
         await prisma.user.delete({
@@ -153,15 +138,9 @@ export async function DELETE(req: Request) {
             },
         });
 
-        return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return new NextResponse(null, { status: 204 });
     } catch (error) {
         console.error(error);
-        return new Response(JSON.stringify({ error: 'Invalid request' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 }
