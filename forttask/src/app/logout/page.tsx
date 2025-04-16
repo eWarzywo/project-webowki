@@ -21,7 +21,7 @@ export default function LogoutPage() {
     };
 
     const handleCancel = () => {
-        router.push('/dashboard');
+        router.push('/');
     };
 
     return (
@@ -29,8 +29,10 @@ export default function LogoutPage() {
             <div className="px-8 md:px-32 flex-col items-center">
                 <div className="flex items-center justify-center flex-wrap flex-col">
                     <h1 className="mb-6 justify-start text-zinc-50 text-2xl font-semibold font-['Inter']">Logout</h1>
-                    <p className="mb-6 text-center justify-start text-zinc-400 text-sm font-normal font-['Inter']">Are you sure you want to log out?</p>
-                    
+                    <p className="mb-6 text-center justify-start text-zinc-400 text-sm font-normal font-['Inter']">
+                        Are you sure you want to log out?
+                    </p>
+
                     <div className="flex gap-4">
                         <button
                             onClick={handleLogout}
@@ -39,7 +41,7 @@ export default function LogoutPage() {
                         >
                             {isLoggingOut ? 'Logging out...' : 'Log out'}
                         </button>
-                        
+
                         <button
                             onClick={handleCancel}
                             className="px-4 py-2 bg-zinc-50 font-['Inter'] text-gray-800 hover:bg-zinc-100 transition rounded-[6px]"
@@ -52,4 +54,3 @@ export default function LogoutPage() {
         </div>
     );
 }
-
