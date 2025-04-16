@@ -13,7 +13,7 @@ export default function ShoppingForm() {
     return (
         <form
             onSubmit={handleSubmit}
-            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950"
+            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-96"
         >
             <div className="flex p-6 flex-col items-start justify-center">
                 <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>
@@ -40,7 +40,7 @@ export default function ShoppingForm() {
                     <div className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between">
                         <input
                             onChange={(e) => setCost(parseFloat(e.target.value))}
-                            value={cost}
+                            value={cost ? cost : ''}
                             type="number"
                             id="cost"
                             placeholder="Cost of the item"
