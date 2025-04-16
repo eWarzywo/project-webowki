@@ -6,12 +6,12 @@ vi.mock('../libs/prisma');
 
 test('POST Bill with correct data should return new Bill and status 201', async () => {
     const mockBill = {
-            name: 'Test Bill',
-            amount: 100,
-            dueDate: '2023-10-01',
-            description: 'Test Description',
-            householdId: 1,
-            createdById: 1,
+        name: 'Test Bill',
+        amount: 100,
+        dueDate: '2023-10-01',
+        description: 'Test Description',
+        householdId: 1,
+        createdById: 1,
     };
 
     const req = new Request('http://localhost/api/bill', {

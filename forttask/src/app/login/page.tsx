@@ -53,13 +53,13 @@ function Form() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Basic validation
         if (!username || !password) {
             setError('Please enter both username and password');
             return;
         }
-        
+
         setIsLoading(true);
         setError('');
 
@@ -82,9 +82,12 @@ function Form() {
             setIsLoading(false);
         }
     };
-    
+
     return (
-        <form onSubmit={handleSubmit} className="self-stretch inline-flex flex-col justify-start items-start gap-2.5 w-full">
+        <form
+            onSubmit={handleSubmit}
+            className="self-stretch inline-flex flex-col justify-start items-start gap-2.5 w-full"
+        >
             <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
                 <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
                     <input
@@ -122,4 +125,3 @@ function Form() {
         </form>
     );
 }
-
