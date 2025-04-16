@@ -46,5 +46,12 @@
         "typescript": "^5",
         "vitest": "^3.1.1",
         "vitest-mock-extended": "^3.0.1"
-    }
+    },
+    "main": "index.js",
+    "directories": {
+        "test": "test"
+    },
+    "author": "",
+    "license": "ISC",
+    "description": ""
 }
