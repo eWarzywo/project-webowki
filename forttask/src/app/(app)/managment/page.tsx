@@ -1,3 +1,3 @@
-export default function Managment() {
+export default function Management() {
     return <>meow</>;
 }
