@@ -2,7 +2,6 @@ import Pagination from '@/components/generalUI/pagination';
 
 export default function ShoppingListHandler() {
     function getData() {
-        // Fetch data from the server or local storage
         return ['meow', 'meow', 'meow'];
     }
 

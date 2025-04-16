@@ -16,32 +16,23 @@ export default function Dashboard() {
                             title="Upcoming events"
                             subtitle="What's the next step in the operation?"
                             dataType={DataType.events}
-                            data={['Jakeing it', 'Jakeing it', 'Jakeing it']}
                         />
                         <Card
                             title="Chores"
                             subtitle="What's the next step in the operation?"
                             dataType={DataType.chores}
-                            data={['Jakeing it', 'Jakeing it', 'Jakeing it']}
                         />
                         <Card
                             title="Upcoming bills"
                             subtitle="What's the next step in the operation?"
                             dataType={DataType.bills}
-                            data={[
-                                ['Baby oil', 100, new Date('11.17.2025')],
-                                ['Night with emati', 2, null],
-                                ['Milion piw', 10000, new Date('07.06.2025')],
-                            ]}
                         />
-                        {/* Przy pobieraniu danych to można wsm zrobić tablice samych idków ostatnich 3 recordów according type i potem pobierać dane */}
                     </div>
                     <div className="flex justify-center gap-x-3 items-start w-full mt-4">
                         <Card
                             title="Shopping list"
                             subtitle="What's the next step in the operation?"
                             dataType={DataType.shopping}
-                            data={[['Beer', '24'], ['Vodka'], ['Cigarettes', '10']]}
                         />
                         <Calendar />
                     </div>
