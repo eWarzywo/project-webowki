@@ -15,8 +15,7 @@ export async function POST(req: Request) {
                 username: body.username,
                 email: body.email,
                 passwordHash: body.passwordHash,
-                householdId: body.householdId || undefined,
-            },
+                householdId: body.householdId ?? undefined,
         });
 
         return NextResponse.json(newUser, { status: 201 });
