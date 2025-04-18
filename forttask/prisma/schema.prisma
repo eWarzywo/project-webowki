@@ -37,8 +37,8 @@ model User {
   passwordHash String   @db.VarChar(255)
   createdAt    DateTime @default(now())
 
-  householdId Int
-  household   Household @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: Cascade)
+  householdId Int?
+  household   Household? @relation("HouseholdMembers", fields: [householdId], references: [id], onDelete: Cascade)
 
   billsCreated Bill[] @relation("CreatedBills")
   billsPaid    Bill[] @relation("PaidBills")
