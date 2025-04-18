@@ -7,7 +7,7 @@ export async function POST(req: Request) {
             username: string;
             email: string;
             passwordHash: string;
-            householdId: number;
+            householdId?: number;
         };
 
         const newUser = await prisma.user.create({
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
                 username: body.username,
                 email: body.email,
                 passwordHash: body.passwordHash,
-                householdId: body.householdId,
+                householdId: body.householdId || undefined,
             },
         });
 
