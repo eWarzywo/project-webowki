@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+
+
 export default function Page() {
+    const router = useRouter();
     return (
         <div className="flex justify-center items-center w-full pt-6 pb-8 px-8 h-full border-zinc-800 border rounded-[6px]">
             <div className="px-8 md:px-32 flex-col items-center">
@@ -25,7 +28,7 @@ export default function Page() {
                     </div>
                     <div className="w-full flex flex-col justify-center items-center gap-2.5 mt-6 space-y-2">
                         <Form />
-                        <button className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
+                        <button onClick={() => router.push('/signup') } className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
                             Sign Up
                         </button>
                     </div>
