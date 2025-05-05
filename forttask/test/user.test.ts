@@ -10,7 +10,7 @@ test('POST User with correct data should return new User and status 201', async 
         email: 'john@email.com',
         passwordHash: 'hashed_password',
         householdId: 1,
-    }
+    };
 
     const req = new Request('http://localhost/api/user', {
         method: 'POST',
@@ -56,7 +56,7 @@ test('POST User with invalid data should return 400', async () => {
         email: 'invalid_email',
         passwordHash: 'hashed_password',
         householdId: 'invalid_id', // Not number
-    }
+    };
 
     const req = new Request('http://localhost/api/user', {
         method: 'POST',
@@ -80,7 +80,7 @@ test('GET User with valid userId should return User', async () => {
         email: 'john@email.com',
         passwordHash: 'hashed_password',
         householdId: 1,
-    }
+    };
 
     const req = new Request('http://localhost/api/user?userId=1', {
         method: 'GET',
@@ -154,7 +154,7 @@ test('PUT User with correct data should return updated User and status 200', asy
         username: 'changed_name',
         email: 'changed@email.com',
         passwordHash: 'changed_password',
-    }
+    };
 
     const req = new Request('http://localhost/api/user', {
         method: 'PUT',
@@ -201,7 +201,7 @@ test('PUT User with invalid data should return 400', async () => {
         email: 'invalid_email',
         passwordHash: 'hashed_password',
         householdId: 'invalid_id', // Not number
-    }
+    };
 
     const req = new Request('http://localhost/api/user', {
         method: 'PUT',
@@ -230,7 +230,7 @@ test('DELETE User with valid userId should return 200', async () => {
         id: 1,
         name: 'Household 1',
         users: [],
-    }
+    };
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error

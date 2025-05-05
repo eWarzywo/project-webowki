@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
+
+
 export default function Page() {
+    const router = useRouter();
     return (
         <div className="flex justify-center items-center w-full pt-6 pb-8 px-8 h-full border-zinc-800 border rounded-[6px]">
-            <div className="px-32 flex-col items-center">
+            <div className="px-8 md:px-32 flex-col items-center">
                 <div className="flex items-center justify-center flex-wrap flex-col">
                     <div className="self-stretch inline-flex flex-col justify-start items-center">
                         <div className="inline-flex justify-center items-center gap-2.5">
@@ -25,7 +28,7 @@ export default function Page() {
                     </div>
                     <div className="w-full flex flex-col justify-center items-center gap-2.5 mt-6 space-y-2">
                         <Form />
-                        <button className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
+                        <button onClick={() => router.push('/signup') } className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
                             Sign Up
                         </button>
                     </div>
@@ -53,6 +56,13 @@ function Form() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Basic validation
+        if (!username || !password) {
+            setError('Please enter both username and password');
+            return;
+        }
+
         setIsLoading(true);
         setError('');
 
@@ -66,7 +76,7 @@ function Form() {
             if (result?.error) {
                 setError('Invalid username or password');
             } else {
-                router.push('/dashboard'); // Redirect to dashboard after successful login
+                router.push('/'); // Redirect to dashboard after successful login
             }
         } catch (error) {
             setError('An error occurred during login');
@@ -75,14 +85,18 @@ function Form() {
             setIsLoading(false);
         }
     };
+
     return (
-        <form onSubmit={handleSubmit} className="self-stretch inline-flex flex-col justify-start items-start gap-2.5">
+        <form
+            onSubmit={handleSubmit}
+            className="self-stretch inline-flex flex-col justify-start items-start gap-2.5 w-full"
+        >
             <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
-                <div className=" w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
+                <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
                     <input
                         type="text"
                         value={username}
-                        placeholder="Email"
+                        placeholder="Username"
                         onChange={(e) => setUsername(e.target.value)}
                         className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                     />
@@ -97,17 +111,17 @@ function Form() {
                     />
                 </div>
             </div>
-            <div className="self-stretch inline-flex justify-start items-start">
+            <div className="self-stretch inline-flex justify-start items-start w-full">
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100"
+                    className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isLoading ? 'Loading...' : 'Login'}
                 </button>
             </div>
             {error && (
-                <div className="self-stretch inline-flex justify-start items-start">
+                <div className="self-stretch inline-flex justify-start items-start mt-2 w-full">
                     <div className="justify-start text-sm font-normal font-['Inter'] text-red-500">{error}</div>
                 </div>
             )}
