@@ -1,66 +1,90 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import type { NextAuthOptions } from 'next-auth';
+import prisma from '../../../../libs/prisma';
+import bcrypt from 'bcrypt';
 
 export const authOptions: NextAuthOptions = {
-    providers: [
-        CredentialsProvider({
-            name: 'Credentials',
-            credentials: {
-                username: { label: 'Username', type: 'text' },
-                password: { label: 'Password', type: 'password' },
-            },
-            async authorize(credentials) {
-                // Add extra logging
-                console.log('Auth attempt with:', credentials?.username);
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        username: { label: 'Username/Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          console.log('Missing credentials');
+          return null;
+        }
 
-                if (!credentials?.username || !credentials?.password) {
-                    console.log('Missing credentials');
-                    return null;
-                }
-
-                // Simple hardcoded user for testing
-                if (credentials.username === 'admin' && credentials.password === 'password') {
-                    console.log('Login successful for:', credentials.username);
-                    return {
-                        id: '1',
-                        name: 'John Doe',
-                        email: 'john@example.com',
-                        username: 'admin',
-                    };
-                }
-
-                console.log('Invalid credentials for:', credentials.username);
-                return null;
-            },
-        }),
-    ],
-    callbacks: {
-        async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.username = user.username;
+        try {
+          // Szukaj użytkownika po nazwie użytkownika lub emailu
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { username: credentials.username },
+                { email: credentials.username }
+              ]
             }
-            return token;
-        },
-        async session({ session, token }) {
-            if (session.user) {
-                session.user.id = token.id as string;
-                session.user.username = token.username as string;
-            }
-            return session;
-        },
+          });
+
+          // Jeśli nie znaleziono użytkownika, zwróć null
+          if (!user) {
+            console.log('User not found:', credentials.username);
+            return null;
+          }
+
+          // Porównaj hashed password
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.passwordHash
+          );
+
+          // Jeśli hasło jest niepoprawne, zwróć null
+          if (!isPasswordValid) {
+            console.log('Invalid password for:', credentials.username);
+            return null;
+          }
+
+          // Przekaż dane użytkownika do sesji
+          return {
+            id: user.id.toString(),
+            name: user.username,
+            email: user.email,
+            username: user.username
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          return null;
+        }
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = user.username;
+      }
+      return token;
     },
-    debug: process.env.NODE_ENV === 'development',
-    secret: process.env.NEXTAUTH_SECRET,
-    session: {
-        strategy: 'jwt',
-        maxAge: 30 * 24 * 60 * 60, // 30 days
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.username = token.username as string;
+      }
+      return session;
     },
-    pages: {
-        signIn: '/login',
-        
-    },
+  },
+  debug: process.env.NODE_ENV === 'development',
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  pages: {
+    signIn: '/login',
+  },
 };
 
 export default NextAuth(authOptions);
