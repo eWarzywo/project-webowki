@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import prisma from '../../../../libs/prisma';
 import bcrypt from 'bcrypt';
 
+const sanitizeName = (name: string): string => {
+    return name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')  // Usuwa znaki diakrytyczne
+        .replace(/[^a-z0-9]/g, '_')       // Zamienia znaki specjalne na podkreślniki
+        .replace(/_+/g, '_')              // Zastępuje wielokrotne podkreślniki jednym
+        .replace(/^_|_$/g, '');           // Usuwa podkreślniki z początku i końca
+};
+
 export async function POST(req: Request) {
     try {
         const body = await req.json() as {
@@ -18,6 +28,18 @@ export async function POST(req: Request) {
                 { status: 400 }
             );
         }
+
+                // Sanityzacja imienia i nazwiska
+                const sanitizedFirstName = sanitizeName(body.firstName);
+                const sanitizedLastName = sanitizeName(body.lastName);
+                
+                // Zabezpieczenie przed pustymi ciągami po sanityzacji
+                if (!sanitizedFirstName || !sanitizedLastName) {
+                    return NextResponse.json(
+                        { message: 'Imię i nazwisko muszą zawierać przynajmniej jeden znak alfanumeryczny' }, 
+                        { status: 400 }
+                    );
+                }
 
         // Sprawdzenie minimalnej długości imienia i nazwiska
         if (body.firstName.length < 2 || body.lastName.length < 2) {
@@ -65,9 +87,28 @@ export async function POST(req: Request) {
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(body.password, saltRounds);
 
-        // Utworzenie użytkownika
-        const username = `${body.firstName.toLowerCase()}_${body.lastName.toLowerCase()}`;
-        
+        // Utworzenie użytkownika z unikalną nazwą użytkownika
+        let username = `${body.firstName.toLowerCase()}_${body.lastName.toLowerCase()}`;
+        let isUsernameUnique = false;
+        let counter = 1;
+
+        // Sprawdzanie unikalności nazwy użytkownika i dodawanie licznika, jeśli jest potrzebne
+        while (!isUsernameUnique) {
+            // Sprawdź, czy nazwa użytkownika już istnieje w bazie
+            const existingUsername = await prisma.user.findUnique({
+                where: { username }
+            });
+            
+            if (!existingUsername) {
+                isUsernameUnique = true;
+            } else {
+                // Jeśli nazwa już istnieje, dodaj licznik na końcu
+                username = `${body.firstName.toLowerCase()}_${body.lastName.toLowerCase()}${counter}`;
+                counter++;
+            }
+        }
+
+        // Utworzenie użytkownika z unikalną nazwą
         const newUser = await prisma.user.create({
             data: {
                 username: username,
