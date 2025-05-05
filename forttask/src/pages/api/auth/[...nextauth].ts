@@ -12,16 +12,22 @@ export const authOptions: NextAuthOptions = {
             },
             async authorize(credentials) {
                 // Add extra logging
-                console.log('Auth attempt with:', credentials?.username);
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('Auth attempt with:', credentials?.username);
+                }
 
                 if (!credentials?.username || !credentials?.password) {
-                    console.log('Missing credentials');
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('Missing credentials');
+                    }
                     return null;
                 }
 
                 // Simple hardcoded user for testing
                 if (credentials.username === 'admin' && credentials.password === 'password') {
-                    console.log('Login successful for:', credentials.username);
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('Login successful for:', credentials.username);
+                    }
                     return {
                         id: '1',
                         name: 'John Doe',
