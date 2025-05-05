@@ -86,7 +86,7 @@ function SignupForm() {
         try {
             console.log('Submitting signup data:', { firstName, lastName, email }); // Don't log password
             
-            const response = await fetch('/api/auth/signup', {
+            const response = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -12,6 +12,13 @@ export async function middleware(req: NextRequest) {
 
     console.log('Token details:', token);
 
+    const path = req.nextUrl.pathname;
+  
+    // Allow all API routes
+    if (path.startsWith('/api/')) {
+        return NextResponse.next();
+    }
+
     // If no token and not on excluded paths, redirect to login
     if (!token) {
         const loginUrl = new URL('/login', req.url);
@@ -24,5 +31,5 @@ export async function middleware(req: NextRequest) {
 
 // Apply the middleware to specific routes
 export const config = {
-    matcher: ['/((?!_next/static|_next/image|favicon.ico|login|signup|api/auth).*)'],
+    matcher: ['/((?!_next/static|_next/image|favicon.ico|login|signup|api).*)'],
 };
