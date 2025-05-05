@@ -29,17 +29,17 @@ export async function POST(req: Request) {
             );
         }
 
-                // Sanityzacja imienia i nazwiska
-                const sanitizedFirstName = sanitizeName(body.firstName);
-                const sanitizedLastName = sanitizeName(body.lastName);
-                
-                // Zabezpieczenie przed pustymi ciągami po sanityzacji
-                if (!sanitizedFirstName || !sanitizedLastName) {
-                    return NextResponse.json(
-                        { message: 'Imię i nazwisko muszą zawierać przynajmniej jeden znak alfanumeryczny' }, 
-                        { status: 400 }
-                    );
-                }
+        // Sanityzacja imienia i nazwiska
+        const sanitizedFirstName = sanitizeName(body.firstName);
+        const sanitizedLastName = sanitizeName(body.lastName);
+        
+        // Zabezpieczenie przed pustymi ciągami po sanityzacji
+        if (!sanitizedFirstName || !sanitizedLastName) {
+            return NextResponse.json(
+                { message: 'Imię i nazwisko muszą zawierać przynajmniej jeden znak alfanumeryczny' }, 
+                { status: 400 }
+            );
+        }
 
         // Sprawdzenie minimalnej długości imienia i nazwiska
         if (body.firstName.length < 2 || body.lastName.length < 2) {
