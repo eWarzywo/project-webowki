@@ -6,17 +6,17 @@ import bcrypt from 'bcrypt';
 vi.mock('../libs/prisma');
 
 vi.mock('bcrypt', () => {
-  const hash = vi.fn().mockResolvedValue('hashed_password');
-  const compare = vi.fn().mockResolvedValue(true);
-  
-  return {
-    hash,
-    compare,
-    default: {
-      hash,
-      compare
-    }
-  };
+    const hash = vi.fn().mockResolvedValue('hashed_password');
+    const compare = vi.fn().mockResolvedValue(true);
+
+    return {
+        hash,
+        compare,
+        default: {
+            hash,
+            compare,
+        },
+    };
 });
 
 test('POST User with correct data should return new User and status 201', async () => {
@@ -36,18 +36,17 @@ test('POST User with correct data should return new User and status 201', async 
     });
 
     vi.clearAllMocks();
-    
+
     prisma.user.findFirst.mockResolvedValue(null);
-    
+
     const originalConsoleError = console.error;
     console.error = vi.fn();
-    
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
     bcrypt.hash.mockResolvedValue('hashed_password');
-    
-    
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
@@ -82,15 +81,13 @@ test('POST User with correct data should return new User and status 201', async 
         expect(data.user).toHaveProperty('email', 'john@email.com');
         expect(data.user).not.toHaveProperty('passwordHash');
     } finally {
- 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // tajpskript diff
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // tajpskript diff
         if (console.error.mock.calls.length > 0) {
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // tajpskript diff
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            // tajpskript diff
             console.log('Captured errors:', console.error.mock.calls);
         }
         console.error = originalConsoleError;

@@ -13,23 +13,33 @@ export async function middleware(req: NextRequest) {
     console.log('Token details:', token);
 
     const path = req.nextUrl.pathname;
-  
-    // Allow all API routes
-    if (path.startsWith('/api/')) {
+
+    if (
+        path.startsWith('/api/') ||
+        path === '/household' ||
+        path === '/login' ||
+        path === '/logout' ||
+        path === '/signup'
+    ) {
         return NextResponse.next();
     }
 
-    // If no token and not on excluded paths, redirect to login
+    // If no token (not logged in), redirect to login
     if (!token) {
         const loginUrl = new URL('/login', req.url);
         return NextResponse.redirect(loginUrl);
     }
 
-    // Allow access if token exists
+    // If user is logged in but doesn't have a household ID, redirect to /household
+    if (!token.householdId) {
+        console.log('User has no household, redirecting to household selection');
+        const householdUrl = new URL('/household', req.url);
+        return NextResponse.redirect(householdUrl);
+    }
+
     return NextResponse.next();
 }
 
-// Apply the middleware to specific routes
 export const config = {
     matcher: ['/((?!_next/static|_next/image|favicon.ico|login|signup|api).*)'],
 };

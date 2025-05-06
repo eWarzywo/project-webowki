@@ -1,13 +1,17 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Page() {
+    const { data: session } = useSession();
+
     return (
         <div className="font-['Inter'] flex justify-center items-center w-full pt-6 pb-8 px-8 h-full border-zinc-800 border rounded-[6px]">
             <div className="w-full max-w-5xl">
                 <h2 className="text-2xl font-semibold text-center text-zinc-50 mb-8">Household Management</h2>
                 <div className="flex flex-wrap justify-center items-stretch gap-8">
+                    {/* Create household card */}
                     <div className="border-zinc-800 border rounded-[6px] p-8 flex flex-col w-full max-w-md">
                         <h3 className="text-xl font-semibold mb-4 text-zinc-50 text-center">Create new household</h3>
                         <p className="text-center text-zinc-400 text-sm leading-relaxed mb-6">
@@ -17,10 +21,13 @@ export default function Page() {
                             <AddHousehold />
                         </div>
                     </div>
+
+                    {/* Join household card */}
                     <div className="border-zinc-800 border rounded-[6px] p-8 flex flex-col w-full max-w-md">
                         <h3 className="text-xl font-semibold mb-4 text-zinc-50 text-center">Join existing household</h3>
                         <p className="text-center text-zinc-400 text-sm leading-relaxed mb-6">
-                            You are required to have a join code provided by the household owner to connect to an existing group.
+                            You are required to have a join code provided by the household owner to connect to an
+                            existing group.
                         </p>
                         <div className="mt-auto w-full">
                             <JoinHousehold />
@@ -34,6 +41,7 @@ export default function Page() {
 
 export function AddHousehold() {
     const router = useRouter();
+    const { data: session, update } = useSession();
     const [householdName, setHouseholdName] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +50,7 @@ export function AddHousehold() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Basic validation
         if (!householdName) {
             setError('Please enter a household name');
             return;
@@ -56,7 +65,7 @@ export function AddHousehold() {
         setSuccess(false);
 
         try {
-            const response = await fetch('/api/household', {
+            const response = await fetch('/api/household/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,11 +81,15 @@ export function AddHousehold() {
 
             setSuccess(true);
             console.log('Household created:', data.household);
-            
+
+            await update({
+                ...session,
+                householdId: data.household.id.toString(),
+            });
+
             setTimeout(() => {
-                router.push('/'); // Redirect to home page
+                router.push('/');
             }, 1500);
-            
         } catch (err) {
             console.error(err);
             setError(err instanceof Error ? err.message : 'Failed to create household');
@@ -112,6 +125,7 @@ export function AddHousehold() {
 
 export function JoinHousehold() {
     const router = useRouter();
+    const { data: session, update } = useSession();
     const [joinCode, setJoinCode] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -146,12 +160,15 @@ export function JoinHousehold() {
 
             setSuccess(true);
             console.log('Joined household:', data.household);
-            
-            // Redirect after successful join
+
+            await update({
+                ...session,
+                householdId: data.household.id.toString(),
+            });
+
             setTimeout(() => {
-                router.push('/'); // Or wherever you want to redirect
+                router.push('/');
             }, 1500);
-            
         } catch (err) {
             console.error(err);
             setError(err instanceof Error ? err.message : 'Failed to join household');
@@ -169,7 +186,7 @@ export function JoinHousehold() {
                 placeholder="Enter join code"
                 className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-none focus:ring-1 focus:ring-zinc-600"
                 disabled={isLoading || success}
-                maxLength={6}
+                maxLength={8}
             />
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
             {success && <p className="text-green-500 text-sm mb-4">Successfully joined household! Redirecting...</p>}

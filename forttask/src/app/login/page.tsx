@@ -26,7 +26,10 @@ export default function Page() {
                     </div>
                     <div className="w-full flex flex-col justify-center items-center gap-2.5 mt-6 space-y-2">
                         <Form />
-                        <button onClick={() => router.push('/signup') } className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
+                        <button
+                            onClick={() => router.push('/signup')}
+                            className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800"
+                        >
                             Sign Up
                         </button>
                     </div>
