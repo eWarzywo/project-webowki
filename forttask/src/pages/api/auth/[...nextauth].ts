@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.username = user.username;
-                token.householdId = user.householdId;
+                token.householdId = user.householdId?.toString() || null;
                 console.log('JWT Callback - User sign-in, householdId:', user.householdId);
             }
 
