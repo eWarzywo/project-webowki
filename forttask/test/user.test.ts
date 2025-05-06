@@ -1,37 +1,97 @@
 import { expect, test, vi } from 'vitest';
 import { POST, GET, PUT, DELETE } from '../src/app/api/user/route';
 import prisma from '../libs/__mocks__/prisma';
+import bcrypt from 'bcrypt';
 
 vi.mock('../libs/prisma');
 
+vi.mock('bcrypt', () => {
+    const hash = vi.fn().mockResolvedValue('hashed_password');
+    const compare = vi.fn().mockResolvedValue(true);
+
+    return {
+        hash,
+        compare,
+        default: {
+            hash,
+            compare,
+        },
+    };
+});
+
 test('POST User with correct data should return new User and status 201', async () => {
-    const mockUser = {
-        username: 'john',
+    const mockUserInput = {
+        firstName: 'John',
+        lastName: 'Doe',
         email: 'john@email.com',
-        passwordHash: 'hashed_password',
-        householdId: 1,
+        password: 'password123',
     };
 
     const req = new Request('http://localhost/api/user', {
         method: 'POST',
-        body: JSON.stringify(mockUser),
+        body: JSON.stringify(mockUserInput),
         headers: {
             'Content-Type': 'application/json',
         },
     });
 
-    const mockResponse = { ...mockUser, id: 1 };
+    vi.clearAllMocks();
+
+    prisma.user.findFirst.mockResolvedValue(null);
+
+    const originalConsoleError = console.error;
+    console.error = vi.fn();
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     // tajpskript diff
-    prisma.user.create.mockResolvedValue(mockResponse);
+    bcrypt.hash.mockResolvedValue('hashed_password');
 
-    const response = await POST(req as Request);
-    const data = await response.json();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    // tajpskript diff
+    prisma.user.findUnique.mockImplementation(({ where }) => {
+        return Promise.resolve(null);
+    });
 
-    expect(response.status).toBe(201);
-    expect(data).toStrictEqual(mockResponse);
+    const mockCreatedUser = {
+        id: 1,
+        username: 'john_doe',
+        email: 'john@email.com',
+        passwordHash: 'hashed_password',
+        createdAt: new Date(),
+    };
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    // tajpskript diff
+    prisma.user.create.mockResolvedValue(mockCreatedUser);
+
+    try {
+        const response = await POST(req as Request);
+        const data = await response.json();
+
+        console.log('Response status:', response.status);
+        console.log('Response data:', data);
+
+        expect(response.status).toBe(201);
+        expect(data).toHaveProperty('message', 'Konto zostało utworzone');
+        expect(data).toHaveProperty('user');
+        expect(data.user).toHaveProperty('username', 'john_doe');
+        expect(data.user).toHaveProperty('email', 'john@email.com');
+        expect(data.user).not.toHaveProperty('passwordHash');
+    } finally {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        // tajpskript diff
+        if (console.error.mock.calls.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            // tajpskript diff
+            console.log('Captured errors:', console.error.mock.calls);
+        }
+        console.error = originalConsoleError;
+    }
 });
 
 test('POST User with missing fields should return 400', async () => {
@@ -47,7 +107,81 @@ test('POST User with missing fields should return 400', async () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid request' });
+    expect(data).toHaveProperty('message', 'Wymagane są wszystkie pola: imię, nazwisko, email i hasło');
+});
+
+test('POST User with invalid email should return 400', async () => {
+    const mockInvalidUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'invalid_email',
+        password: 'password123',
+    };
+
+    const req = new Request('http://localhost/api/user', {
+        method: 'POST',
+        body: JSON.stringify(mockInvalidUser),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const response = await POST(req as Request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data).toHaveProperty('message', 'Podaj prawidłowy adres email');
+});
+
+test('POST User with too short password should return 400', async () => {
+    const mockInvalidUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@email.com',
+        password: '123', // Too short
+    };
+
+    const req = new Request('http://localhost/api/user', {
+        method: 'POST',
+        body: JSON.stringify(mockInvalidUser),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const response = await POST(req as Request);
+    const data = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(data).toHaveProperty('message', 'Hasło musi mieć co najmniej 8 znaków');
+});
+
+test('POST User with existing email should return 409', async () => {
+    const mockUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'existing@email.com',
+        password: 'password123',
+    };
+
+    const req = new Request('http://localhost/api/user', {
+        method: 'POST',
+        body: JSON.stringify(mockUser),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    // tajpskript diff
+    prisma.user.findFirst.mockResolvedValue({ id: 1, email: 'existing@email.com' });
+
+    const response = await POST(req as Request);
+    const data = await response.json();
+
+    expect(response.status).toBe(409);
+    expect(data).toHaveProperty('message', 'Użytkownik o podanym adresie email już istnieje');
 });
 
 test('POST User with invalid data should return 400', async () => {
@@ -70,7 +204,7 @@ test('POST User with invalid data should return 400', async () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid request' });
+    expect(data).toHaveProperty('message');
 });
 
 test('GET User with valid userId should return User', async () => {

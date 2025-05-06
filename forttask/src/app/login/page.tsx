@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-
-
 export default function Page() {
     const router = useRouter();
     return (
@@ -28,7 +26,10 @@ export default function Page() {
                     </div>
                     <div className="w-full flex flex-col justify-center items-center gap-2.5 mt-6 space-y-2">
                         <Form />
-                        <button onClick={() => router.push('/signup') } className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800">
+                        <button
+                            onClick={() => router.push('/signup')}
+                            className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800"
+                        >
                             Sign Up
                         </button>
                     </div>
@@ -96,7 +97,7 @@ function Form() {
                     <input
                         type="text"
                         value={username}
-                        placeholder="Username"
+                        placeholder="Username or Email"
                         onChange={(e) => setUsername(e.target.value)}
                         className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                     />

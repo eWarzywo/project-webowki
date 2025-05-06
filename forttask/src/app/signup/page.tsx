@@ -61,12 +61,12 @@ function SignupForm() {
             setError('First and last names must be at least 2 characters long');
             return;
         }
-        
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             setError('Please enter a valid email address');
             return;
-}
+        }
 
         if (password.length < 8) {
             setError('Password must be at least 8 characters long');
@@ -76,16 +76,19 @@ function SignupForm() {
         setIsLoading(true);
         setError('');
 
-        console.log('About to send this data:', JSON.stringify({
-            firstName, 
-            lastName,
-            email,
-            password: '[REDACTED]' // Never log actual passwords
-        }));
+        console.log(
+            'About to send this data:',
+            JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                password: '[REDACTED]', // Never log actual passwords
+            }),
+        );
 
         try {
             console.log('Submitting signup data:', { firstName, lastName, email }); // Don't log password
-            
+
             const response = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
@@ -101,7 +104,7 @@ function SignupForm() {
 
             // Get the response as text first
             const rawText = await response.text();
-            
+
             // Try to parse it as JSON
             let data;
             try {
@@ -190,13 +193,8 @@ function SignupForm() {
 
             {/* Login Link */}
             <div className="self-stretch text-center mt-4">
-                <span className="text-zinc-400 text-sm font-['Inter']">
-                    Already have an account?{' '}
-                </span>
-                <a 
-                    href="/login"
-                    className="text-zinc-50 text-sm font-['Inter'] hover:underline cursor-pointer"
-                >
+                <span className="text-zinc-400 text-sm font-['Inter']">Already have an account? </span>
+                <a href="/login" className="text-zinc-50 text-sm font-['Inter'] hover:underline cursor-pointer">
                     Log in
                 </a>
             </div>
