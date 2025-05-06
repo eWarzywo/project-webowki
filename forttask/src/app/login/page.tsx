@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-
-
 export default function Page() {
     const router = useRouter();
     return (
@@ -96,7 +94,7 @@ function Form() {
                     <input
                         type="text"
                         value={username}
-                        placeholder="Username"
+                        placeholder="Username or Email"
                         onChange={(e) => setUsername(e.target.value)}
                         className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                     />
