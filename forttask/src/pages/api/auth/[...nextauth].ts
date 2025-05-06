@@ -51,7 +51,8 @@ export const authOptions: NextAuthOptions = {
             id: user.id.toString(),
             name: user.username,
             email: user.email,
-            username: user.username
+            username: user.username,
+            householdId: user.householdId?.toString() || null
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -61,17 +62,26 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // When signing in
       if (user) {
         token.id = user.id;
         token.username = user.username;
+        token.householdId = user.householdId;
       }
+      
+      // If this is an update session event (e.g. after joining a household)
+      if (trigger === 'update' && session?.householdId) {
+        token.householdId = session.householdId;
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.username = token.username as string;
+        session.user.householdId = token.householdId as string | null;
       }
       return session;
     },

@@ -11,6 +11,8 @@ declare module "next-auth" {
       id: string;
       /** The user's username. */
       username: string;
+      /** The user's household id. */
+      householdId: string | null;
     } & DefaultSession["user"];
   }
 
@@ -21,6 +23,8 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     /** The user's username. */
     username: string;
+    /** The user's household id. */
+    householdId: string | null;
   }
 }
 
@@ -31,5 +35,7 @@ declare module "next-auth/jwt" {
     id: string;
     /** The user's username. */
     username: string;
+    /** The user's household id. */
+    householdId: string | null;
   }
 }
