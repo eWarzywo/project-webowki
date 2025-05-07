@@ -8,20 +8,19 @@ export default function ShoppingForm() {
         const name = formData.get('name') as string;
         const cost = parseFloat(formData.get('cost') as string);
 
+        const errorDiv = document.getElementById('error') as HTMLDivElement;
+        errorDiv.innerHTML = '';
         if (name.trim().length < 3) {
-            e.currentTarget.querySelector('#name')?.classList.add('border-red-500');
-            e.currentTarget.querySelector('#name-error')!.textContent = 'Name must be at least 3 characters long';
-        } else {
-            e.currentTarget.querySelector('#name')?.classList.remove('border-red-500');
-            e.currentTarget.querySelector('#name-error')!.textContent = '';
+            errorDiv.innerHTML = 'Name must be at least 3 characters long';
+            return;
         }
-
         if (isNaN(cost) || cost <= 0) {
-            e.currentTarget.querySelector('#costdiv')?.classList.add('border-red-500');
-            e.currentTarget.querySelector('#cost-error')!.textContent = 'Cost must be a positive number';
-        } else {
-            e.currentTarget.querySelector('#costdiv')?.classList.remove('border-red-500');
-            e.currentTarget.querySelector('#cost-error')!.textContent = '';
+            errorDiv.innerHTML = 'Cost must be a positive number';
+            return;
+        }
+        if (cost < 0.1) {
+            errorDiv.innerHTML = 'Cost must be at least $0.1';
+            return;
         }
 
         if (!isNaN(cost) && cost > 0 && name.trim().length >= 3) {
@@ -52,11 +51,10 @@ export default function ShoppingForm() {
             } catch (error) {
                 console.error('Error creating shopping item:', error);
             }
+            setName('');
+            setCost(undefined);
+            window.location.reload();
         }
-
-        setName('');
-        setCost(undefined);
-        window.location.reload();
     }
 
     const [name, setName] = useState<string>('');
@@ -64,8 +62,9 @@ export default function ShoppingForm() {
 
     return (
         <form
+            id="shopping-form"
             onSubmit={handleSubmit}
-            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[450px]"
+            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px]"
         >
             <div className="flex p-6 flex-col items-start justify-center">
                 <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>
@@ -85,7 +84,6 @@ export default function ShoppingForm() {
                         placeholder="Name of the item"
                         className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
                     />
-                    <span id="name-error" className="text-red-500 text-sm"></span>
                 </div>
                 <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
                     <label className="text-zinc-50 text-sm" htmlFor="cost">
@@ -108,7 +106,6 @@ export default function ShoppingForm() {
                         />
                         <span className="text-zinc-400">$</span>
                     </div>
-                    <span id="cost-error" className="text-red-500 text-sm"></span>
                 </div>
             </div>
             <div className="w-full flex justify-between px-6 pb-6 items-center">
@@ -123,6 +120,7 @@ export default function ShoppingForm() {
                     className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
                 />
             </div>
+            <div id="error" className="text-red-500 text-sm px-6 pb-4"></div>
         </form>
     );
 }

@@ -29,9 +29,23 @@ export async function GET(req: Request) {
             );
         }
 
+        const { searchParams } = new URL(req.url);
+        const skip = parseInt(searchParams.get('skip') || '0');
+        const limit = parseInt(searchParams.get('limit') || '0');
+
+        if (isNaN(skip) || skip < 0) {
+            return NextResponse.json({ message: 'Invalid skip parameter' }, { status: 400 });
+        }
+
+        if (isNaN(limit) || limit <= 0) {
+            return NextResponse.json({ message: 'Invalid limit parameter' }, { status: 400 });
+        }
+
         const shoppingItems = await prisma.shoppingItem.findMany({
             where: { householdId: user.householdId },
             orderBy: { createdAt: 'desc' },
+            skip: skip,
+            take: limit,
             include: { createdBy: true },
         });
 

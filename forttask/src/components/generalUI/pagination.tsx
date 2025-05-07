@@ -3,28 +3,26 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { unstable_noStore as noStore } from 'next/cache';
 
 interface PaginationProps {
-    data: any[];
+    totalNumberOfItems: number;
     itemsPerPage: number;
 }
 
-export default function Pagination({ data, itemsPerPage }: PaginationProps) {
+export default function Pagination({ totalNumberOfItems, itemsPerPage }: PaginationProps) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
     const url = (page: number) => {
-        const params = new URLSearchParams(searchParams || '');
+        const params = new URLSearchParams(searchParams?.toString() || '');
         params.set('page', page.toString());
         return `${pathname}?${params.toString()}`;
     };
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(totalNumberOfItems / itemsPerPage);
     const [currentPage, setCurrentPage] = useState(() => {
         const pageParam = parseInt(searchParams?.get('page') || '1', 10);
         return pageParam > 0 && pageParam <= totalPages ? pageParam : 1;
     });
-    noStore();
     return (
         <div className="flex flex-col items-center justify-center p-6 text-zinc-50 w-full">
             <div className="flex items-center justify-center w-full gap-4">
