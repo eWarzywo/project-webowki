@@ -121,7 +121,6 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Wystąpił błąd podczas tworzenia konta' }, { status: 500 });
     }
 }
-
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
