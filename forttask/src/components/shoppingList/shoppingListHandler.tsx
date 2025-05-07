@@ -7,6 +7,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 import clsx from 'clsx';
 
 interface ShoppingItem {
+    id: number;
     name: string;
     cost: number;
     createdBy: {
@@ -76,7 +77,12 @@ export default function ShoppingListHandler() {
             <div className="flex items-start flex-col self-stretch px-[30px]">
                 {data.map((item, index) => (
                     <span key={index} className="w-full">
-                        <ShoppingListItem name={item.name} cost={item.cost} userName={item.createdBy.username} />
+                        <ShoppingListItem
+                            id={item.id}
+                            name={item.name}
+                            cost={item.cost}
+                            userName={item.createdBy.username}
+                        />
                         <hr className="border-zinc-700 border" />
                     </span>
                 ))}
