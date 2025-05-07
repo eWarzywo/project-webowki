@@ -4,7 +4,6 @@ import ShoppingListItem from '@/components/shoppingList/shoppingListItem';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
-import clsx from 'clsx';
 
 interface ShoppingItem {
     id: number;
@@ -13,6 +12,7 @@ interface ShoppingItem {
     createdBy: {
         username: string;
     };
+    boughtById: number | null;
 }
 
 export default function ShoppingListHandler() {
@@ -82,6 +82,7 @@ export default function ShoppingListHandler() {
                             name={item.name}
                             cost={item.cost}
                             userName={item.createdBy.username}
+                            boughtById={item.boughtById ? item.boughtById : null}
                         />
                         <hr className="border-zinc-700 border" />
                     </span>

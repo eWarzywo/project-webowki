@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 
 export default function ShoppingListItem({
@@ -8,16 +8,42 @@ export default function ShoppingListItem({
     name,
     cost,
     userName,
+    boughtById,
 }: {
     id: number;
     name: string;
     cost: number;
     userName: string;
+    boughtById: number | null;
 }) {
     const [showConfirm, setShowConfirm] = useState(false);
+    const [isBought, setIsBought] = useState(boughtById !== null);
+
+    React.useEffect(() => {
+        setIsBought(boughtById !== null);
+    }, [boughtById]);
 
     const handleBought = () => {
-        alert('Item bought!');
+        fetch(`/api/shoppingList/bought?id=${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log('Item bought:', data);
+                setIsBought(!isBought);
+            })
+            .catch((error) => {
+                console.error('Error marking item as bought:', error);
+            });
     };
 
     const handleDelete = () => {
@@ -62,10 +88,12 @@ export default function ShoppingListItem({
                     <div className="text-zinc-400 w-1/3 flex justify-center items-center">{`Added by ${userName}`}</div>
                     <div className="w-1/3 flex justify-end items-center">
                         <span className="flex gap-2.5">
-                            <div
-                                onClick={handleBought}
-                                className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
-                            />
+                            {!isBought && (
+                                <div
+                                    onClick={handleBought}
+                                    className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                                />
+                            )}
                             <Image
                                 onClick={handleDelete}
                                 src="/shopping-list-vector.svg"
