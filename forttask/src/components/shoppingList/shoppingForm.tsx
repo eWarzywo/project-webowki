@@ -4,7 +4,56 @@ import { useState } from 'react';
 export default function ShoppingForm() {
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        alert('Form submitted!');
+        const formData = new FormData(e.currentTarget);
+        const name = formData.get('name') as string;
+        const cost = parseFloat(formData.get('cost') as string);
+
+        if (name.trim().length < 3) {
+            e.currentTarget.querySelector('#name')?.classList.add('border-red-500');
+            e.currentTarget.querySelector('#name-error')!.textContent = 'Name must be at least 3 characters long';
+        } else {
+            e.currentTarget.querySelector('#name')?.classList.remove('border-red-500');
+            e.currentTarget.querySelector('#name-error')!.textContent = '';
+        }
+
+        if (isNaN(cost) || cost <= 0) {
+            e.currentTarget.querySelector('#costdiv')?.classList.add('border-red-500');
+            e.currentTarget.querySelector('#cost-error')!.textContent = 'Cost must be a positive number';
+        } else {
+            e.currentTarget.querySelector('#costdiv')?.classList.remove('border-red-500');
+            e.currentTarget.querySelector('#cost-error')!.textContent = '';
+        }
+
+        try {
+            fetch('/api/shoppingList', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name.trim(),
+                    cost: parseFloat(cost.toString()),
+                }),
+            })
+                .then((res) => {
+                    if (res.status === 201) {
+                        return res.json();
+                    } else {
+                        throw new Error('Failed to create shopping item');
+                    }
+                })
+                .then((data) => {
+                    console.log('Shopping item created:', data);
+                })
+                .catch((error) => {
+                    console.error('Error creating shopping item:', error);
+                });
+        } catch (error) {
+            console.error('Error creating shopping item:', error);
+        }
+
+        setName('');
+        setCost(undefined);
     }
 
     const [name, setName] = useState<string>('');
@@ -29,28 +78,34 @@ export default function ShoppingForm() {
                         value={name}
                         type="text"
                         id="name"
+                        name="name"
                         placeholder="Name of the item"
                         className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
                     />
+                    <span id="name-error" className="text-red-500 text-sm"></span>
                 </div>
                 <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
                     <label className="text-zinc-50 text-sm" htmlFor="cost">
                         Cost
                     </label>
-                    <div className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between">
+                    <div
+                        id="costdiv"
+                        className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between"
+                    >
                         <input
                             onChange={(e) => setCost(parseFloat(e.target.value))}
                             value={cost ? cost : ''}
                             type="number"
                             id="cost"
+                            name="cost"
                             placeholder="Cost of the item"
                             min="0.1"
                             step="0.1"
                             className="bg-zinc-950 no-spinner focus:border-none focus:outline-none"
                         />
-
                         <span className="text-zinc-400">$</span>
                     </div>
+                    <span id="cost-error" className="text-red-500 text-sm"></span>
                 </div>
             </div>
             <div className="w-full flex justify-between px-6 pb-6 items-center">

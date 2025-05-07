@@ -15,13 +15,13 @@ export default function Pagination({ data, itemsPerPage }: PaginationProps) {
     const searchParams = useSearchParams();
 
     const url = (page: number) => {
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(searchParams || '');
         params.set('page', page.toString());
         return `${pathname}?${params.toString()}`;
     };
     const totalPages = Math.ceil(data.length / itemsPerPage);
     const [currentPage, setCurrentPage] = useState(() => {
-        const pageParam = parseInt(searchParams.get('page') || '1', 10);
+        const pageParam = parseInt(searchParams?.get('page') || '1', 10);
         return pageParam > 0 && pageParam <= totalPages ? pageParam : 1;
     });
     noStore();
