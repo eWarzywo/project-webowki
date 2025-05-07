@@ -24,36 +24,39 @@ export default function ShoppingForm() {
             e.currentTarget.querySelector('#cost-error')!.textContent = '';
         }
 
-        try {
-            fetch('/api/shoppingList', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: name.trim(),
-                    cost: parseFloat(cost.toString()),
-                }),
-            })
-                .then((res) => {
-                    if (res.status === 201) {
-                        return res.json();
-                    } else {
-                        throw new Error('Failed to create shopping item');
-                    }
+        if (!isNaN(cost) && cost > 0 && name.trim().length >= 3) {
+            try {
+                fetch('/api/shoppingList', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        cost: parseFloat(cost.toString()),
+                    }),
                 })
-                .then((data) => {
-                    console.log('Shopping item created:', data);
-                })
-                .catch((error) => {
-                    console.error('Error creating shopping item:', error);
-                });
-        } catch (error) {
-            console.error('Error creating shopping item:', error);
+                    .then((res) => {
+                        if (res.status === 201) {
+                            return res.json();
+                        } else {
+                            throw new Error('Failed to create shopping item');
+                        }
+                    })
+                    .then((data) => {
+                        console.log('Shopping item created:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error creating shopping item:', error);
+                    });
+            } catch (error) {
+                console.error('Error creating shopping item:', error);
+            }
         }
 
         setName('');
         setCost(undefined);
+        window.location.reload();
     }
 
     const [name, setName] = useState<string>('');
@@ -62,7 +65,7 @@ export default function ShoppingForm() {
     return (
         <form
             onSubmit={handleSubmit}
-            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-96"
+            className="w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[450px]"
         >
             <div className="flex p-6 flex-col items-start justify-center">
                 <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>

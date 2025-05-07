@@ -5,14 +5,13 @@ import React from 'react';
 import { useSearchParams } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 
-type ShoppingItem = {
+interface ShoppingItem {
     name: string;
     cost: number;
     createdBy: {
-        id: number;
-        name: string;
+        username: string;
     };
-};
+}
 
 export default function ShoppingListHandler() {
     const [data, setData] = React.useState<ShoppingItem[]>([]);
@@ -72,7 +71,7 @@ function ShoppingListItem({ name, cost, userName }: { name: string; cost: number
                 <div className="text-zinc-400 w-1/3 flex justify-center items-center">{`Added by ${userName}`}</div>
                 <div className="w-1/3 flex justify-end items-center">
                     <span className="flex gap-2.5">
-                        <div className="border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out" />
+                        <div className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out" />
                         <Image
                             src="/shopping-list-vector.svg"
                             alt="close"

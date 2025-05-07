@@ -31,6 +31,7 @@ export async function GET(req: Request) {
 
         const shoppingItems = await prisma.shoppingItem.findMany({
             where: { householdId: user.householdId },
+            orderBy: { createdAt: 'desc' },
             include: { createdBy: true },
         });
 
