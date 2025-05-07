@@ -3,52 +3,36 @@ import Pagination from '@/components/generalUI/pagination';
 import Image from 'next/image';
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
+import { unstable_noStore as noStore } from 'next/cache';
+
+type ShoppingItem = {
+    name: string;
+    cost: number;
+    createdBy: {
+        id: number;
+        name: string;
+    };
+};
 
 export default function ShoppingListHandler() {
-    const [data, setData] = React.useState<{ name: string; cost: number; userName: string }[]>([]);
+    const [data, setData] = React.useState<ShoppingItem[]>([]);
     const itemsPerPage = 1;
     const searchParams = useSearchParams();
     const page = parseInt(searchParams?.get('page') || '1', 10);
+    noStore();
 
     React.useEffect(() => {
-        async function getUserName(userId: number) {
-            try {
-                if (!userId) {
-                    console.warn('Invalid userId:', userId);
-                    return 'Unknown';
-                }
-                const response = await fetch(`/api/user?userId=${userId}`);
-                if (!response.ok) {
-                    console.error(`Failed to fetch user data for userId: ${userId}, Status: ${response.status}`);
-                    return 'Unknown';
-                }
-                const user = await response.json();
-                return user?.name;
-            } catch (error) {
-                console.error('Error fetching user name:', error);
-                return 'Unknown';
-            }
-        }
-
         const fetchData = async () => {
             try {
-                const response = await fetch(`/api/shoppingList?page=${page}`);
+                const response = await fetch(`/api/shoppingList`);
                 if (!response.ok) {
                     console.error(`Failed to fetch shopping list data, Status: ${response.status}`);
                     return;
                 }
+
                 const items = await response.json();
-                const updatedItems = await Promise.all(
-                    items.map(async (item: any) => {
-                        const userName = await getUserName(item.userId);
-                        return {
-                            name: item.name,
-                            cost: item.cost,
-                            userName,
-                        };
-                    }),
-                );
-                setData(updatedItems);
+                setData(items);
+                console.log('Shopping list data:', items);
             } catch (error) {
                 console.error('Error fetching shopping list data:', error);
             }
@@ -68,7 +52,7 @@ export default function ShoppingListHandler() {
             <div className="flex items-start flex-col self-stretch px-[30px]">
                 {data.map((item, index) => (
                     <span key={index} className="w-full">
-                        <ShoppingListItem name={item.name} cost={item.cost} userName={item.userName} />
+                        <ShoppingListItem name={item.name} cost={item.cost} userName={item.createdBy.username} />
                         <hr className="border-zinc-700 border" />
                     </span>
                 ))}
@@ -85,7 +69,7 @@ function ShoppingListItem({ name, cost, userName }: { name: string; cost: number
                 <div className="text-zinc-50 w-1/3 flex justify-start items-center">
                     {name + (cost ? ` - ${cost}$` : '')}
                 </div>
-                <div className="text-zinc-400 w-1/3 flex justify-center items-center">{userName}</div>
+                <div className="text-zinc-400 w-1/3 flex justify-center items-center">{`Added by ${userName}`}</div>
                 <div className="w-1/3 flex justify-end items-center">
                     <span className="flex gap-2.5">
                         <div className="border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out" />
