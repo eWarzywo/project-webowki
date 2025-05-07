@@ -5,7 +5,7 @@ import React from 'react';
 import { useSearchParams } from 'next/navigation';
 
 export default function ShoppingListHandler() {
-    const [data, setData] = React.useState<any[]>([]);
+    const [data, setData] = React.useState<{ name: string; cost: number; userName: string }[]>([]);
     const itemsPerPage = 1;
     const searchParams = useSearchParams();
     const page = parseInt(searchParams?.get('page') || '1', 10);
@@ -20,27 +20,32 @@ export default function ShoppingListHandler() {
                 const response = await fetch(`/api/user?userId=${userId}`);
                 if (!response.ok) {
                     console.error(`Failed to fetch user data for userId: ${userId}, Status: ${response.status}`);
-                    throw new Error('Failed to fetch user data');
+                    return 'Unknown';
                 }
                 const user = await response.json();
-                return user?.name || 'Unknown';
+                return user?.name;
             } catch (error) {
                 console.error('Error fetching user name:', error);
                 return 'Unknown';
             }
         }
+
         const fetchData = async () => {
             try {
                 const response = await fetch(`/api/shoppingList?page=${page}`);
                 if (!response.ok) {
                     console.error(`Failed to fetch shopping list data, Status: ${response.status}`);
-                    throw new Error('Failed to fetch shopping list data');
+                    return;
                 }
                 const items = await response.json();
                 const updatedItems = await Promise.all(
                     items.map(async (item: any) => {
                         const userName = await getUserName(item.userId);
-                        return [item.name, item.cost, userName];
+                        return {
+                            name: item.name,
+                            cost: item.cost,
+                            userName,
+                        };
                     }),
                 );
                 setData(updatedItems);
@@ -60,39 +65,43 @@ export default function ShoppingListHandler() {
                 </h2>
                 <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
             </div>
-            <div className=" flex items-start flex-col self-stretch px-[30px]">
+            <div className="flex items-start flex-col self-stretch px-[30px]">
                 {data.map((item, index) => (
                     <span key={index} className="w-full">
-                        <div className="flex flex-col w-full gap-2.5 items-start py-4">
-                            <div className="flex justify-between w-full py-2">
-                                <div className="text-zinc-50 w-1/3 flex justify-start items-center">
-                                    {item[0] + (item[1] ? ' - ' + item[1] + '$' : '')}
-                                </div>
-                                <div className="text-zinc-400 w-1/3 flex justify-center items-center">
-                                    {item[2] ? 'Added by ' + item[2] : 'Creator not specified'}
-                                </div>
-                                <div className="w-1/3 flex justify-end items-center">
-                                    <span className="flex gap-2.5">
-                                        <div className="border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out hover:bg-zinc-200" />
-                                        <Image
-                                            src="/shopping-list-vector.svg"
-                                            alt="close"
-                                            width={20}
-                                            height={20}
-                                            className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-ou"
-                                            style={{
-                                                filter: 'invert(16%) sepia(91%) saturate(7496%) hue-rotate(0deg) brightness(96%) contrast(104%)',
-                                            }}
-                                        />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
+                        <ShoppingListItem name={item.name} cost={item.cost} userName={item.userName} />
                         <hr className="border-zinc-700 border" />
                     </span>
                 ))}
             </div>
             <Pagination data={data} itemsPerPage={itemsPerPage} />
+        </div>
+    );
+}
+
+function ShoppingListItem({ name, cost, userName }: { name: string; cost: number; userName: string }) {
+    return (
+        <div className="flex flex-col w-full gap-2.5 items-start py-4">
+            <div className="flex justify-between w-full py-2">
+                <div className="text-zinc-50 w-1/3 flex justify-start items-center">
+                    {name + (cost ? ` - ${cost}$` : '')}
+                </div>
+                <div className="text-zinc-400 w-1/3 flex justify-center items-center">{userName}</div>
+                <div className="w-1/3 flex justify-end items-center">
+                    <span className="flex gap-2.5">
+                        <div className="border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out" />
+                        <Image
+                            src="/shopping-list-vector.svg"
+                            alt="close"
+                            width={20}
+                            height={20}
+                            className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                            style={{
+                                filter: 'invert(16%) sepia(91%) saturate(7496%) hue-rotate(0deg) brightness(96%) contrast(104%)',
+                            }}
+                        />
+                    </span>
+                </div>
+            </div>
         </div>
     );
 }
