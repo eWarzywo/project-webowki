@@ -10,8 +10,6 @@ export async function middleware(req: NextRequest) {
         secret: process.env.NEXTAUTH_SECRET,
     });
 
-    console.log('Token details:', token);
-
     const path = req.nextUrl.pathname;
 
     if (

@@ -220,7 +220,7 @@ describe('Household Join API', () => {
         expect(responseBody.message).toBe('Successfully joined household');
         expect(responseBody.household).toHaveProperty('id', 42);
         expect(responseBody.household).toHaveProperty('name', 'Test Household');
-        expect(responseBody.household.users).toHaveLength(2); // Owner + new user
+        expect(responseBody.household.users).toHaveLength(2);
 
         expect(prisma.user.update).toHaveBeenCalledWith({
             where: { id: 1 },

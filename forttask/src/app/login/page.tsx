@@ -58,7 +58,6 @@ function Form() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Basic validation
         if (!username || !password) {
             setError('Please enter both username and password');
             return;
@@ -77,7 +76,7 @@ function Form() {
             if (result?.error) {
                 setError('Invalid username or password');
             } else {
-                router.push('/'); // Redirect to dashboard after successful login
+                router.push('/');
             }
         } catch (error) {
             setError('An error occurred during login');

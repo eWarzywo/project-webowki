@@ -52,35 +52,26 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user, trigger, session }) {
-            console.log('JWT Callback - Input token:', JSON.stringify(token));
-            console.log('JWT Callback - Trigger:', trigger);
 
             if (user) {
                 token.id = user.id;
                 token.username = user.username;
                 token.householdId = user.householdId?.toString() || null;
-                console.log('JWT Callback - User sign-in, householdId:', user.householdId);
             }
 
             if (trigger === 'update' && session?.householdId) {
                 token.householdId = session.householdId;
-                console.log('JWT Callback - Session update with new householdId:', session.householdId);
             }
 
             if (token.id && !session?.householdId) {
                 try {
-                    // Fetch the latest user data to get current householdId
                     const userData = await prisma.user.findUnique({
                         where: { id: parseInt(token.id) },
                         select: { householdId: true },
                     });
 
                     if (userData?.householdId) {
-                        // Only update if different from current token value
                         if (token.householdId !== userData.householdId.toString()) {
-                            console.log(`JWT Callback - Refreshing householdId from DB. 
-                Token had: ${token.householdId}, 
-                DB has: ${userData.householdId}`);
                             token.householdId = userData.householdId.toString();
                         }
                     }
@@ -89,7 +80,6 @@ export const authOptions: NextAuthOptions = {
                 }
             }
 
-            console.log('JWT Callback - Final token:', JSON.stringify(token));
             return token;
         },
 
@@ -98,7 +88,6 @@ export const authOptions: NextAuthOptions = {
                 session.user.id = token.id as string;
                 session.user.username = token.username as string;
                 session.user.householdId = token.householdId as string | null;
-                console.log('Session Callback - Setting householdId:', token.householdId);
             }
             return session;
         },

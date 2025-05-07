@@ -52,7 +52,6 @@ function SignupForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Basic validation
         if (!firstName || !lastName || !email || !password) {
             setError('Please fill in all fields');
             return;
@@ -76,18 +75,8 @@ function SignupForm() {
         setIsLoading(true);
         setError('');
 
-        console.log(
-            'About to send this data:',
-            JSON.stringify({
-                firstName,
-                lastName,
-                email,
-                password: '[REDACTED]', // Never log actual passwords
-            }),
-        );
-
         try {
-            console.log('Submitting signup data:', { firstName, lastName, email }); // Don't log password
+            console.log('Submitting signup data:', { firstName, lastName, email });
 
             const response = await fetch('/api/user', {
                 method: 'POST',
@@ -102,10 +91,8 @@ function SignupForm() {
                 }),
             });
 
-            // Get the response as text first
             const rawText = await response.text();
 
-            // Try to parse it as JSON
             let data;
             try {
                 data = JSON.parse(rawText);
@@ -120,7 +107,6 @@ function SignupForm() {
                 throw new Error(data.message || 'Something went wrong');
             }
 
-            // If successful, redirect to login page
             router.push('/login');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred during sign up');
@@ -136,7 +122,6 @@ function SignupForm() {
             className="self-stretch inline-flex flex-col justify-start items-start gap-2.5 w-full"
         >
             <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
-                {/* First Name Input */}
                 <input
                     type="text"
                     value={firstName}
@@ -145,7 +130,6 @@ function SignupForm() {
                     className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
 
-                {/* Last Name Input */}
                 <input
                     type="text"
                     value={lastName}
@@ -154,7 +138,6 @@ function SignupForm() {
                     className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
 
-                {/* Email Input */}
                 <input
                     type="email"
                     value={email}
@@ -163,7 +146,6 @@ function SignupForm() {
                     className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
 
-                {/* Password Input */}
                 <input
                     type="password"
                     value={password}
@@ -173,14 +155,12 @@ function SignupForm() {
                 />
             </div>
 
-            {/* Error Message Display */}
             {error && (
                 <div className="self-stretch inline-flex justify-start items-start mt-2 w-full">
                     <div className="justify-start text-sm font-normal font-['Inter'] text-red-500">{error}</div>
                 </div>
             )}
 
-            {/* Submit Button */}
             <div className="self-stretch inline-flex justify-start items-start w-full mt-4">
                 <button
                     type="submit"
@@ -191,7 +171,6 @@ function SignupForm() {
                 </button>
             </div>
 
-            {/* Login Link */}
             <div className="self-stretch text-center mt-4">
                 <span className="text-zinc-400 text-sm font-['Inter']">Already have an account? </span>
                 <a href="/login" className="text-zinc-50 text-sm font-['Inter'] hover:underline cursor-pointer">
