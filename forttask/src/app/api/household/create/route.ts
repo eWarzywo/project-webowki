@@ -20,10 +20,7 @@ export async function POST(req: Request) {
 
         // Validate household householdName
         if (!householdName || householdName.trim().length < 3) {
-            return NextResponse.json(
-                { message: 'Household name must be at least 3 characters long' },
-                { status: 400 },
-            );
+            return NextResponse.json({ message: 'Household name must be at least 3 characters long' }, { status: 400 });
         }
 
         // Check if user already owns a household
