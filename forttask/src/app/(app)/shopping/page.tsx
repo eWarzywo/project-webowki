@@ -4,6 +4,7 @@ import ShoppingListHandler from '@/components/shoppingList/shoppingListHandler';
 
 export default function Shopping() {
     const [addedToggle, setAddedToggle] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
     React.useEffect(() => {
         setAddedToggle(false);
     }, [addedToggle]);
@@ -127,7 +128,9 @@ export default function Shopping() {
                             className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
                         />
                     </div>
-                    <div id="error" className="text-red-500 text-sm px-6 pb-4"></div>
+                    <div id="error" className="text-red-500 text-sm px-6 pb-4">
+                        {errorMessage}
+                    </div>
                 </form>
                 {!addedToggle && <ShoppingListHandler />}
             </div>
