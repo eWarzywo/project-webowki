@@ -14,18 +14,17 @@ export default function Shopping() {
         const name = formData.get('name') as string;
         const cost = parseFloat(formData.get('cost') as string);
 
-        const errorDiv = document.getElementById('error') as HTMLDivElement;
-        errorDiv.innerHTML = '';
+        setErrorMessage('');
         if (name.trim().length < 3) {
-            errorDiv.innerHTML = 'Name must be at least 3 characters long';
+            setErrorMessage('Name must be at least 3 characters long');
             return;
         }
         if (isNaN(cost) || cost <= 0) {
-            errorDiv.innerHTML = 'Cost must be a positive number';
+            setErrorMessage('Cost must be a positive number');
             return;
         }
         if (cost < 0.1) {
-            errorDiv.innerHTML = 'Cost must be at least $0.1';
+            setErrorMessage('Cost must be at least $0.1');
             return;
         }
 
