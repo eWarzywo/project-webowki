@@ -3,18 +3,13 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 
-interface ShoppingListItemDetails {
+interface ShoppingListItemProps {
     id: number;
     name: string;
     cost: number;
     userName: string;
-    createdBy: {
-        username: string;
-    };
-    boughtBy: {
-        username: string;
-    };
-    updatedAt: string;
+    boughtBy: { username: string } | null;
+    updatedAt: string | null;
 }
 
 function ConfirmationBox({ name, onCancel, onConfirm }: { name: string; onCancel: () => void; onConfirm: () => void }) {
@@ -39,23 +34,25 @@ function ConfirmationBox({ name, onCancel, onConfirm }: { name: string; onCancel
 }
 
 function DetailsBox({
-    details,
+    name,
+    cost,
+    userName,
+    boughtBy,
+    updatedAt,
     onClose,
     onUnBought,
-}: {
-    details: ShoppingListItemDetails;
-    onClose: () => void;
-    onUnBought: () => void;
-}) {
+}: ShoppingListItemProps & { onClose: () => void; onUnBought: () => void }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
                 <h2 className="text-lg font-semibold mb-4">Item Details</h2>
-                <p className="text-zinc-400 mb-6">Item name: {details.name}</p>
-                <p className="text-zinc-400 mb-6">Cost: {details.cost}$</p>
-                <p className="text-zinc-400 mb-6">Added by: {details.createdBy.username}</p>
-                <p className="text-zinc-400 mb-6">Bought by: {details.boughtBy.username}</p>
-                <p className="text-zinc-400 mb-6">Bought at: {new Date(details.updatedAt).toLocaleString()}</p>
+                <p className="text-zinc-400 mb-6">Item name: {name}</p>
+                <p className="text-zinc-400 mb-6">Cost: {cost}$</p>
+                <p className="text-zinc-400 mb-6">Added by: {userName}</p>
+                <p className="text-zinc-400 mb-6">Bought by: {boughtBy?.username || 'Not bought yet'}</p>
+                <p className="text-zinc-400 mb-6">
+                    Bought at: {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
+                </p>
                 <div className="flex justify-between gap-4">
                     <button onClick={onUnBought} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition">
                         Mark as Unbought
@@ -69,129 +66,39 @@ function DetailsBox({
     );
 }
 
-export default function ShoppingListItem({
-    id,
-    name,
-    cost,
-    userName,
-    boughtById,
-}: {
-    id: number;
-    name: string;
-    cost: number;
-    userName: string;
-    boughtById: number | null;
-}) {
+export default function ShoppingListItem({ id, name, cost, userName, boughtBy, updatedAt }: ShoppingListItemProps) {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
-    const [isBought, setIsBought] = useState(boughtById !== null);
-    const [details, setDetails] = useState({} as ShoppingListItemDetails);
+    const [isBought, setIsBought] = useState(!!boughtBy);
 
-    React.useEffect(() => {
-        setIsBought(boughtById !== null);
-    }, [boughtById]);
-
-    React.useEffect(() => {
-        fetch(`/api/shoppingList/details?id=${id}`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setDetails(data);
-            })
-            .catch((error) => {
-                console.error('Error fetching item details:', error);
-            });
-    }, [id, isBought]);
-
-    const handleBought = () => {
-        fetch(`/api/shoppingList/bought?id=${id}`, {
+    const toggleBoughtStatus = (url: string) => {
+        fetch(url, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id }),
         })
             .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Failed to update item status');
                 return response.json();
             })
-            .then((data) => {
-                console.log('Item bought:', data);
-                setIsBought(!isBought);
+            .then(() => {
+                setIsBought((prev) => !prev);
+                if (showDetails) setShowDetails(false);
             })
-            .catch((error) => {
-                console.error('Error marking item as bought:', error);
-            });
-    };
-
-    const handleUnBought = () => {
-        fetch(`/api/shoppingList/unbought?id=${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log('Item unbought:', data);
-                setIsBought(!isBought);
-                setShowDetails(false);
-            })
-            .catch((error) => {
-                console.error('Error marking item as unbought:', error);
-            });
+            .catch((error) => console.error('Error updating item status:', error));
     };
 
     const handleDelete = () => {
-        setShowConfirm(true);
-    };
-
-    const confirmDelete = () => {
-        setShowConfirm(false);
         fetch(`/api/shoppingList?id=${id}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
+            headers: { 'Content-Type': 'application/json' },
         })
             .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                if (!response.ok) throw new Error('Failed to delete item');
                 return response.json();
             })
-            .then((data: any) => {
-                console.log('Item deleted:', data);
-                window.location.reload();
-            })
-            .catch((error: any) => {
-                console.error('Error deleting item:', error);
-            });
-    };
-
-    const cancelDelete = () => {
-        setShowConfirm(false);
-    };
-
-    const handleDetails = () => {
-        setShowDetails(true);
-    };
-
-    const handleCloseDetails = () => {
-        setShowDetails(false);
+            .then(() => window.location.reload())
+            .catch((error) => console.error('Error deleting item:', error));
     };
 
     return (
@@ -206,21 +113,21 @@ export default function ShoppingListItem({
                         <span className="flex gap-2.5">
                             {!isBought ? (
                                 <div
-                                    onClick={handleBought}
+                                    onClick={() => toggleBoughtStatus(`/api/shoppingList/bought?id=${id}`)}
                                     className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
                                 />
                             ) : (
                                 <div
-                                    onClick={handleDetails}
+                                    onClick={() => setShowDetails(true)}
                                     className="bg-blue-600 text-zinc-50 rounded-[15px] size-6 flex justify-center items-center cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out text-xl"
                                 >
                                     ?
                                 </div>
                             )}
                             <Image
-                                onClick={handleDelete}
+                                onClick={() => setShowConfirm(true)}
                                 src="/shopping-list-vector.svg"
-                                alt="close"
+                                alt="delete"
                                 width={20}
                                 height={20}
                                 className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -233,9 +140,22 @@ export default function ShoppingListItem({
                 </div>
             </div>
 
-            {showConfirm && <ConfirmationBox name={name} onCancel={cancelDelete} onConfirm={confirmDelete} />}
+            {showConfirm && (
+                <ConfirmationBox name={name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
+            )}
 
-            {showDetails && <DetailsBox details={details} onClose={handleCloseDetails} onUnBought={handleUnBought} />}
+            {showDetails && (
+                <DetailsBox
+                    id={id}
+                    name={name}
+                    cost={cost}
+                    userName={userName}
+                    boughtBy={boughtBy}
+                    updatedAt={updatedAt}
+                    onClose={() => setShowDetails(false)}
+                    onUnBought={() => toggleBoughtStatus(`/api/shoppingList/unbought?id=${id}`)}
+                />
+            )}
         </>
     );
 }
