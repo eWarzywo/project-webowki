@@ -75,18 +75,24 @@ export default function ShoppingListHandler() {
                 <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
             </div>
             <div className="flex items-start flex-col self-stretch px-[30px]">
-                {data.map((item) => (
-                    <span key={item.id} className="w-full">
-                        <ShoppingListItem
-                            id={item.id}
-                            name={item.name}
-                            cost={item.cost}
-                            userName={item.createdBy.username}
-                            boughtById={item.boughtById ? item.boughtById : null}
-                        />
-                        <hr className="border-zinc-700 border" />
-                    </span>
-                ))}
+                {data.length > 0 ? (
+                    data.map((item) => (
+                        <span key={item.id} className="w-full">
+                            <ShoppingListItem
+                                id={item.id}
+                                name={item.name}
+                                cost={item.cost}
+                                userName={item.createdBy.username}
+                                boughtById={item.boughtById ? item.boughtById : null}
+                            />
+                            <hr className="border-zinc-700 border" />
+                        </span>
+                    ))
+                ) : (
+                    <div className="flex items-center justify-center w-full py-10 text-zinc-400">
+                        <p className="text-lg">No items found in your shopping list. {':('}</p>
+                    </div>
+                )}
             </div>
             {Math.ceil(totalItems / itemsPerPage) > 1 && (
                 <span className="flex justify-center items-center w-full mt-5">
