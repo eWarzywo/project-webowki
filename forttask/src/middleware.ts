@@ -22,13 +22,11 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
-    // If no token (not logged in), redirect to login
     if (!token) {
         const loginUrl = new URL('/login', req.url);
         return NextResponse.redirect(loginUrl);
     }
 
-    // If user is logged in but doesn't have a household ID, redirect to /household
     if (!token.householdId) {
         console.log('User has no household, redirecting to household selection');
         const householdUrl = new URL('/household', req.url);

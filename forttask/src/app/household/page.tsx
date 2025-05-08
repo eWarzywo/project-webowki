@@ -10,7 +10,6 @@ export default function Page() {
 
     return (
         <div className="font-['Inter'] flex flex-col md:flex-row justify-center items-center w-full pt-6 pb-16 md:pb-8 px-4 sm:px-8 h-full border-zinc-800 border rounded-[6px] relative">
-            {/* Responsive Logout button - always attached to left */}
             <div className="fixed sm:absolute bottom-4 left-4 z-10">
                 <button
                     onClick={() => router.push('/logout')}
@@ -46,7 +45,6 @@ export default function Page() {
             <div className="w-full max-w-5xl">
                 <h2 className="text-2xl font-semibold text-center text-zinc-50 mb-4 sm:mb-8">Household Management</h2>
                 <div className="flex flex-col sm:flex-row flex-wrap justify-center items-stretch gap-4 sm:gap-8">
-                    {/* Create household card */}
                     <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-8 flex flex-col w-full max-w-md">
                         <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
                             Create new household
@@ -59,7 +57,6 @@ export default function Page() {
                         </div>
                     </div>
 
-                    {/* Join household card */}
                     <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-8 flex flex-col w-full max-w-md">
                         <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
                             Join existing household
@@ -89,7 +86,6 @@ export function AddHousehold() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Basic validation
         if (!householdName) {
             setError('Please enter a household name');
             return;
