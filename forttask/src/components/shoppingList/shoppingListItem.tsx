@@ -138,7 +138,7 @@ export default function ShoppingListItem({
         setShowDetails(true);
     };
 
-    const handeCloseDetails = () => {
+    const handleCloseDetails = () => {
         setShowDetails(false);
     };
 
@@ -224,7 +224,7 @@ export default function ShoppingListItem({
                                 Mark as Unbought
                             </button>
                             <button
-                                onClick={handeCloseDetails}
+                                onClick={handleCloseDetails}
                                 className="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition"
                             >
                                 Close

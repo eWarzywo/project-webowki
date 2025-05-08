@@ -75,8 +75,8 @@ export default function ShoppingListHandler() {
                 <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
             </div>
             <div className="flex items-start flex-col self-stretch px-[30px]">
-                {data.map((item, index) => (
-                    <span key={index} className="w-full">
+                {data.map((item) => (
+                    <span key={item.id} className="w-full">
                         <ShoppingListItem
                             id={item.id}
                             name={item.name}
