@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
     format,
     startOfMonth,
@@ -14,9 +14,14 @@ import {
     isBefore,
 } from 'date-fns';
 
-export default function Calendar() {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(new Date());
+type CalendarProps = {
+    initialDate?: Date;
+    onChange?: (date: Date) => void;
+}
+
+export default function Calendar({initialDate = new Date(), onChange}: CalendarProps) {
+    const [currentMonth, setCurrentMonth] = useState(new Date(initialDate));
+    const [selectedDate, setSelectedDate] = useState(initialDate);
     const today = new Date();
 
     const monthStart = startOfMonth(currentMonth);
@@ -28,14 +33,13 @@ export default function Calendar() {
     const styleForSelected = "bg-[#A1A1AA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]";;
 
     const handleDateClick = (day: Date) => {
-        if (isSameMonth(day, monthStart) && !isBefore(day, today)) {
+        if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {
             setSelectedDate(day);
+            if (onChange) {
+                onChange(day);
+            }
         }
     }
-
-    useEffect(() => {
-        console.log(`Selected date: ${format(selectedDate, 'yyyy-MM-dd')}`);
-    }, [selectedDate]);
 
     return (
         <div className="w-80 p-4 bg-[#09090B] text-[#FAFAFA] rounded-xl shadow-md border border-[#27272A]">
