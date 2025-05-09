@@ -33,7 +33,7 @@ export async function DELETE(req: Request) {
         }
 
         if (event.householdId !== householdId) {
-            return NextResponse.json({ error: 'Not authorized to delete this events' }, { status: 403 });
+            return NextResponse.json({ error: 'Not authorized to delete this event' }, { status: 403 });
         }
 
         await prisma.event.delete({
