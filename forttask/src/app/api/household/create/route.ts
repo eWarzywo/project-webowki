@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../../../libs/prisma';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../../pages/api/auth/[...nextauth]';
+import { authOptions } from '../../../auth';
 
 export async function POST(req: Request) {
     try {
-        // Get the authenticated user from the session
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
@@ -14,16 +13,13 @@ export async function POST(req: Request) {
 
         const userId = parseInt(session.user.id);
 
-        // Parse request body
         const body = await req.json();
         const { householdName } = body;
 
-        // Validate household householdName
         if (!householdName || householdName.trim().length < 3) {
             return NextResponse.json({ message: 'Household name must be at least 3 characters long' }, { status: 400 });
         }
 
-        // Check if user already owns a household
         const existingOwnership = await prisma.household.findUnique({
             where: {
                 ownerId: userId,
@@ -37,13 +33,10 @@ export async function POST(req: Request) {
             );
         }
 
-        // Generate a unique join code
-        // Initialize joinCode with a value when declared to satisfy TypeScript
         let joinCode = Math.random().toString(36).substring(2, 8).toUpperCase();
         let isJoinCodeUnique = false;
 
         while (!isJoinCodeUnique) {
-            // Check if code is already in use
             const existingCode = await prisma.household.findUnique({
                 where: {
                     joinCode,
@@ -53,12 +46,10 @@ export async function POST(req: Request) {
             if (!existingCode) {
                 isJoinCodeUnique = true;
             } else {
-                // Generate a new code only if this one is already used
                 joinCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             }
         }
 
-        // Create the household
         const household = await prisma.household.create({
             data: {
                 name: householdName.trim(),
@@ -88,7 +79,6 @@ export async function POST(req: Request) {
             },
         });
 
-        // Also update the user to be part of the household
         await prisma.user.update({
             where: {
                 id: userId,
