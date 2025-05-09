@@ -73,6 +73,8 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
+
+            handleCancel();
             handleRefresh();
         } catch (error) {
             setError(error instanceof Error ? error : new Error('An unknown error occurred'));

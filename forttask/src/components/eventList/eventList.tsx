@@ -24,9 +24,10 @@ type EventListProps = {
     events: Event[];
     loading?: boolean;
     error?: Error | null;
+    onRefresh?: () => void;
 }
 
-export default function EventList({ events, loading, error }: EventListProps) {
+export default function EventList({ events, loading, error, onRefresh }: EventListProps) {
     return (
         <div className="w-full">
             <div className="flex w-full justify-center items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-96 mb-2 p-2">
@@ -38,7 +39,7 @@ export default function EventList({ events, loading, error }: EventListProps) {
                 ) : error ? (
                     <p className="text-zinc-400 text-center">Error: {error.message}</p>
                 ) : events && events.length > 0 ? (
-                    events.map((event) => <EventCard key={event.id} event={event} />)
+                    events.map((event) => <EventCard key={event.id} event={event} onRefresh={onRefresh} />)
                 ) : (
                     <p className="text-zinc-400 text-center">No events found</p>
                 )}

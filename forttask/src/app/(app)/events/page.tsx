@@ -54,6 +54,7 @@ export default function Events() {
                     events={events}
                     loading={loading}
                     error={error}
+                    onRefresh={handleRefresh}
                 />
                 <EventAddForm
                     onRefresh={handleRefresh}
