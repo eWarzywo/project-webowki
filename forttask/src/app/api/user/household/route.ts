@@ -1,0 +1,31 @@
+import {getServerSession} from "next-auth/next";
+import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import {NextResponse} from "next/server";
+import prisma from "../../../../../libs/prisma";
+
+export async function GET() {
+    try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ message: 'You must be logged in to access user info' }, { status: 401 });
+        }
+
+        if (!session.user?.householdId) {
+            return NextResponse.json({ message: 'You must be part of a household to access user info' }, { status: 401 });
+        }
+
+        const householdId = parseInt(session.user.householdId);
+
+        const users = await prisma.user.findMany({
+            where: {
+                householdId: householdId,
+            },
+        });
+
+        return NextResponse.json(users);
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    }
+}

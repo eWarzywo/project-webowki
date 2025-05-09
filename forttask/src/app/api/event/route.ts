@@ -1,15 +1,29 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../../libs/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../../../pages/api/auth/[...nextauth]';
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ message: 'You must be logged in to view events' }, { status: 401 });
+        }
+
+        const userId = parseInt(session.user.id);
+
+        if (!session.user?.householdId) {
+            return NextResponse.json({ message: 'You must be part of a household to create events' }, { status: 401 });
+        }
+
+        const householdId = parseInt(session.user.householdId);
+
         const body = (await req.json()) as {
             name: string;
             description?: string;
             date: string;
             attendees: number[];
-            householdId: number;
-            createdById: number;
         };
 
         const newEvent = await prisma.event.create({
@@ -17,8 +31,8 @@ export async function POST(req: Request) {
                 name: body.name,
                 description: body.description || '',
                 date: new Date(body.date),
-                householdId: body.householdId,
-                createdById: body.createdById,
+                householdId: householdId,
+                createdById: userId,
                 attendees: {
                     create: body.attendees.map((userId) => ({
                         user: { connect: { id: userId } },

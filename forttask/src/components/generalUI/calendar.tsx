@@ -12,6 +12,7 @@ import {
     isSameMonth,
     isToday,
     isBefore,
+    startOfDay,
 } from 'date-fns';
 
 type CalendarProps = {
@@ -34,9 +35,9 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
 
     const handleDateClick = (day: Date) => {
         if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {
-            setSelectedDate(day);
+            setSelectedDate(startOfDay(day));
             if (onChange) {
-                onChange(day);
+                onChange(startOfDay(day));
             }
         }
     }
