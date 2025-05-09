@@ -1,174 +1,141 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import ConfirmationBox from '../generalUI/confirmation';
 
-interface ShoppingListItemDetails {
+interface ShoppingListItemProps {
     id: number;
-    name: string;
-    cost: number;
-    userName: string;
-    createdBy: {
-        username: string;
-    };
-    boughtBy: {
-        username: string;
-    };
-    updatedAt: string;
+    handleDelete: () => void;
 }
 
-export default function ShoppingListItem({
-    id,
-    name,
-    cost,
-    userName,
-    boughtById,
-}: {
-    id: number;
+interface DetailsBoxProps {
     name: string;
     cost: number;
     userName: string;
-    boughtById: number | null;
-}) {
+    updatedAt: string | null;
+    boughtBy: string | null;
+    onClose: () => void;
+    onUnBought: () => void;
+}
+
+function DetailsBox({ name, cost, userName, updatedAt, boughtBy, onClose, onUnBought }: DetailsBoxProps) {
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
+                <h2 className="text-lg font-semibold mb-4">Item Details</h2>
+                <p className="text-zinc-400 mb-2">Item name: {name}</p>
+                <p className="text-zinc-400 mb-2">Cost: {cost}$</p>
+                <p className="text-zinc-400 mb-2">Added by: {userName}</p>
+                <p className="text-zinc-400 mb-2">Bought by: {boughtBy || 'N/A'}</p>
+                <p className="text-zinc-400 mb-4">
+                    Bought at: {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
+                </p>
+                <div className="flex justify-between gap-4">
+                    <button onClick={onUnBought} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition">
+                        Mark as Unbought
+                    </button>
+                    <button onClick={onClose} className="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemProps) {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
-    const [isBought, setIsBought] = useState(boughtById !== null);
-    const [details, setDetails] = useState({} as ShoppingListItemDetails);
+    const [data, setData] = useState<null | {
+        id: number;
+        name: string;
+        cost: number;
+        updatedAt: string | null;
+        createdBy: { id: number; username: string };
+        boughtBy: { id: number; username: string } | null;
+    }>(null);
+    const [loading, setLoading] = useState(true);
 
-    React.useEffect(() => {
-        setIsBought(boughtById !== null);
-    }, [boughtById]);
-
-    React.useEffect(() => {
-        fetch(`/api/shoppingList/details?id=${id}`)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                setDetails(data);
-            })
-            .catch((error) => {
-                console.error('Error fetching item details:', error);
+    const fetchData = async () => {
+        try {
+            const res = await fetch(`/api/shoppingList/details?id=${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
             });
-    }, [id, isBought]);
+            if (res.ok) {
+                const item: {
+                    id: number;
+                    name: string;
+                    cost: number;
+                    updatedAt: string | null;
+                    createdBy: { id: number; username: string };
+                    boughtBy: { id: number; username: string } | null;
+                } = await res.json();
+                setData(item);
+            } else {
+                console.error('Failed to fetch item:', res.status);
+            }
+        } catch (error) {
+            console.error('Error fetching item:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    const handleBought = () => {
-        fetch(`/api/shoppingList/bought?id=${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log('Item bought:', data);
-                setIsBought(!isBought);
-            })
-            .catch((error) => {
-                console.error('Error marking item as bought:', error);
+    useEffect(() => {
+        fetchData();
+    }, [id]);
+
+    const toggleBoughtStatus = async (url: string) => {
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id }),
             });
+            if (!res.ok) throw new Error('Failed to toggle bought status');
+            await fetchData();
+            setShowDetails(false);
+        } catch (error) {
+            console.error('Error toggling status:', error);
+        }
     };
 
-    const handleUnBought = () => {
-        fetch(`/api/shoppingList/unbought?id=${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log('Item unbought:', data);
-                setIsBought(!isBought);
-                setShowDetails(false);
-            })
-            .catch((error) => {
-                console.error('Error marking item as unbought:', error);
-            });
-    };
+    if (loading) return <div className="text-zinc-400">Loading...</div>;
+    if (!data) return <div className="text-red-500">Item not found</div>;
 
-    const handleDelete = () => {
-        setShowConfirm(true);
-    };
-
-    const confirmDelete = () => {
-        setShowConfirm(false);
-        fetch(`/api/shoppingList?id=${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ id }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then((data: any) => {
-                console.log('Item deleted:', data);
-                window.location.reload();
-            })
-            .catch((error: any) => {
-                console.error('Error deleting item:', error);
-            });
-    };
-
-    const cancelDelete = () => {
-        setShowConfirm(false);
-    };
-
-    const handleDetails = () => {
-        setShowDetails(true);
-    };
-
-    const handleCloseDetails = () => {
-        setShowDetails(false);
-    };
+    const isBought = !!data.boughtBy;
 
     return (
         <>
             <div className="flex flex-col w-full gap-2.5 items-start py-4">
                 <div className="flex justify-between w-full py-2">
                     <div className="text-zinc-50 w-1/3 flex justify-start items-center">
-                        {name + (cost ? ` - ${cost}$` : '')}
+                        {data.name + (data.cost ? ` - ${data.cost}$` : '')}
                     </div>
-                    <div className="text-zinc-400 w-1/3 flex justify-center items-center">{`Added by ${userName}`}</div>
+                    <div className="text-zinc-400 w-1/3 flex justify-center items-center">
+                        {`Added by ${data.createdBy.username}`}
+                    </div>
                     <div className="w-1/3 flex justify-end items-center">
                         <span className="flex gap-2.5">
                             {!isBought ? (
                                 <div
-                                    onClick={handleBought}
+                                    onClick={() => toggleBoughtStatus(`/api/shoppingList/bought?id=${id}`)}
                                     className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
                                 />
                             ) : (
                                 <div
-                                    onClick={handleDetails}
+                                    onClick={() => setShowDetails(true)}
                                     className="bg-blue-600 text-zinc-50 rounded-[15px] size-6 flex justify-center items-center cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out text-xl"
                                 >
                                     ?
                                 </div>
                             )}
                             <Image
-                                onClick={handleDelete}
+                                onClick={() => setShowConfirm(true)}
                                 src="/shopping-list-vector.svg"
-                                alt="close"
+                                alt="delete"
                                 width={20}
                                 height={20}
                                 className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
@@ -182,56 +149,19 @@ export default function ShoppingListItem({
             </div>
 
             {showConfirm && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
-                        <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
-                        <p className="text-zinc-400 mb-6">
-                            Do you really want to delete <span className="text-white font-bold">{name}</span> from the
-                            list?
-                        </p>
-                        <div className="flex justify-end gap-4">
-                            <button
-                                onClick={cancelDelete}
-                                className="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={confirmDelete}
-                                className="px-4 py-2 rounded bg-red-600 hover:bg-red-500 transition"
-                            >
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ConfirmationBox name={data.name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
             )}
 
             {showDetails && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
-                        <h2 className="text-lg font-semibold mb-4">Item Details</h2>
-                        <p className="text-zinc-400 mb-6">Item name: {details.name}</p>
-                        <p className="text-zinc-400 mb-6">Cost: {details.cost}$</p>
-                        <p className="text-zinc-400 mb-6">Added by: {details.createdBy.username}</p>
-                        <p className="text-zinc-400 mb-6">Bought by: {details.boughtBy.username}</p>
-                        <p className="text-zinc-400 mb-6">Bought at: {new Date(details.updatedAt).toLocaleString()}</p>
-                        <div className="flex justify-beetwen gap-4">
-                            <button
-                                onClick={handleUnBought}
-                                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition"
-                            >
-                                Mark as Unbought
-                            </button>
-                            <button
-                                onClick={handleCloseDetails}
-                                className="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <DetailsBox
+                    name={data.name}
+                    cost={data.cost}
+                    userName={data.createdBy.username}
+                    updatedAt={data.updatedAt}
+                    boughtBy={data.boughtBy?.username || null}
+                    onClose={() => setShowDetails(false)}
+                    onUnBought={() => toggleBoughtStatus(`/api/shoppingList/unbought?id=${id}`)}
+                />
             )}
         </>
     );

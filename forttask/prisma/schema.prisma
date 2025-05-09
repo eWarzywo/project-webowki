@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "/generated/client"
 }
 
 datasource db {
@@ -53,9 +52,6 @@ model User {
   eventsCreated  Event[]
   eventsAttended EventAttendee[]
 
-  sentDMs     DM[] @relation("SentDMs")
-  receivedDMs DM[] @relation("ReceivedDMs")
-
   householdMessages HouseholdDM[]
   householdOwner    Household?    @relation("HouseholdOwner")
 }
@@ -65,6 +61,7 @@ model Bill {
   name        String   @db.VarChar(255)
   description String   @db.Text
   amount      Decimal
+  cycle       Int      @default(0)
   dueDate     DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -84,7 +81,8 @@ model Chore {
   name        String   @db.VarChar(255)
   description String   @db.Text
   priority    Int      @default(1)
-  dueDate     DateTime
+  cycle       Int      @default(0)
+  dueDate     DateTime 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -115,18 +113,6 @@ model ShoppingItem {
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
-model DM {
-  id   Int      @id @default(autoincrement())
-  text String   @db.Text
-  time DateTime @default(now())
-
-  sentById Int
-  sentBy   User @relation("SentDMs", fields: [sentById], references: [id], onDelete: Cascade)
-
-  sentToId Int
-  sentTo   User @relation("ReceivedDMs", fields: [sentToId], references: [id], onDelete: Cascade)
-}
-
 model HouseholdDM {
   id   Int      @id @default(autoincrement())
   text String   @db.Text
@@ -144,6 +130,8 @@ model Event {
   name        String   @db.VarChar(255)
   description String   @db.Text
   date        DateTime
+  cycle       Int      @default(0)
+  location    String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
