@@ -16,7 +16,6 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
     const [eventDate, setEventDate] = useState(new Date());
     const [participants, setParticipants] = useState<number[]>([]);
     const [description, setDescription] = useState('');
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [householders, setHouseholders] = useState<Householders[]>([]);
 
@@ -53,7 +52,6 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
             return;
         }
 
-        setLoading(true);
         setError(null);
 
         try {
@@ -78,8 +76,6 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
             handleRefresh();
         } catch (error) {
             setError(error instanceof Error ? error : new Error('An unknown error occurred'));
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -95,16 +91,6 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
             console.error('Error:', error.message);
         }
     }, [error]);
-
-    if (loading) {
-        return (
-            <div className="flex w-auto flex-col items-center">
-                <div className="flex w-full justify-center items-center rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-2">
-                    <p className="text-4m text-zinc-400 w-full text-end pl-1">Loading...</p>
-                </div>
-            </div>
-        );
-    }
 
     if (error) {
         return (
