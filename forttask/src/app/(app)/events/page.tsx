@@ -23,7 +23,7 @@ export default function Events() {
 
             try {
                 const dateString = format(date, 'yyyy-MM-dd');
-                const response = await fetch(`/api/event/get?date=${dateString}`);
+                const response = await fetch(`/api/events/get?date=${dateString}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch events: ${response.status}`);
                 }

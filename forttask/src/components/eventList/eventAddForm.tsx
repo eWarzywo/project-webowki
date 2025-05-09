@@ -23,7 +23,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
     useEffect(() => {
         const fetchHouseholders = async () => {
             try {
-                const response = await fetch('/api/user/household');
+                const response = await fetch('/api/household/users/get');
                 if (!response.ok) {
                     throw new Error(`Failed to fetch household members: ${response.status}`);
                 }
@@ -57,7 +57,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
         setError(null);
 
         try {
-            const response = await fetch('/api/event', {
+            const response = await fetch('/api/event/create', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

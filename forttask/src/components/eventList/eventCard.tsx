@@ -34,7 +34,7 @@ export default function EventCard({ event, onRefresh }: EventCardProps) {
 
     const handleDone = async () => {
         try {
-            const response = await fetch(`/api/event?eventId=${event.id}`, {
+            const response = await fetch(`/api/event/delete?eventId=${event.id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
@@ -42,7 +42,7 @@ export default function EventCard({ event, onRefresh }: EventCardProps) {
             }
             handleRefresh();
         } catch (error) {
-            console.error('Error deleting event:', error);
+            console.error('Error deleting events:', error);
         }
     }
 
