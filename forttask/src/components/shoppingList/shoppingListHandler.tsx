@@ -17,8 +17,6 @@ interface ShoppingItem {
 
 export default function ShoppingListHandler() {
     const [data, setData] = React.useState<ShoppingItem[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
-    const [isLoading, setIsLoading] = React.useState(true);
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
     const page = parseInt(searchParams?.get('page') || '1', 10);
@@ -30,8 +28,7 @@ export default function ShoppingListHandler() {
             try {
                 const response = await fetch('/api/shoppingList/totalNumber');
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    console.error(`Failed to fetch total items, Status: ${response.status}`, errorData);
+                    console.error(`Failed to fetch total items, Status: ${response.status}`);
                     return;
                 }
 
@@ -47,17 +44,12 @@ export default function ShoppingListHandler() {
 
     React.useEffect(() => {
         const fetchData = async () => {
-            setError(null);
-            setIsLoading(true);
             try {
                 const response = await fetch(
                     `/api/shoppingList?limit=${itemsPerPage}&skip=${(page - 1) * itemsPerPage}`,
                 );
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    const errorMessage = errorData.message || `Failed to fetch shopping list data, Status: ${response.status}`;
-                    console.error(errorMessage, errorData);
-                    setError(errorMessage);
+                    console.error(`Failed to fetch shopping list data, Status: ${response.status}`);
                     return;
                 }
 
@@ -65,11 +57,7 @@ export default function ShoppingListHandler() {
                 setData(items);
                 console.log('Shopping list data:', items);
             } catch (error) {
-                const errorMessage = error instanceof Error ? error.message : 'Unknown error fetching data';
                 console.error('Error fetching shopping list data:', error);
-                setError(errorMessage);
-            } finally {
-                setIsLoading(false);
             }
         };
 
@@ -87,19 +75,7 @@ export default function ShoppingListHandler() {
                 <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
             </div>
             <div className="flex items-start flex-col self-stretch px-[30px]">
-                {isLoading && <div className="w-full text-center py-4">Loading shopping list...</div>}
-                
-                {error && (
-                    <div className="w-full text-center py-4 text-red-500">
-                        Error: {error}
-                    </div>
-                )}
-                
-                {!isLoading && !error && data.length === 0 && (
-                    <div className="w-full text-center py-4">No shopping items found.</div>
-                )}
-                
-                {!isLoading && data.map((item) => (
+                {data.map((item) => (
                     <span key={item.id} className="w-full">
                         <ShoppingListItem
                             id={item.id}
