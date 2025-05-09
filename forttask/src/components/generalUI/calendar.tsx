@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     format,
     startOfMonth,
@@ -16,6 +16,7 @@ import {
 
 export default function Calendar() {
     const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const today = new Date();
 
     const monthStart = startOfMonth(currentMonth);
@@ -23,6 +24,18 @@ export default function Calendar() {
     const startDate = startOfWeek(monthStart);
     const endDate = endOfWeek(monthEnd);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
+
+    const styleForSelected = "bg-[#A1A1AA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]";;
+
+    const handleDateClick = (day: Date) => {
+        if (isSameMonth(day, monthStart) && !isBefore(day, today)) {
+            setSelectedDate(day);
+        }
+    }
+
+    useEffect(() => {
+        console.log(`Selected date: ${format(selectedDate, 'yyyy-MM-dd')}`);
+    }, [selectedDate]);
 
     return (
         <div className="w-80 p-4 bg-[#09090B] text-[#FAFAFA] rounded-xl shadow-md border border-[#27272A]">
@@ -52,10 +65,12 @@ export default function Calendar() {
                 {days.map((day) => (
                     <div
                         key={day.toString()}
+                        onClick={() => handleDateClick(day)}
                         className={`p-2 rounded-xl flex items-center justify-center h-10 w-10 text-lg cursor-pointer
-              ${isToday(day) ? 'bg-[#FAFAFA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]' : ''} 
-              ${isBefore(day, today) && !isToday(day) ? 'text-[#A1A1AA]' : ''} 
-              ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-[#18181B]' : ''}`}
+                          ${isToday(day) ? 'bg-[#FAFAFA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]' : ''} 
+                          ${isBefore(day, today) && !isToday(day) ? 'text-[#A1A1AA]' : ''} 
+                          ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-[#18181B]' : ''}
+                          ${format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') ? styleForSelected : ''}`}
                     >
                         {format(day, 'd')}
                     </div>
