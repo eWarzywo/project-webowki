@@ -1,5 +1,5 @@
 import { expect, test, vi } from 'vitest';
-import { POST, GET, DELETE } from '../src/app/api/event/route';
+import { POST, GET, DELETE } from '@/app/api/events/route';
 import prisma from '../libs/__mocks__/prisma';
 
 vi.mock('../libs/prisma');

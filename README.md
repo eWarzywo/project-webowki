@@ -15,6 +15,7 @@ To get started with this project, follow these steps:
     ```bash
     git clone https://github.com/eWarzywo/project-webowki.git
     cd project-webowki
+    cd forttask
     ```
 
 2. **Install dependencies**:
