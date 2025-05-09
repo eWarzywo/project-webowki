@@ -1,6 +1,6 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import prisma from '../../../../libs/prisma';
+import prisma from '../../libs/prisma';
 import bcrypt from 'bcrypt';
 
 export const authOptions: NextAuthOptions = {
@@ -52,44 +52,71 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async jwt({ token, user, trigger, session }) {
+            const minimalToken = {
+                id: token.id,
+                householdId: token.householdId,
+                username: token.username
+            };
 
             if (user) {
-                token.id = user.id;
-                token.username = user.username;
-                token.householdId = user.householdId?.toString() || null;
+                minimalToken.id = user.id;
+                minimalToken.householdId = user.householdId?.toString() || null;
+                minimalToken.username = user.username;
             }
 
             if (trigger === 'update' && session?.householdId) {
-                token.householdId = session.householdId;
+                minimalToken.householdId = session.householdId;
             }
 
-            if (token.id && !session?.householdId) {
+            if (minimalToken.id && !session?.householdId && minimalToken.householdId === null) {
                 try {
                     const userData = await prisma.user.findUnique({
-                        where: { id: parseInt(token.id) },
+                        where: { id: parseInt(minimalToken.id) },
                         select: { householdId: true },
                     });
 
                     if (userData?.householdId) {
-                        if (token.householdId !== userData.householdId.toString()) {
-                            token.householdId = userData.householdId.toString();
-                        }
+                        minimalToken.householdId = userData.householdId.toString();
                     }
                 } catch (error) {
                     console.error('Error refreshing household ID:', error);
                 }
             }
-
-            return token;
+            
+            if (authOptions.debug) {
+                console.log('JWT callback:', minimalToken);
+            }
+            return minimalToken;
         },
 
         async session({ session, token }) {
-            if (session.user) {
-                session.user.id = token.id as string;
-                session.user.username = token.username as string;
-                session.user.householdId = token.householdId as string | null;
+            const minimalSession = {
+                user: {
+                    id: token.id as string,
+                    username: '',
+                    householdId: token.householdId as string | null
+                },
+                expires: session.expires 
+            };
+            
+            if (!token.username) {
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: { id: parseInt(token.id as string) },
+                        select: { username: true }
+                    });
+                    minimalSession.user.username = user?.username || '';
+                } catch (error) {
+                    console.error('Error fetching username:', error);
+                }
+            } else {
+                minimalSession.user.username = token.username as string;
             }
-            return session;
+            
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Session callback:', minimalSession);
+            }
+            return minimalSession;
         },
     },
     debug: process.env.NODE_ENV === 'development',
@@ -102,5 +129,3 @@ export const authOptions: NextAuthOptions = {
         signIn: '/login',
     },
 };
-
-export default NextAuth(authOptions);

@@ -6,10 +6,10 @@ const sanitizeName = (name: string): string => {
     return name
         .toLowerCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') 
-        .replace(/[^a-z0-9]/g, '_') 
-        .replace(/_+/g, '_') 
-        .replace(/^_|_$/g, ''); 
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '_')
+        .replace(/_+/g, '_')
+        .replace(/^_|_$/g, '');
 };
 
 export async function POST(req: Request) {
@@ -58,10 +58,7 @@ export async function POST(req: Request) {
         });
 
         if (existingUser) {
-            return NextResponse.json(
-                { message: 'Użytkownik o podanym adresie email już istnieje' },
-                { status: 409 },
-            );
+            return NextResponse.json({ message: 'Użytkownik o podanym adresie email już istnieje' }, { status: 409 });
         }
 
         const saltRounds = 10;
@@ -196,10 +193,21 @@ export async function DELETE(req: Request) {
         }
 
         if (household.ownerId === parseInt(userId)) {
-            await prisma.user.deleteMany({
+            await prisma.user.update({
+                where: {
+                    id: parseInt(userId),
+                },
+                data: {
+                    householdId: null,
+                },
+            });
+            
+            await prisma.user.updateMany({
                 where: {
                     householdId: parseInt(householdId),
-                    id: { not: parseInt(userId) },
+                },
+                data: {
+                    householdId: null,
                 },
             });
 
@@ -212,9 +220,12 @@ export async function DELETE(req: Request) {
             return new NextResponse(null, { status: 204 });
         }
 
-        await prisma.user.delete({
+        await prisma.user.update({
             where: {
                 id: parseInt(userId),
+            },
+            data: {
+                householdId: null,
             },
         });
 

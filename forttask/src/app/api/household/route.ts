@@ -96,9 +96,12 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
         }
 
-        await prisma.user.deleteMany({
+        await prisma.user.updateMany({
             where: {
                 householdId: parseInt(householdId),
+            },
+            data: {
+                householdId: null,
             },
         });
 
