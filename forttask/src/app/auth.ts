@@ -83,7 +83,9 @@ export const authOptions: NextAuthOptions = {
                 }
             }
             
-            console.log('JWT callback:', minimalToken);
+            if (authOptions.debug) {
+                console.log('JWT callback:', minimalToken);
+            }
             return minimalToken;
         },
 
