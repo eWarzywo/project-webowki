@@ -158,7 +158,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 <input
                     type="text"
                     id="description"
-                    placeholder="Name of the event"
+                    placeholder="Enter event description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
