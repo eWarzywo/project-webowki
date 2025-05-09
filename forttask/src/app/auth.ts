@@ -113,7 +113,9 @@ export const authOptions: NextAuthOptions = {
                 minimalSession.user.username = token.username as string;
             }
             
-            console.log('Session callback:', minimalSession);
+            if (process.env.NODE_ENV === 'development') {
+                console.log('Session callback:', minimalSession);
+            }
             return minimalSession;
         },
     },
