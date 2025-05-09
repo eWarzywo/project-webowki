@@ -1,36 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import ConfirmationBox from '../generalUI/confirmation';
 
 interface ShoppingListItemProps {
     id: number;
+    handleDelete: () => void;
+}
+
+interface DetailsBoxProps {
     name: string;
     cost: number;
     userName: string;
-    boughtBy: { username: string } | null;
     updatedAt: string | null;
+    boughtBy: string | null;
+    onClose: () => void;
+    onUnBought: () => void;
 }
 
-function DetailsBox({
-    name,
-    cost,
-    userName,
-    boughtBy,
-    updatedAt,
-    onClose,
-    onUnBought,
-}: ShoppingListItemProps & { onClose: () => void; onUnBought: () => void }) {
+function DetailsBox({ name, cost, userName, updatedAt, boughtBy, onClose, onUnBought }: DetailsBoxProps) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
                 <h2 className="text-lg font-semibold mb-4">Item Details</h2>
-                <p className="text-zinc-400 mb-6">Item name: {name}</p>
-                <p className="text-zinc-400 mb-6">Cost: {cost}$</p>
-                <p className="text-zinc-400 mb-6">Added by: {userName}</p>
-                <p className="text-zinc-400 mb-6">Bought by: {boughtBy?.username || 'Not bought yet'}</p>
-                <p className="text-zinc-400 mb-6">
+                <p className="text-zinc-400 mb-2">Item name: {name}</p>
+                <p className="text-zinc-400 mb-2">Cost: {cost}$</p>
+                <p className="text-zinc-400 mb-2">Added by: {userName}</p>
+                <p className="text-zinc-400 mb-2">Bought by: {boughtBy || 'N/A'}</p>
+                <p className="text-zinc-400 mb-4">
                     Bought at: {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
                 </p>
                 <div className="flex justify-between gap-4">
@@ -46,49 +44,79 @@ function DetailsBox({
     );
 }
 
-export default function ShoppingListItem({ id, name, cost, userName, boughtBy, updatedAt }: ShoppingListItemProps) {
+export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemProps) {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
-    const [isBought, setIsBought] = useState(!!boughtBy);
+    const [data, setData] = useState<null | {
+        id: number;
+        name: string;
+        cost: number;
+        updatedAt: string | null;
+        createdBy: { id: number; username: string };
+        boughtBy: { id: number; username: string } | null;
+    }>(null);
+    const [loading, setLoading] = useState(true);
 
-    const toggleBoughtStatus = (url: string) => {
-        fetch(url, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id }),
-        })
-            .then((response) => {
-                if (!response.ok) throw new Error('Failed to update item status');
-                return response.json();
-            })
-            .then(() => {
-                setIsBought((prev) => !prev);
-                if (showDetails) setShowDetails(false);
-            })
-            .catch((error) => console.error('Error updating item status:', error));
+    const fetchData = async () => {
+        try {
+            const res = await fetch(`/api/shoppingList/details?id=${id}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (res.ok) {
+                const item: {
+                    id: number;
+                    name: string;
+                    cost: number;
+                    updatedAt: string | null;
+                    createdBy: { id: number; username: string };
+                    boughtBy: { id: number; username: string } | null;
+                } = await res.json();
+                setData(item);
+            } else {
+                console.error('Failed to fetch item:', res.status);
+            }
+        } catch (error) {
+            console.error('Error fetching item:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDelete = () => {
-        fetch(`/api/shoppingList?id=${id}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-        })
-            .then((response) => {
-                if (!response.ok) throw new Error('Failed to delete item');
-                return response.json();
-            })
-            .then(() => window.location.reload())
-            .catch((error) => console.error('Error deleting item:', error));
+    useEffect(() => {
+        fetchData();
+    }, [id]);
+
+    const toggleBoughtStatus = async (url: string) => {
+        try {
+            const res = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id }),
+            });
+            if (!res.ok) throw new Error('Failed to toggle bought status');
+            await fetchData();
+            setShowDetails(false);
+        } catch (error) {
+            console.error('Error toggling status:', error);
+        }
     };
+
+    if (loading) return <div className="text-zinc-400">Loading...</div>;
+    if (!data) return <div className="text-red-500">Item not found</div>;
+
+    const isBought = !!data.boughtBy;
 
     return (
         <>
             <div className="flex flex-col w-full gap-2.5 items-start py-4">
                 <div className="flex justify-between w-full py-2">
                     <div className="text-zinc-50 w-1/3 flex justify-start items-center">
-                        {name + (cost ? ` - ${cost}$` : '')}
+                        {data.name + (data.cost ? ` - ${data.cost}$` : '')}
                     </div>
-                    <div className="text-zinc-400 w-1/3 flex justify-center items-center">{`Added by ${userName}`}</div>
+                    <div className="text-zinc-400 w-1/3 flex justify-center items-center">
+                        {`Added by ${data.createdBy.username}`}
+                    </div>
                     <div className="w-1/3 flex justify-end items-center">
                         <span className="flex gap-2.5">
                             {!isBought ? (
@@ -121,17 +149,16 @@ export default function ShoppingListItem({ id, name, cost, userName, boughtBy, u
             </div>
 
             {showConfirm && (
-                <ConfirmationBox name={name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
+                <ConfirmationBox name={data.name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
             )}
 
             {showDetails && (
                 <DetailsBox
-                    id={id}
-                    name={name}
-                    cost={cost}
-                    userName={userName}
-                    boughtBy={boughtBy}
-                    updatedAt={updatedAt}
+                    name={data.name}
+                    cost={data.cost}
+                    userName={data.createdBy.username}
+                    updatedAt={data.updatedAt}
+                    boughtBy={data.boughtBy?.username || null}
                     onClose={() => setShowDetails(false)}
                     onUnBought={() => toggleBoughtStatus(`/api/shoppingList/unbought?id=${id}`)}
                 />

@@ -13,6 +13,7 @@ interface ShoppingItem {
         username: string;
     };
     boughtBy: {
+        id: number;
         username: string;
     } | null;
     updatedAt: string | null;
@@ -22,6 +23,7 @@ export default function ShoppingListHandler() {
     const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+    const [deleted, setDeleted] = useState(false);
 
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
@@ -68,7 +70,20 @@ export default function ShoppingListHandler() {
         };
 
         fetchData();
-    }, [page]);
+    }, [page, deleted]);
+
+    const handleDelete = (id: number) => {
+        fetch(`/api/shoppingList?id=${id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        })
+            .then((response) => {
+                if (!response.ok) throw new Error('Failed to delete item');
+                setDeleted((prev) => !prev);
+                return response.json();
+            })
+            .catch((error) => console.error('Error deleting item:', error));
+    };
 
     const renderContent = () => {
         if (isLoading) {
@@ -89,14 +104,7 @@ export default function ShoppingListHandler() {
 
         return data.map((item) => (
             <span key={item.id} className="w-full">
-                <ShoppingListItem
-                    id={item.id}
-                    name={item.name}
-                    cost={item.cost}
-                    userName={item.createdBy.username}
-                    boughtBy={item.boughtBy}
-                    updatedAt={item.updatedAt}
-                />
+                <ShoppingListItem id={item.id} handleDelete={() => handleDelete(item.id)} />
                 <hr className="border-zinc-700 border" />
             </span>
         ));

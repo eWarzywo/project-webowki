@@ -54,7 +54,7 @@ export async function PUT(req: Request) {
 
         const updatedItem = await prisma.shoppingItem.update({
             where: { id: itemId },
-            data: { boughtById: user.id },
+            data: { boughtById: user.id, updatedAt: new Date() },
         });
 
         return NextResponse.json(updatedItem, { status: 200 });
