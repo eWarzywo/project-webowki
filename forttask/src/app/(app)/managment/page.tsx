@@ -460,7 +460,7 @@ function HouseholdContent() {
                                         type="text"
                                         value={newJoinCode}
                                         onChange={(e) => setNewJoinCode(e.target.value.toUpperCase())}
-                                        className="flex-grow bg-zinc-950 border border-zinc-800 rounded-l-[6px] p-2 text-zinc-400 text-sm font-normal"
+                                        className="flex-grow bg-zinc-950 border border-zinc-800 rounded-l-[6px] p-2 text-zinc-400 text-sm font-normal mr-1"
                                         disabled={!isOwner}
                                         maxLength={8}
                                     />
@@ -583,7 +583,8 @@ function HouseholdContent() {
 
                             <div className="bg-amber-900/30 border border-amber-800 p-4 rounded-[6px]">
                                 <p className="text-sm mb-4 text-zinc-300">
-                                    Leaving the household will remove you from all household activities. You can join again with an invitation code from the owner.
+                                    Leaving the household will remove you from all household activities. You can join
+                                    again with an invitation code from the owner.
                                 </p>
 
                                 {confirmLeave ? (
