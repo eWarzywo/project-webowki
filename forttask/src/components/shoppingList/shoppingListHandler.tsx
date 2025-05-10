@@ -23,7 +23,7 @@ export default function ShoppingListHandler() {
     const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [deleted, setDeleted] = useState(false);
+    const [refresh, setRefresh] = useState(false);
 
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
@@ -70,7 +70,7 @@ export default function ShoppingListHandler() {
         };
 
         fetchData();
-    }, [page, deleted]);
+    }, [page, refresh]);
 
     const handleDelete = (id: number) => {
         fetch(`/api/shoppingList?id=${id}`, {
@@ -79,7 +79,7 @@ export default function ShoppingListHandler() {
         })
             .then((response) => {
                 if (!response.ok) throw new Error('Failed to delete item');
-                setDeleted((prev) => !prev);
+                setRefresh((prev) => !prev);
                 return response.json();
             })
             .catch((error) => console.error('Error deleting item:', error));
