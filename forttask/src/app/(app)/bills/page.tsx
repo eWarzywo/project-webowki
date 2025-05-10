@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Calendar from '@/components/generalUI/calendar';
+import DatePicker from '@/components/generalUI/datePicker';
 
 export default function Bills() {
     const [showCalendar, setShowCalendar] = React.useState(false);
@@ -9,6 +9,10 @@ export default function Bills() {
 
     const handleShowCalendar = () => {
         setShowCalendar(!showCalendar);
+    };
+
+    const handleSelectDate = (date: Date) => {
+        setSelectedDate(date);
     };
 
     return (
@@ -63,7 +67,7 @@ export default function Bills() {
                                 onClick={handleShowCalendar}
                                 className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
                             >
-                                Pick date
+                                {selectedDate ? selectedDate.toLocaleDateString() : 'Select a date'}
                             </div>
                         </div>
                         <div className=" flex w-full gap-[10px] justify-between items-center">
@@ -83,25 +87,11 @@ export default function Bills() {
             </div>
 
             {showCalendar && (
-                <div className="fixed inset-0 bg-zinc-950 bg-opacity-50 flex flex-col items-center justify-center z-50">
-                    <div className="bg-zinc-950 rounded-xl p-6 w-96 flex flex-col items-center justify-center border border-zinc-800">
-                        <Calendar />
-                        <div className="mt-2 text-zinc-50 text-sm">
-                            {selectedDate ? selectedDate.toLocaleDateString() : 'No date selected'}
-                        </div>
-                        <div className="flex justify-between items-center gap-4 mt-2 w-full px-3">
-                            <button className="w-1/2 rounded-xl px-4 py-2 transition bg-blue-600 hover:bg-blue-500">
-                                Select
-                            </button>
-                            <button
-                                onClick={handleShowCalendar}
-                                className="w-1/2 rounded-xl px-4 py-2 bg-zinc-700 hover:bg-zinc-600 transition"
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <DatePicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={handleSelectDate}
+                    handleShowCalendar={handleShowCalendar}
+                />
             )}
         </>
     );
