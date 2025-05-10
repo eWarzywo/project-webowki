@@ -74,7 +74,7 @@ export default function Shopping() {
                     onSubmit={handleSubmit}
                     className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px]"
                 >
-                    <div className="flex p-6 flex-col items-start justify-start">
+                    <div className="flex p-6 flex-col items-start justify-start w-full">
                         <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>
                         <h4 className="text-zinc-400 mt-1.5 text-sm">Add a new item to your shopping list</h4>
                     </div>

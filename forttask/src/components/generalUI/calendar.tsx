@@ -18,9 +18,9 @@ import {
 type CalendarProps = {
     initialDate?: Date;
     onChange?: (date: Date) => void;
-}
+};
 
-export default function Calendar({initialDate = new Date(), onChange}: CalendarProps) {
+export default function Calendar({ initialDate = new Date(), onChange }: CalendarProps) {
     const [currentMonth, setCurrentMonth] = useState(new Date(initialDate));
     const [selectedDate, setSelectedDate] = useState(initialDate);
     const today = new Date();
@@ -31,7 +31,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
     const endDate = endOfWeek(monthEnd);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-    const styleForSelected = "bg-[#A1A1AA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]";
+    const styleForSelected = 'bg-[#A1A1AA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]';
 
     const handleDateClick = (day: Date) => {
         if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {
@@ -40,7 +40,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
                 onChange(startOfDay(day));
             }
         }
-    }
+    };
 
     return (
         <div className="w-80 p-4 bg-[#09090B] text-[#FAFAFA] rounded-xl shadow-md border border-[#27272A]">

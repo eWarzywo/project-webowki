@@ -1,14 +1,26 @@
+'use client';
+
+import React from 'react';
+import Calendar from '@/components/generalUI/calendar';
+
 export default function Bills() {
+    const [showCalendar, setShowCalendar] = React.useState(false);
+    const [selectedDate, setSelectedDate] = React.useState<Date | null>(null);
+
+    const handleShowCalendar = () => {
+        setShowCalendar(!showCalendar);
+    };
+
     return (
         <>
             <div className="flex w-full self-stretch gap-[10px]">
                 <form
                     id="bills-form"
-                    className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px]"
+                    className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950"
                 >
-                    <div className="flex p-6 flex-col items-start justify-start">
-                        <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>
-                        <h4 className="text-zinc-400 mt-1.5 text-sm">Add a new item to your shopping list</h4>
+                    <div className="flex p-6 flex-col items-start justify-start w-full">
+                        <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new bill</h3>
+                        <h4 className="text-zinc-400 mt-1.5 text-sm">Add an upcoming bill to pay</h4>
                     </div>
                     <div className="px-6 pb-6 space-y-4 flex flex-col items-start">
                         <div className="flex flex-col items-start justify-start w-full gap-2.5 mt-1.5">
@@ -47,6 +59,12 @@ export default function Bills() {
                             <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
                                 Due to
                             </label>
+                            <div
+                                onClick={handleShowCalendar}
+                                className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                            >
+                                Pick date
+                            </div>
                         </div>
                         <div className=" flex w-full gap-[10px] justify-between items-center">
                             <input
@@ -63,6 +81,28 @@ export default function Bills() {
                     </div>
                 </form>
             </div>
+
+            {showCalendar && (
+                <div className="fixed inset-0 bg-zinc-950 bg-opacity-50 flex flex-col items-center justify-center z-50">
+                    <div className="bg-zinc-950 rounded-xl p-6 w-96 flex flex-col items-center justify-center border border-zinc-800">
+                        <Calendar />
+                        <div className="mt-2 text-zinc-50 text-sm">
+                            {selectedDate ? selectedDate.toLocaleDateString() : 'No date selected'}
+                        </div>
+                        <div className="flex justify-between items-center gap-4 mt-2 w-full px-3">
+                            <button className="w-1/2 rounded-xl px-4 py-2 transition bg-blue-600 hover:bg-blue-500">
+                                Select
+                            </button>
+                            <button
+                                onClick={handleShowCalendar}
+                                className="w-1/2 rounded-xl px-4 py-2 bg-zinc-700 hover:bg-zinc-600 transition"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
