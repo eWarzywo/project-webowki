@@ -47,7 +47,7 @@ export default function ShoppingListHandler() {
         };
 
         fetchTotalItems();
-    }, []);
+    }, [refresh]);
 
     useEffect(() => {
         const fetchData = async () => {

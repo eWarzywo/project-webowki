@@ -64,7 +64,37 @@ export default function Bills() {
             setError('Description must be less than 200 characters');
             return;
         }
-        setRefresh(!refresh);
+
+        const cycle = selectedOption ? calculateCycle(selectedDate, selectedOption) : 0;
+
+        const billData = {
+            name,
+            amount: cost,
+            cycle,
+            dueDate: selectedDate.toISOString(),
+            description,
+        };
+
+        fetch('/api/bill', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(billData),
+        })
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error('Failed to create bill');
+                }
+                return res.json();
+            })
+            .then(() => {
+                setRefresh(true);
+            })
+            .catch((error) => {
+                console.error(error);
+                setError('Failed to create bill');
+            });
     };
 
     const handleShowCalendar = () => {

@@ -1,25 +1,52 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../../../libs/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../..//auth';
 
 export async function POST(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ message: 'You must be logged in to create a bill' }, { status: 401 });
+        }
+
+        const userId = parseInt(session.user.id);
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { household: true },
+        });
+
+        if (!user) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 });
+        }
+
+        if (!user.householdId) {
+            return NextResponse.json(
+                { message: 'You must be a member of a household to create a bill' },
+                { status: 403 },
+            );
+        }
+
+        const householdId = user.householdId;
+
         const body = (await req.json()) as {
             name: string;
             amount: number;
+            cycle: number;
             dueDate: string;
             description?: string;
-            householdId: number;
-            createdById: number;
         };
 
         const newBill = await prisma.bill.create({
             data: {
                 name: body.name,
                 amount: body.amount,
+                cycle: body.cycle,
                 dueDate: new Date(body.dueDate),
                 description: body.description || '',
-                householdId: body.householdId,
-                createdById: body.createdById,
+                householdId: householdId,
+                createdById: userId,
             },
         });
 
@@ -32,24 +59,47 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ message: 'You must be logged in to get the bills' }, { status: 401 });
+        }
+
+        const userId = parseInt(session.user.id);
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { household: true },
+        });
+
+        if (!user) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 });
+        }
+
+        if (!user.householdId) {
+            return NextResponse.json(
+                { message: 'You must be a member of a household to get the bills' },
+                { status: 403 },
+            );
+        }
+
+        const householdId = user.householdId;
+
         const { searchParams } = new URL(req.url);
-        const householdId = searchParams.get('householdId');
-
-        if (!householdId) {
-            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
-        }
-
-        if (isNaN(Number(householdId))) {
-            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
-        }
+        const skip = parseInt(searchParams.get('skip') || '0');
+        const limit = parseInt(searchParams.get('limit') || '0');
 
         const bills = await prisma.bill.findMany({
             where: {
-                householdId: parseInt(householdId),
+                householdId,
+            },
+            skip: skip,
+            take: limit,
+            orderBy: {
+                dueDate: 'asc',
             },
         });
 
-        return NextResponse.json(bills);
+        return NextResponse.json(bills, { status: 200 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
@@ -58,24 +108,43 @@ export async function GET(req: Request) {
 
 export async function DELETE(req: Request) {
     try {
-        const { searchParams } = new URL(req.url);
-        const billId = searchParams.get('billId');
-
-        if (!billId) {
-            return NextResponse.json({ error: 'Missing billId parameter' }, { status: 400 });
+        const session = await getServerSession(authOptions);
+        if (!session || !session.user?.id) {
+            return NextResponse.json({ message: 'You must be logged in to delete a bill' }, { status: 401 });
         }
 
-        if (isNaN(Number(billId))) {
-            return NextResponse.json({ error: 'Invalid billId parameter' }, { status: 400 });
+        const userId = parseInt(session.user.id);
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { household: true },
+        });
+
+        if (!user) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        await prisma.bill.delete({
+        if (!user.householdId) {
+            return NextResponse.json(
+                { message: 'You must be a member of a household to delete a bill' },
+                { status: 403 },
+            );
+        }
+
+        const householdId = user.householdId;
+
+        const body = (await req.json()) as {
+            id: number;
+        };
+
+        const deletedBill = await prisma.bill.deleteMany({
             where: {
-                id: parseInt(billId),
+                id: body.id,
+                householdId,
             },
         });
 
-        return new NextResponse(null, { status: 204 });
+        return NextResponse.json(deletedBill, { status: 200 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
