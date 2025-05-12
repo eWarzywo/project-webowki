@@ -116,11 +116,27 @@ export async function GET(req: Request) {
 export async function DELETE(req: Request) {
     try {
         const session = await getServerSession(authOptions);
+
         if (!session || !session.user?.id) {
             return NextResponse.json({ message: 'You must be logged in to delete a bill' }, { status: 401 });
         }
 
         const userId = parseInt(session.user.id);
+
+        const { searchParams } = new URL(req.url);
+        const billId = parseInt(searchParams.get('id') || '');
+
+        if (isNaN(billId)) {
+            return NextResponse.json({ message: 'Invalid bill ID' }, { status: 400 });
+        }
+
+        const bill = await prisma.bill.findUnique({
+            where: { id: billId },
+        });
+
+        if (!bill) {
+            return NextResponse.json({ message: 'Bill not found' }, { status: 404 });
+        }
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
@@ -131,29 +147,17 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 });
         }
 
-        if (!user.householdId) {
-            return NextResponse.json(
-                { message: 'You must be a member of a household to delete a bill' },
-                { status: 403 },
-            );
+        if (!user.householdId || bill.householdId !== user.householdId) {
+            return NextResponse.json({ message: 'You are not authorized to delete this bill' }, { status: 403 });
         }
 
-        const householdId = user.householdId;
-
-        const body = (await req.json()) as {
-            id: number;
-        };
-
-        const deletedBill = await prisma.bill.deleteMany({
-            where: {
-                id: body.id,
-                householdId,
-            },
+        await prisma.bill.delete({
+            where: { id: billId },
         });
 
-        return NextResponse.json(deletedBill, { status: 200 });
+        return NextResponse.json({ message: 'Bill deleted successfully' }, { status: 200 });
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        console.error('Error deleting bill:', error);
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }

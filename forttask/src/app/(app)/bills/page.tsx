@@ -183,7 +183,12 @@ export default function Bills() {
                         <div className="flex items-start justify-start w-full mt-1.5 gap-2.5 ">
                             <div className="flex items-center gap-2 px-1">
                                 <div
-                                    onClick={() => setRecurring(!recurring)}
+                                    onClick={() => {
+                                        if (recurring) {
+                                            setSelectedOption(null);
+                                        }
+                                        setRecurring(!recurring);
+                                    }}
                                     className={`w-5 h-5 flex items-center justify-center border rounded cursor-pointer ${
                                         recurring ? 'bg-zinc-50 border-zinc-400' : 'bg-zinc-950 border-zinc-800'
                                     }`}
