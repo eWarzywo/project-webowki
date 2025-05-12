@@ -97,6 +97,13 @@ export async function GET(req: Request) {
             orderBy: {
                 dueDate: 'asc',
             },
+            include: {
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
         });
 
         return NextResponse.json(bills, { status: 200 });

@@ -8,6 +8,11 @@ import { unstable_noStore as noStore } from 'next/cache';
 
 interface Bill {
     id: number;
+    name: string;
+    amount: number;
+    createdBy: {
+        username: string;
+    };
 }
 
 export default function ShoppingListHandler() {
@@ -93,7 +98,13 @@ export default function ShoppingListHandler() {
 
         return data.map((item) => (
             <span key={item.id} className="w-full">
-                <BillRecord id={item.id} onDelete={handleDelete} />
+                <BillRecord
+                    id={item.id}
+                    onDelete={handleDelete}
+                    cost={item.amount}
+                    name={item.name}
+                    addedBy={item.createdBy.username}
+                />
                 <hr className="border-zinc-700 border" />
             </span>
         ));
