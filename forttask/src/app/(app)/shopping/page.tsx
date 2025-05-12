@@ -71,6 +71,8 @@ export default function Shopping() {
             <div className="flex w-full self-stretch gap-[10px]">
                 <form
                     id="shopping-form"
+                    autoComplete="off"
+                    autoCorrect="off"
                     onSubmit={handleSubmit}
                     className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px]"
                 >
