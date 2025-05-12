@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
 
 interface User {
     id: number;
@@ -40,7 +41,7 @@ interface SideBarProps {
 }
 
 function ManagementSideBar({ activeSection, setActiveSection }: SideBarProps) {
-    const sections = ['Account', 'Household'];
+    const sections = ['Account', 'Profile Picture', 'Household'];
 
     return (
         <div className="flex flex-col w-1/4">
@@ -69,6 +70,8 @@ function ContentSection({ activeSection }: ContentProps) {
     switch (activeSection) {
         case 'Account':
             return <AccountContent />;
+        case 'Profile Picture':
+            return <ProfilePicture />;
         case 'Household':
             return <HouseholdContent />;
         default:
@@ -211,6 +214,202 @@ function AccountContent() {
         </div>
     );
 }
+
+
+function ProfilePicture() {
+    const { data: session } = useSession();
+    const [profilePictures, setProfilePictures] = useState<{ id: number; name: string; imageUrl: string; category: string | null }[]>([]);
+    const [selectedPicture, setSelectedPicture] = useState<number | null>(null);
+    const [currentPicture, setCurrentPicture] = useState<{ id: number; name: string; imageUrl: string; category: string | null } | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [message, setMessage] = useState({ text: '', type: '' });
+
+
+    const defaultAvatar = {
+        id: 0,
+        name: 'Default Avatar',
+        imageUrl: '/images/avatars/defaultAvatar.png',
+        category: 'default'
+    };
+
+    useEffect(() => {
+        async function fetchProfilePictures() {
+            try {
+                setLoading(true);
+                const picResponse = await fetch('/api/user/profilepictures');
+                if (!picResponse.ok) {
+                    throw new Error('Failed to fetch profile pictures');
+                }
+                const picData = await picResponse.json();
+                
+                if (picData.profilePictures) {
+                    const uniquePictures = picData.profilePictures
+                    setProfilePictures(uniquePictures);
+                }
+
+                const userPicResponse = await fetch('/api/user/profilepicture');
+                if (userPicResponse.ok) {
+                    const userData = await userPicResponse.json();
+                    if (userData.profilePicture) {
+                        setCurrentPicture(userData.profilePicture);
+                        setSelectedPicture(userData.profilePicture.id);
+                    } else {
+                        setSelectedPicture(0);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching profile pictures:', error);
+                setMessage({ text: 'Failed to load profile pictures. Please try again.', type: 'error' });
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchProfilePictures();
+    }, []);
+
+    const handleSelectPicture = (pictureId: number) => {
+        setSelectedPicture(pictureId);
+    };
+
+    const handleSaveProfilePicture = async () => {
+        if (!session?.user?.id || selectedPicture === null) return;
+
+        try {
+            setSaving(true);
+            setMessage({ text: '', type: '' });
+
+            const response = await fetch('/api/user/profilepicture', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: parseInt(session.user.id),
+                    profilePictureId: selectedPicture,
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update profile picture');
+            }
+
+            const updatedData = await response.json();
+            setCurrentPicture(updatedData.profilePicture);
+            setMessage({ text: 'Profile picture updated successfully!', type: 'success' });
+        } catch (error) {
+            console.error('Error updating profile picture:', error);
+            setMessage({
+                text: error instanceof Error ? error.message : 'Failed to update profile picture. Please try again.',
+                type: 'error',
+            });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="flex-1 ml-6">
+            <div className="mb-8">
+                <h2 className="text-xl font-bold mb-1">Profile Picture</h2>
+                <p className="text-zinc-400 text-sm">Choose an avatar for your profile.</p>
+            </div>
+
+            {loading ? (
+                <div className="text-center py-4">Loading avatars...</div>
+            ) : (
+                <>
+                    {message.text && (
+                        <div
+                            className={`mb-4 p-2 rounded-[6px] ${
+                                message.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-green-900/50 text-green-200'
+                            }`}
+                        >
+                            {message.text}
+                        </div>
+                    )}
+
+                    <div className="mb-6">
+                        <h3 className="text-lg font-semibold mb-3">Current Avatar</h3>
+                        <div className="flex items-center">
+                            <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-800">
+                                <img
+                                    src={currentPicture?.imageUrl || defaultAvatar.imageUrl}
+                                    alt={currentPicture?.name || 'Default Avatar'}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm">{currentPicture?.name || 'Default Avatar'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mb-6">
+                        <h3 className="text-lg font-semibold mb-3">Choose a New Avatar</h3>
+                        
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                            <div
+                                key="default-avatar"
+                                onClick={() => handleSelectPicture(0)}
+                                className={`cursor-pointer transition-all duration-200 p-1 rounded-lg ${
+                                    selectedPicture === 0
+                                        ? 'bg-blue-500/20 ring-2 ring-blue-500'
+                                        : 'hover:bg-zinc-800'
+                                }`}
+                            >
+                                <div className="w-16 h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
+                                    <img
+                                        src={defaultAvatar.imageUrl}
+                                        alt={defaultAvatar.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <p className="text-xs text-center mt-1 truncate">{defaultAvatar.name}</p>
+                            </div>
+                            
+                            {profilePictures.map((picture) => (
+                                <div
+                                    key={picture.id}
+                                    onClick={() => handleSelectPicture(picture.id)}
+                                    className={`cursor-pointer transition-all duration-200 p-1 rounded-lg ${
+                                        selectedPicture === picture.id
+                                            ? 'bg-blue-500/20 ring-2 ring-blue-500'
+                                            : 'hover:bg-zinc-800'
+                                    }`}
+                                >
+                                    <div className="w-16 h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
+                                        <img
+                                            src={picture.imageUrl}
+                                            alt={picture.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-center mt-1 truncate">{picture.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <button
+                            className={`bg-zinc-50 text-zinc-900 px-4 py-2 rounded-[6px] hover:bg-zinc-100 text-sm font-normal ${
+                                saving ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                            onClick={handleSaveProfilePicture}
+                            disabled={saving || (selectedPicture === currentPicture?.id || (selectedPicture === 0 && currentPicture === null))}
+                        >
+                            {saving ? 'Saving...' : 'Save Profile Picture'}
+                        </button>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
 
 function HouseholdContent() {
     const { data: session } = useSession();

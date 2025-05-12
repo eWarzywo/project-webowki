@@ -1,50 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '../../../../../libs/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../auth';
+import prisma from '../../../../../libs/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userEmail = session.user.email;
+    const userId = parseInt(session.user.id);
 
     const user = await prisma.user.findUnique({
       where: {
-        email: userEmail as string,
+        id: userId,
       },
-      include: {
+      select: {
         profilePicture: true,
       },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (user.profilePicture) {
-      return NextResponse.json({
-        profilePicture: user.profilePicture
-      }, { status: 200 });
-    } else {
-      return NextResponse.json({
-        profilePicture: null
-      }, { status: 200 });
-    }
+    return NextResponse.json({ profilePicture: user.profilePicture }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching profile picture:', error);
+    console.error('Failed to fetch user profile picture:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch profile picture' },
       { status: 500 }
     );
   }
@@ -52,39 +38,38 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId } = body;
+    const session = await getServerSession(authOptions);
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const { userId, profilePictureId } = await request.json();
+
+    if (parseInt(session.user.id) !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const updatedUser = await prisma.user.update({
       where: {
-        id: parseInt(userId),
+        id: userId,
       },
-      include: {
+      data: {
+        profilePictureId: profilePictureId === 0 ? null : profilePictureId,
+      },
+      select: {
         profilePicture: true,
       },
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      profilePicture: user.profilePicture
+    return NextResponse.json({ 
+      profilePicture: updatedUser.profilePicture,
+      message: 'Profile picture updated successfully' 
     }, { status: 200 });
   } catch (error) {
-    console.error('Error fetching profile picture by userId:', error);
+    console.error('Failed to update profile picture:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to update profile picture' },
       { status: 500 }
     );
   }

@@ -9,7 +9,6 @@ async function main() {
   
   const profilePictures = [
     // Avatars
-    { name: 'Default Avatar', imageUrl: '/images/avatars/defaultAvatar.png', category: 'avatar' },
     { name: 'Default Avatar 1', imageUrl: '/images/avatars/avatar1.jpg', category: 'avatar' },
     { name: 'Default Avatar 2', imageUrl: '/images/avatars/avatar2.jpg', category: 'avatar' },
     { name: 'Default Avatar 3', imageUrl: '/images/avatars/avatar3.jpg', category: 'avatar' },
