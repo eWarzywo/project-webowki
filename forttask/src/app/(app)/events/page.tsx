@@ -4,6 +4,7 @@ import EventAddForm from "@/components/eventList/eventAddForm";
 import EventList from "@/components/eventList/eventList";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export default function Events() {
     const [date, setDate] = useState<Date>(new Date());
@@ -13,6 +14,8 @@ export default function Events() {
     const [refresh, setRefresh] = useState(false);
     const [page, setPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+
+    const router = useRouter();
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate);
@@ -34,7 +37,7 @@ export default function Events() {
         };
 
         fetchTotalItems();
-    }, [date]);
+    }, [date, refresh]);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -62,6 +65,8 @@ export default function Events() {
 
     const handleRefresh = () => {
         setRefresh(!refresh);
+        setPage(1);
+        router.push(`?page=1`);
     }
 
     const handlePageChange = (newPage: number) => {
