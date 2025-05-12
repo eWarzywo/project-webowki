@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ProfilePicture } from './profilePicture';
 
 export default function Header() {
     return (
@@ -13,10 +14,7 @@ export default function Header() {
                     </div>
                 </div>
                 <div className="flex flex-row-reverse items-center w-[30%]">
-                    <div className="hover:cursor-pointer rounded-3xl w-[40px] h-[40px] mx-2 bg-white text-black flex justify-center items-center">
-                        pfp
-                        {/*Do zmiany na ikonke*/}
-                    </div>{' '}
+                    <ProfilePicture />
                     <SearchBar />
                 </div>
             </header>
