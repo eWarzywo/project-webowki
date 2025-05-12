@@ -16,6 +16,8 @@ type Event = {
     date: Date;
     createdById: number;
     attendees: EventAttendee[];
+    location: string;
+    cycle: number;
 }
 
 type EventCardProps = {
@@ -62,9 +64,10 @@ export default function EventCard({ event, onRefresh }: EventCardProps) {
                     ))}
                 </div>
                 <p>{event.description}</p>
+                <p>Event happening at: {event.location}</p>
                 <p className="mr-2">{formattedDate}</p>
             </div>
-            <div className="flex flex-col w-1/5 justify-center">
+            <div className="flex flex-col w-1/5 justify-end">
                 <input type="button" value="Done" onClick={handleDone} className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium" />
             </div>
         </div>

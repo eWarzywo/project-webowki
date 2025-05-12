@@ -24,6 +24,8 @@ export async function POST(req: Request) {
             description?: string;
             date: string;
             attendees: number[];
+            location: string;
+            repeat: number;
         };
 
         const newEvent = await prisma.event.create({
@@ -33,6 +35,8 @@ export async function POST(req: Request) {
                 date: new Date(body.date),
                 householdId: householdId,
                 createdById: userId,
+                location: body.location,
+                cycle: body.repeat,
                 attendees: {
                     create: body.attendees.map((userId) => ({
                         user: { connect: { id: userId } },
