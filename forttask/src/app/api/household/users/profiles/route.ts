@@ -9,16 +9,16 @@ export async function GET(req: Request) {
         const householdId = searchParams.get('householdId');
 
         if (!householdId) {
-            return NextResponse.json({ error: 'Missing householdId parameter' }, { status: 400 });
+            return NextResponse.json({ message: 'Missing householdId parameter' }, { status: 400 });
         }
 
         if (isNaN(Number(householdId))) {
-            return NextResponse.json({ error: 'Invalid householdId parameter' }, { status: 400 });
+            return NextResponse.json({ message: 'Invalid householdId parameter' }, { status: 400 });
         }
 
         const session = await getServerSession(authOptions);
         if (!session || !session.user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }
 
         const users = await prisma.user.findMany({
