@@ -49,9 +49,7 @@ export async function POST(req: Request) {
             include: { attendees: { include: { user: true } } },
         });
 
-        console.log(body.repeat, body.repeatCount);
-
-        if (body.repeat > 0 && body.repeatCount > 0) {
+        if ((body.repeat > 0 || body.repeat == -30 || body.repeat == -365) && body.repeatCount > 0) {
             const childEvents = [];
             const baseDate = new Date(body.date);
 
@@ -59,7 +57,6 @@ export async function POST(req: Request) {
                 let nextDate;
 
                 if (body.repeat === -30) {
-                    console.log("fuck next")
                     nextDate = addMonths(baseDate, i);
                 } else if (body.repeat === -365) {
                     nextDate = addYears(baseDate, i);

@@ -19,6 +19,7 @@ export default function Events() {
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate);
+        handleRefresh();
     }
 
     useEffect(() => {
@@ -64,9 +65,9 @@ export default function Events() {
     }, [date, refresh, page]);
 
     const handleRefresh = () => {
-        setRefresh(!refresh);
         setPage(1);
         router.push(`?page=1`);
+        setRefresh(!refresh);
     }
 
     const handlePageChange = (newPage: number) => {

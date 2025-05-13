@@ -3,7 +3,6 @@ import EventCard from "@/components/eventList/eventCard";
 import Pagination from "@/components/generalUI/pagination";
 import { useEffect } from "react";
 import {useSearchParams} from "next/navigation";
-import {unstable_noStore as noStore} from "next/dist/server/web/spec-extension/unstable-no-store";
 
 type User = {
     id: number;
@@ -38,17 +37,13 @@ type EventListProps = {
 
 export default function EventList({ events, loading, error, onRefresh, setPage, totalItems }: EventListProps) {
     const searchParams = useSearchParams();
+    const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
     useEffect(() => {
         if (setPage) {
-            const currentPage = parseInt(searchParams?.get('page') || '1', 10);
             setPage(currentPage);
         }
     }, [searchParams, setPage]);
-
-    noStore();
-
-    console.log(totalItems);
 
     return (
         <div className="flex w-full h-fit flex-col border border-zinc-800 bg-zinc-950 rounded-xl p-6">
@@ -67,7 +62,7 @@ export default function EventList({ events, loading, error, onRefresh, setPage, 
             </div>
             {Math.ceil(totalItems / 5) > 1 && (
                 <span className="flex justify-center items-center w-full mt-5">
-                    <Pagination totalNumberOfItems={totalItems} itemsPerPage={5} />
+                    <Pagination totalNumberOfItems={totalItems} itemsPerPage={5} key={`pagination-${currentPage}`} />
                 </span>
             )}
         </div>

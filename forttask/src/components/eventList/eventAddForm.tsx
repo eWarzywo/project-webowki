@@ -129,7 +129,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
         setIsCustomRepeat(false);
         setCustomRepeatInput("");
         setRepeatAmount(0);
-        setRepeatAmountInput(""); // Added missing reset
+        setRepeatAmountInput("");
         setError(null);
     };
 
@@ -280,7 +280,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 )}
                 {repeat !== 0 && (
                     <>
-                        <label htmlFor="repeatCount" className="text-zinc-400 text-sm mb-1">
+                        <label htmlFor="repeatCount" className="text-zinc-400 text-sm mb-1 text-end">
                             How many times should it repeat?
                         </label>
                         <input

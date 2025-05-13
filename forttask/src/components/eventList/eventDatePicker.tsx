@@ -15,7 +15,7 @@ export default function EventDatePicker({ initialDate = new Date(), onChange }: 
         if (onChange) {
             onChange(selectedDate);
         }
-    }, [selectedDate, onChange]);
+    }, [selectedDate]);
 
     return (
         <div className="flex w-auto h-auto flex-col items-center max-h-96">
