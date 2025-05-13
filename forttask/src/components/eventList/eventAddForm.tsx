@@ -1,4 +1,4 @@
-import Calendar from '@/components/generalUI/calendar';
+import DatePicker from '@/components/generalUI/datePicker';
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
@@ -17,11 +17,24 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
     const [participants, setParticipants] = useState<number[]>([]);
     const [eventLocation, setLocation] = useState('');
     const [repeat, setRepeat] = useState(0);
+    const [isCustomRepeat, setIsCustomRepeat] = useState(false);
+    const [customRepeatInput, setCustomRepeatInput] = useState("");
+    const [repeatAmount, setRepeatAmount] = useState(0);
+    const [repeatAmountInput, setRepeatAmountInput] = useState(""); // Fixed variable name
     const [description, setDescription] = useState('');
     const [error, setError] = useState<Error | null>(null);
     const [householders, setHouseholders] = useState<Householders[]>([]);
     const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
+    const [showCalendar, setShowCalendar] = useState(false);
 
+    const handleShowCalendar = () => {
+        setShowCalendar(!showCalendar);
+    };
+
+    const handleSelectDate = (date: Date) => {
+        setEventDate(date);
+        handleShowCalendar();
+    };
 
     useEffect(() => {
         const fetchHouseholders = async () => {
@@ -88,6 +101,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                     attendees: participants,
                     location: eventLocation,
                     repeat: repeat,
+                    repeatCount: repeatAmount,
                     description: description,
                 }),
             });
@@ -111,6 +125,12 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
         setRepeat(0);
         setDescription('');
         setValidationErrors({});
+        setShowCalendar(false);
+        setIsCustomRepeat(false);
+        setCustomRepeatInput("");
+        setRepeatAmount(0);
+        setRepeatAmountInput(""); // Added missing reset
+        setError(null);
     };
 
     useEffect(() => {
@@ -133,7 +153,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
     return (
         <div className="flex flex-col w-1/5 justify-center items-end rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-6">
             <p className="text-zinc-50 text-2xl font-semibold w-full text-end">Add Event</p>
-            <p className="text-zinc-400 mt-1.5 text-sm pb-6">Add a new event for you or your buddy</p>
+            <p className="text-zinc-400 mt-1.5 text-sm pb-6 text-end">Add a new event for you or your buddy</p>
             <form className="flex flex-col w-full justify-center items-end">
                 <label htmlFor="eventName">Name</label>
                 <input
@@ -144,7 +164,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                     onChange={(e) => {
                         setEventName(e.target.value);
                         if (validationErrors.eventName && e.target.value.trim()) {
-                            setValidationErrors({ ...validationErrors, eventName: false });
+                            setValidationErrors({...validationErrors, eventName: false});
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -153,7 +173,12 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 />
                 {validationErrors.eventName && <p className="text-red-500 text-xs mb-2">Event name is required</p>}
                 <label htmlFor="eventDate">Date</label>
-                <Calendar onChange={setEventDate} />
+                <div
+                    onClick={handleShowCalendar}
+                    className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                >
+                    {eventDate ? eventDate.toLocaleDateString() : 'Select a date'}
+                </div>
                 <label htmlFor="participants" className="mt-2">
                     Participants
                 </label>
@@ -161,12 +186,12 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 <select
                     id="participants"
                     multiple
-                    value={participants.map(String)} // Add this to make it fully controlled
+                    value={participants.map(String)}
                     onChange={(e) => {
                         const selectedOptions = Array.from(e.target.selectedOptions, (option) => Number(option.value));
                         setParticipants(selectedOptions);
                         if (validationErrors.participants && selectedOptions.length > 0) {
-                            setValidationErrors({ ...validationErrors, participants: false });
+                            setValidationErrors({...validationErrors, participants: false});
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -191,7 +216,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                     onChange={(e) => {
                         setLocation(e.target.value);
                         if (validationErrors.eventLocation && e.target.value.trim()) {
-                            setValidationErrors({ ...validationErrors, eventLocation: false });
+                            setValidationErrors({...validationErrors, eventLocation: false});
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -200,23 +225,91 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 />
                 {validationErrors.eventLocation && <p className="text-red-500 text-xs mb-2">Location is required</p>}
                 <label htmlFor="repeat">Repeat after x days?</label>
-                <p className="text-zinc-400 text-sm mb-1">Leave 0 if not repeatable</p>
-                <input
-                    type="text"
+                <select
                     id="repeat"
-                    placeholder="Enter event repeat interval"
-                    value={repeat}
-                    onChange={(e) =>
-                        parseInt(e.target.value) >= 0
-                            ? parseInt(e.target.value) <= 365
-                                ? setRepeat(parseInt(e.target.value))
-                                : setRepeat(365)
-                            : setRepeat(0)
-                    }
-                    min={0}
-                    max={365}
+                    value={isCustomRepeat ? "-1" : repeat.toString()}
+                    onChange={(e) => {
+                        const value = parseInt(e.target.value, 10);
+                        if (value === -1) {
+                            setIsCustomRepeat(true);
+                            setCustomRepeatInput("");
+                        } else {
+                            setIsCustomRepeat(false);
+                            setRepeat(value);
+                        }
+
+                        if (value === 0) {
+                            setRepeatAmount(0);
+                            setRepeatAmountInput("");
+                        }
+                    }}
                     className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
-                />
+                >
+                    <option value="0">No Repeat</option>
+                    <option value="1">Daily</option>
+                    <option value="7">Weekly</option>
+                    <option value="-30">Monthly</option>
+                    <option value="-365">Yearly</option>
+                    <option value="-1">Custom...</option>
+                </select>
+                {isCustomRepeat && (
+                    <input
+                        type="number"
+                        id="customRepeat"
+                        placeholder="Enter days"
+                        min="1"
+                        value={customRepeatInput}
+                        onChange={(e) => {
+                            const newValue = e.target.value;
+
+                            if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                                setCustomRepeatInput(newValue);
+
+                                if (newValue === "") {
+                                    setRepeat(0);
+                                } else {
+                                    const value = parseInt(newValue, 10);
+                                    if (value >= 1) {
+                                        setRepeat(value);
+                                    }
+                                }
+                            }
+                        }}
+                        className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                    />
+                )}
+                {repeat !== 0 && (
+                    <>
+                        <label htmlFor="repeatCount" className="text-zinc-400 text-sm mb-1">
+                            How many times should it repeat?
+                        </label>
+                        <input
+                            type="number"
+                            id="repeatCount"
+                            placeholder="Enter repeat count"
+                            min="1"
+                            max="100"
+                            value={repeatAmountInput}
+                            onChange={(e) => {
+                                const newValue = e.target.value;
+
+                                if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                                    setRepeatAmountInput(newValue);
+
+                                    if (newValue === "") {
+                                        setRepeatAmount(0);
+                                    } else {
+                                        const value = parseInt(newValue, 10);
+                                        if (value >= 1 && value <= 365) {
+                                            setRepeatAmount(value);
+                                        }
+                                    }
+                                }
+                            }}
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                        />
+                    </>
+                )}
                 <label htmlFor="description">Description</label>
                 <input
                     type="text"
@@ -226,7 +319,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                     onChange={(e) => {
                         setDescription(e.target.value);
                         if (validationErrors.description && e.target.value.trim()) {
-                            setValidationErrors({ ...validationErrors, description: false });
+                            setValidationErrors({...validationErrors, description: false});
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -249,6 +342,13 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                     />
                 </div>
             </form>
+            {showCalendar && (
+                <DatePicker
+                    selectedDate={eventDate}
+                    setSelectedDate={handleSelectDate}
+                    handleShowCalendar={handleShowCalendar}
+                />
+            )}
         </div>
     );
 }
