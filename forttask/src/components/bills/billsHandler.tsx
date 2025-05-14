@@ -1,29 +1,25 @@
 'use client';
+
 import Pagination from '@/components/generalUI/pagination';
-import ShoppingListItem from '@/components/shoppingList/shoppingListItem';
+import BillRecord from './billRecord';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { unstable_noStore as noStore } from 'next/cache';
 
-interface ShoppingItem {
+interface Bill {
     id: number;
     name: string;
-    cost: number;
+    amount: number;
     createdBy: {
         username: string;
     };
-    boughtBy: {
-        id: number;
-        username: string;
-    } | null;
-    updatedAt: string | null;
 }
 
 export default function ShoppingListHandler() {
-    const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [refresh, setRefresh] = useState(false);
+    const [data, setData] = useState<Bill[]>([]);
 
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
@@ -34,7 +30,7 @@ export default function ShoppingListHandler() {
     useEffect(() => {
         const fetchTotalItems = async () => {
             try {
-                const response = await fetch('/api/shoppingList/totalNumber');
+                const response = await fetch('/api/bill/totalNumber');
                 if (response.ok) {
                     const { count } = await response.json();
                     setTotalItems(count);
@@ -53,9 +49,7 @@ export default function ShoppingListHandler() {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(
-                    `/api/shoppingList?limit=${itemsPerPage}&skip=${(page - 1) * itemsPerPage}`,
-                );
+                const response = await fetch(`/api/bill?limit=${itemsPerPage}&skip=${(page - 1) * itemsPerPage}`);
                 if (response.ok) {
                     const items = await response.json();
                     setData(items);
@@ -73,7 +67,7 @@ export default function ShoppingListHandler() {
     }, [page, refresh]);
 
     const handleDelete = (id: number) => {
-        fetch(`/api/shoppingList?id=${id}`, {
+        fetch(`/api/bill?id=${id}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
         })
@@ -96,27 +90,38 @@ export default function ShoppingListHandler() {
 
         if (data.length === 0) {
             return (
-                <div className="flex items-center justify-center w-full py-10 text-zinc-400">
-                    <p className="text-lg">No items found in your shopping list. {':('}</p>
+                <div className="flex items-center justify-center w-full py-10">
+                    <p className="text-zinc-400">No bills found. {':('}</p>
                 </div>
             );
         }
 
         return data.map((item) => (
             <span key={item.id} className="w-full">
-                <ShoppingListItem id={item.id} handleDelete={() => handleDelete(item.id)} />
+                <BillRecord
+                    id={item.id}
+                    onDelete={handleDelete}
+                    cost={item.amount}
+                    name={item.name}
+                    addedBy={item.createdBy.username}
+                />
                 <hr className="border-zinc-700 border" />
             </span>
         ));
     };
 
     return (
-        <div className="w-5/6 flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5">
+        <div
+            className={`min-h-80 w-5/6 flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5`}
+            style={{ maxHeight: `${data?.length * 10 + (Math.ceil(totalItems / itemsPerPage) > 1 ? 12 : 0)}rem` }}
+        >
             <div className="flex p-6 flex-col justify-center items-start">
                 <h2 className="text-2xl font-semibold text-zinc-50 self-stretch gap-2.5 flex items-center">
-                    Your shopping List
+                    Your bills
                 </h2>
-                <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
+                <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">
+                    Manage your expenses
+                </p>
             </div>
             <div className="flex items-start flex-col self-stretch px-[30px]">{renderContent()}</div>
             {Math.ceil(totalItems / itemsPerPage) > 1 && (

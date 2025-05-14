@@ -149,7 +149,14 @@ export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemP
             </div>
 
             {showConfirm && (
-                <ConfirmationBox name={data.name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
+                <ConfirmationBox
+                    name={data.name}
+                    onCancel={() => setShowConfirm(false)}
+                    onConfirm={() => {
+                        handleDelete();
+                        setShowConfirm(false);
+                    }}
+                />
             )}
 
             {showDetails && (
