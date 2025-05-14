@@ -140,7 +140,7 @@ export function Card({
             );
         }
         
-        const recordsToShow = data.slice(Math.max(data.length - 3, 0));
+        const recordsToShow = getLastThreeRecords(data);
         
         if (dataType == DataType.events || dataType == DataType.chores) {
             let c = 1;
