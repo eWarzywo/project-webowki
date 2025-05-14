@@ -9,8 +9,6 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
-
     try {
         const url = new URL(request.url);
         const id = url.searchParams.get('id');
@@ -21,10 +19,9 @@ export async function GET(request: Request) {
 
         const billDetails = await prisma.bill.findUnique({
             where: {
-                id: parseInt(id),
+                id: Number(id),
             },
             select: {
-                id: true,
                 name: true,
                 description: true,
                 amount: true,
@@ -33,14 +30,16 @@ export async function GET(request: Request) {
                 createdAt: true,
                 updatedAt: true,
                 createdBy: {
-                    select: { username: true },
+                    select: {
+                        username: true,
+                    },
                 },
                 paidBy: {
-                    select: { username: true },
+                    select: {
+                        username: true,
+                    },
                 },
-                household: {
-                    select: { name: true },
-                },
+                householdId: true,
             },
         });
 
