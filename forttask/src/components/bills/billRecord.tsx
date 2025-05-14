@@ -79,7 +79,7 @@ function DetailsBox({ id, onCancel }: { id: number; onCancel: (value: boolean) =
                         <p className="text-zinc-400 mb-2 text-xl pl-2">Cost: {details?.amount}$</p>
                         {details?.cycle ? (
                             <p className="text-zinc-400 mb-2 text-xl pl-2">
-                                Repated:{' '}
+                                Repeated:{' '}
                                 {details.cycle === 7
                                     ? 'Weekly'
                                     : details.cycle === 30 || details.cycle === 31
