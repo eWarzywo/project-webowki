@@ -1,3 +1,12 @@
+'use client';
+import { useState, useEffect } from 'react';
+import ChoreAddForm from '@/components/choreList/choreAddForm';
+
+
 export default function Chores() {
-    return <>meow</>;
+    return (
+        <>
+            <ChoreAddForm />
+        </>
+    );
 }
