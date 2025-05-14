@@ -252,6 +252,7 @@ export default function Bills() {
                 </form>
                 {!refresh && <BillsHandler />}
             </div>
+        
             {showCalendar && (
                 <DatePicker
                     selectedDate={selectedDate}
