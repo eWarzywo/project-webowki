@@ -53,7 +53,7 @@ function NavMenu() {
             </li>
             <li>
                 <Link href="/managment" className="hover:text-white">
-                    Managment
+                    Management
                 </Link>
             </li>
         </ul>
