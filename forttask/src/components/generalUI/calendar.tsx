@@ -31,7 +31,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
     const endDate = endOfWeek(monthEnd);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-    const styleForSelected = "bg-[#A1A1AA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]";
+    const styleForSelected = "bg-zinc-50 text-[#18181B] font-semibold hover:bg-zinc-300 hover:text-[#FAFAFA]";
 
     const handleDateClick = (day: Date) => {
         if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {
@@ -72,7 +72,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
                         key={day.toString()}
                         onClick={() => handleDateClick(day)}
                         className={`p-2 rounded-xl flex items-center justify-center h-10 w-10 text-lg cursor-pointer
-                          ${isToday(day) ? 'bg-[#FAFAFA] text-[#18181B] font-semibold hover:bg-[#A1A1AA] hover:text-[#FAFAFA]' : ''} 
+                          ${isToday(day) ? 'bg-zinc-600 text-[#18181B] font-semibold hover:text-[#FAFAFA]' : ''} 
                           ${isBefore(day, today) && !isToday(day) ? 'text-[#A1A1AA]' : ''} 
                           ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-[#18181B]' : ''}
                           ${format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') ? styleForSelected : ''}`}
