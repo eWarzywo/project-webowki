@@ -19,7 +19,7 @@ export default function Events() {
     const [refresh, setRefresh] = useState(false);
 
     const router = useRouter();
-    const { isConnected, socketRefresh, emitUpdate, joinHousehold } = useSocket();
+    const { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate);
@@ -71,15 +71,13 @@ export default function Events() {
 
         return () => {
             if (householdId) {
-                emitUpdate(householdId);
+                leaveHousehold(householdId.toString());
             }
         };
     }, [isConnected, householdId]);
 
     useEffect(() => {
-        if (socketRefresh) {
-            handleRefresh();
-        }
+        handleRefresh();
     }, [socketRefresh]);
 
     useEffect(() => {
@@ -110,9 +108,6 @@ export default function Events() {
         setPage(1);
         router.push(`?page=1`);
         setRefresh(!refresh);
-        if (householdId) {
-            emitUpdate(householdId);
-        }
     }
 
     const handlePageChange = (newPage: number) => {
@@ -132,9 +127,11 @@ export default function Events() {
                     onRefresh={handleRefresh}
                     setPage={handlePageChange}
                     totalItems={totalItems}
+                    emitUpdate={() => householdId && emitUpdate(householdId)}
                 />
                 <EventAddForm
                     onRefresh={handleRefresh}
+                    emitUpdate={() => householdId && emitUpdate(householdId)}
                 />
             </div>
         </>

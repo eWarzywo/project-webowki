@@ -44,5 +44,13 @@ export const useSocket = () => {
         }
     }
 
-    return { isConnected, socketRefresh, emitUpdate, joinHousehold };
+    const leaveHousehold = (householdId: string) => {
+        if (socket) {
+            socket.emit('leave household', householdId);
+        } else {
+            console.error('Socket is not initialized');
+        }
+    }
+
+    return { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold };
 }

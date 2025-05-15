@@ -22,6 +22,10 @@ app.prepare().then(() => {
             socket.join(`household-${householdId}`);
         });
 
+        socket.on('leave household', (householdId) => {
+            socket.leave(`household-${householdId}`);
+        });
+
         socket.on('refresh', (data) => {
             io.to(`household-${data.householdId}`).emit('refresh', data);
         });

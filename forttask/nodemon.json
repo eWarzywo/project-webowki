@@ -1,6 +1,6 @@
 {
-  "watch": ["server.js", "src"],
-  "ext": "js,ts,tsx,json",
+  "watch": ["server.mjs", "src"],
+  "ext": "mjs,js,ts,tsx,json",
   "ignore": ["node_modules"],
-  "exec": "node server.js"
+  "exec": "node server.mjs"
 }

@@ -33,9 +33,10 @@ type EventListProps = {
     onRefresh?: () => void;
     setPage?: (page: number) => void;
     totalItems: number;
+    emitUpdate?: () => void;
 }
 
-export default function EventList({ events, loading, error, onRefresh, setPage, totalItems }: EventListProps) {
+export default function EventList({ events, loading, error, onRefresh, setPage, totalItems, emitUpdate }: EventListProps) {
     const searchParams = useSearchParams();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
 
@@ -55,7 +56,7 @@ export default function EventList({ events, loading, error, onRefresh, setPage, 
                 ) : error ? (
                     <p className="text-zinc-400 text-center">Error: {error.message}</p>
                 ) : events && events.length > 0 ? (
-                    events.map((event) => <EventCard key={event.id} event={event} onRefresh={onRefresh} />)
+                    events.map((event) => <EventCard key={event.id} event={event} onRefresh={onRefresh} emitUpdate={emitUpdate} />)
                 ) : (
                     <p className="text-zinc-400 text-center">No events found</p>
                 )}

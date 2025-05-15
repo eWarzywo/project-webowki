@@ -26,6 +26,7 @@ type Event = {
 type EventCardProps = {
     event: Event;
     onRefresh?: () => void;
+    emitUpdate?: () => void;
 }
 
 type DetailsBoxProps = {
@@ -140,7 +141,7 @@ function DetailsBox({ name, description, date, location, attendees, onClose }: D
     );
 }
 
-export default function EventCard({ event, onRefresh }: EventCardProps) {
+export default function EventCard({ event, onRefresh, emitUpdate }: EventCardProps) {
     const dateObject = new Date(event.date);
 
     const formattedDate = dateObject.toLocaleDateString('en-US', {
@@ -169,6 +170,9 @@ export default function EventCard({ event, onRefresh }: EventCardProps) {
                         });
                         if (!response.ok) {
                             throw new Error(`Failed to delete event: ${response.status}`);
+                        }
+                        if (emitUpdate) {
+                            emitUpdate();
                         }
                         handleRefresh();
                     } catch (error) {
