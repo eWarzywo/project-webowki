@@ -124,7 +124,6 @@ export default function Events() {
                     events={events}
                     loading={loading}
                     error={error}
-                    onRefresh={handleRefresh}
                     setPage={handlePageChange}
                     totalItems={totalItems}
                     emitUpdate={() => householdId && emitUpdate(householdId)}

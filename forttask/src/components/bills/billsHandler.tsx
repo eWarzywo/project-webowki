@@ -15,10 +15,14 @@ interface Bill {
     };
 }
 
-export default function ShoppingListHandler() {
+type BillHandlerProps = {
+    emitUpdate?: () => void;
+    refresh?: boolean;
+}
+
+export default function ShoppingListHandler({ emitUpdate, refresh }: BillHandlerProps) {
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [refresh, setRefresh] = useState(false);
     const [data, setData] = useState<Bill[]>([]);
 
     const itemsPerPage = 6;
@@ -73,7 +77,9 @@ export default function ShoppingListHandler() {
         })
             .then((response) => {
                 if (!response.ok) throw new Error('Failed to delete item');
-                setRefresh((prev) => !prev);
+                if (emitUpdate) {
+                    emitUpdate();
+                }
                 return response.json();
             })
             .catch((error) => console.error('Error deleting item:', error));

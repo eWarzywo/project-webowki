@@ -86,7 +86,6 @@ export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerP
                 if (emitUpdate) {
                     emitUpdate();
                 }
-                setRefresh((prev) => !prev);
                 return response.json();
             })
             .catch((error) => console.error('Error deleting item:', error));

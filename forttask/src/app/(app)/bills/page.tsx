@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import DatePicker from '@/components/generalUI/datePicker';
 import BillsHandler from '@/components/bills/billsHandler';
 import Image from 'next/image';
-import { set } from 'date-fns';
+import { useSocket } from '@/lib/socket';
 
 export default function Bills() {
     const [showCalendar, setShowCalendar] = React.useState(false);
@@ -17,6 +17,45 @@ export default function Bills() {
     const [description, setDescription] = React.useState<string>('');
     const [error, setError] = React.useState<string | null>(null);
     const [refresh, setRefresh] = React.useState<boolean>(false);
+
+    const [householdId, setHouseholdId] = React.useState<number | null>(null); // moj bracie wez zaimportuj po prostu useState XDDD
+    const { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+
+    useEffect(() => {
+        const fetchHouseholdId = async () => {
+            try {
+                const response = await fetch('/api/user/get');
+                if (response.ok) {
+                    const data = await response.json();
+                    setHouseholdId(data.householdId);
+                } else {
+                    console.error(`Failed to fetch household ID, Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error fetching household ID:', error);
+            }
+        };
+
+        fetchHouseholdId();
+    }, []);
+
+    useEffect(() => {
+        if (!isConnected) return;
+
+        if (householdId) {
+            joinHousehold(householdId.toString());
+        }
+
+        return () => {
+            if (householdId) {
+                leaveHousehold(householdId.toString());
+            }
+        };
+    }, [isConnected, householdId]);
+
+    useEffect(() => {
+        setRefresh(!refresh);
+    }, [socketRefresh]);
 
     React.useEffect(() => {
         if (refresh) {
@@ -89,7 +128,9 @@ export default function Bills() {
                 return res.json();
             })
             .then(() => {
-                setRefresh(true);
+                if (householdId) {
+                    emitUpdate(householdId);
+                }
             })
             .catch((error) => {
                 console.error(error);
@@ -250,7 +291,7 @@ export default function Bills() {
                     </div>
                     {error && <p className="text-red-500 text-sm pb-1">{error}</p>}
                 </form>
-                {!refresh && <BillsHandler />}
+                {!refresh && <BillsHandler emitUpdate={() => householdId && emitUpdate(householdId)} refresh={refresh}/>}
             </div>
         
             {showCalendar && (

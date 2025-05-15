@@ -115,7 +115,6 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                 emitUpdate();
             }
             handleCancel();
-            handleRefresh();
         } catch (error) {
             setError(error instanceof Error ? error : new Error('An unknown error occurred'));
         }

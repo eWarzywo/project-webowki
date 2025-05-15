@@ -20,7 +20,13 @@ interface BillDetails {
     };
 }
 
-function DetailsBox({ id, onCancel }: { id: number; onCancel: (value: boolean) => void }) {
+type DetailsBoxProps = {
+    id: number;
+    onCancel: (value: boolean) => void;
+    emitUpdate?: () => void;
+}
+
+function DetailsBox({ id, onCancel, emitUpdate }: DetailsBoxProps) {
     const [details, setDetails] = React.useState<BillDetails | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [reload, setReload] = React.useState(false);
@@ -56,6 +62,9 @@ function DetailsBox({ id, onCancel }: { id: number; onCancel: (value: boolean) =
 
         if (response.ok) {
             console.log('Bill updated successfully');
+            if (emitUpdate) {
+                emitUpdate();
+            }
         } else {
             console.error('Failed to update bill');
         }
