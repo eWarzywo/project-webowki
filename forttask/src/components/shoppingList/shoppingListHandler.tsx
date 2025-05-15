@@ -19,7 +19,11 @@ interface ShoppingItem {
     updatedAt: string | null;
 }
 
-export default function ShoppingListHandler() {
+type ShoppingListHandlerProps = {
+    emitUpdate?: () => void;
+}
+
+export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerProps) {
     const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +83,9 @@ export default function ShoppingListHandler() {
         })
             .then((response) => {
                 if (!response.ok) throw new Error('Failed to delete item');
+                if (emitUpdate) {
+                    emitUpdate();
+                }
                 setRefresh((prev) => !prev);
                 return response.json();
             })
@@ -104,7 +111,7 @@ export default function ShoppingListHandler() {
 
         return data.map((item) => (
             <span key={item.id} className="w-full">
-                <ShoppingListItem id={item.id} handleDelete={() => handleDelete(item.id)} />
+                <ShoppingListItem id={item.id} handleDelete={() => handleDelete(item.id)} emitUpdate={emitUpdate} />
                 <hr className="border-zinc-700 border" />
             </span>
         ));
