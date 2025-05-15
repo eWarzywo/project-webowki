@@ -118,7 +118,7 @@ export default function ShoppingListHandler() {
                 </h2>
                 <p className="gap-2.5 mt-1.5 flex self-stretch text-sm font-normal text-zinc-400">Manage your needs</p>
             </div>
-            <div className="flex items-start flex-col self-stretch px-[30px]">{renderContent()}</div>
+            <div className="flex items-start flex-col self-stretch px-8">{renderContent()}</div>
             {Math.ceil(totalItems / itemsPerPage) > 1 && (
                 <span className="flex justify-center items-center w-full mt-5">
                     <Pagination totalNumberOfItems={totalItems} itemsPerPage={itemsPerPage} />

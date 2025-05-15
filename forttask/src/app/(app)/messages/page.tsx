@@ -132,7 +132,7 @@ export default function Messages() {
 
         await householdChannel.watch();
         
-        const channelResponse = await householdChannel.query({ messages: { limit: 50 } });
+        const channelResponse = await householdChannel.query({ messages: { limit: 100 } });
         if (channelResponse.messages) {
           setMessages(channelResponse.messages);
         }
@@ -251,7 +251,7 @@ export default function Messages() {
         </p>
         <a
           href="/household"
-          className="bg-zinc-800 text-zinc-50 px-4 py-2 rounded-[6px] hover:bg-zinc-700 text-sm font-normal"
+          className="bg-zinc-800 text-zinc-50 px-4 py-2 rounded-md hover:bg-zinc-700 text-sm font-normal"
         >
           Join or Create a Household
         </a>
@@ -273,7 +273,7 @@ export default function Messages() {
   if (messages.length === 0) {
     return (
       <div className="flex h-full bg-zinc-950 text-zinc-50">
-        <div className="w-[280px] border-r border-zinc-800 overflow-y-auto">
+        <div className="w-72 border-r border-zinc-800 overflow-y-auto">
           <div className="p-4">
             <h2 className="text-lg font-medium text-zinc-50 mb-4">Messages</h2>
             <div className="space-y-2">
@@ -336,7 +336,7 @@ export default function Messages() {
 
   return (
     <div className="flex h-full bg-zinc-950 text-zinc-50">
-      <div className="w-[280px] border-r border-zinc-800 overflow-y-auto">
+      <div className="w-72 border-r border-zinc-800 overflow-y-auto">
         <div className="p-4">
           <h2 className="text-lg font-medium text-zinc-50 mb-4">Members</h2>
           <div className="space-y-2">
