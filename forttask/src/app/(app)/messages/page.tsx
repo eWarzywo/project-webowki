@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { StreamChat, MessageResponse, Channel } from 'stream-chat';
+import { StreamChat, MessageResponse } from 'stream-chat';
 
 interface ProfilePictureData {
   id: number;
