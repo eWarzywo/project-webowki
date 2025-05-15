@@ -47,7 +47,7 @@ export default function Shopping() {
     }, [isConnected, householdId]);
 
     useEffect(() => {
-        setAddedToggle(!addedToggle);
+        setAddedToggle(prev => !prev);
     }, [shoppingRefresh]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
