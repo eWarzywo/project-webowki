@@ -5,22 +5,44 @@ import EventList from "@/components/eventList/eventList";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import { useSocket } from '@/lib/socket';
 
 export default function Events() {
     const [date, setDate] = useState<Date>(new Date());
     const [events, setEvents] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [householdId, setHouseholdId] = useState<number | null>(null);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [refresh, setRefresh] = useState(false);
-    const [page, setPage] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
 
     const router = useRouter();
+    const { isConnected, eventsRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate);
         handleRefresh();
     }
+
+    useEffect(() => {
+        const fetchHouseholdId = async () => {
+            try {
+                const response = await fetch('/api/user/get');
+                if (response.ok) {
+                    const data = await response.json();
+                    setHouseholdId(data.householdId);
+                } else {
+                    console.error(`Failed to fetch household ID, Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error fetching household ID:', error);
+            }
+        };
+
+        fetchHouseholdId();
+    }, []);
 
     useEffect(() => {
         const fetchTotalItems = async () => {
@@ -39,6 +61,24 @@ export default function Events() {
 
         fetchTotalItems();
     }, [date, refresh]);
+
+    useEffect(() => {
+        if (!isConnected) return;
+
+        if (householdId) {
+            joinHousehold(householdId.toString());
+        }
+
+        return () => {
+            if (householdId) {
+                leaveHousehold(householdId.toString());
+            }
+        };
+    }, [isConnected, householdId]);
+
+    useEffect(() => {
+        handleRefresh();
+    }, [eventsRefresh]);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -84,12 +124,13 @@ export default function Events() {
                     events={events}
                     loading={loading}
                     error={error}
-                    onRefresh={handleRefresh}
                     setPage={handlePageChange}
                     totalItems={totalItems}
+                    emitUpdate={() => householdId && emitUpdate(householdId, 'events')}
                 />
                 <EventAddForm
                     onRefresh={handleRefresh}
+                    emitUpdate={() => householdId && emitUpdate(householdId, 'events')}
                 />
             </div>
         </>

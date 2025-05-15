@@ -1,13 +1,54 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ShoppingListHandler from '@/components/shoppingList/shoppingListHandler';
+import { useSocket } from '@/lib/socket';
 
 export default function Shopping() {
     const [addedToggle, setAddedToggle] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+
     React.useEffect(() => {
         setAddedToggle(false);
     }, [addedToggle]);
+
+    const [householdId, setHouseholdId] = useState<number | null>(null);
+    const { isConnected, shoppingRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+
+    useEffect(() => {
+        const fetchHouseholdId = async () => {
+            try {
+                const response = await fetch('/api/user/get');
+                if (response.ok) {
+                    const data = await response.json();
+                    setHouseholdId(data.householdId);
+                } else {
+                    console.error(`Failed to fetch household ID, Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error fetching household ID:', error);
+            }
+        };
+
+        fetchHouseholdId();
+    }, []);
+
+    useEffect(() => {
+        if (!isConnected) return;
+
+        if (householdId) {
+            joinHousehold(householdId.toString());
+        }
+
+        return () => {
+            if (householdId) {
+                leaveHousehold(householdId.toString());
+            }
+        };
+    }, [isConnected, householdId]);
+
+    useEffect(() => {
+        setAddedToggle(prev => !prev);
+    }, [shoppingRefresh]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -50,6 +91,9 @@ export default function Shopping() {
                     })
                     .then((data) => {
                         console.log('Shopping item created:', data);
+                        if (householdId) {
+                            emitUpdate(householdId, 'shopping');
+                        }
                     })
                     .catch((error) => {
                         console.error('Error creating shopping item:', error);
@@ -134,7 +178,7 @@ export default function Shopping() {
                         </div>
                     </div>
                 </form>
-                {!addedToggle && <ShoppingListHandler />}
+                {!addedToggle && <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} />}
             </div>
         </>
     );

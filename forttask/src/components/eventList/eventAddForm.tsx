@@ -9,9 +9,10 @@ interface Householders {
 
 type EventAddFormProps = {
     onRefresh?: () => void;
+    emitUpdate?: () => void;
 }
 
-export default function EventAddForm({ onRefresh }: EventAddFormProps) {
+export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProps) {
     const [eventName, setEventName] = useState('');
     const [eventDate, setEventDate] = useState(new Date());
     const [participants, setParticipants] = useState<number[]>([]);
@@ -20,7 +21,7 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
     const [isCustomRepeat, setIsCustomRepeat] = useState(false);
     const [customRepeatInput, setCustomRepeatInput] = useState("");
     const [repeatAmount, setRepeatAmount] = useState(0);
-    const [repeatAmountInput, setRepeatAmountInput] = useState(""); // Fixed variable name
+    const [repeatAmountInput, setRepeatAmountInput] = useState("");
     const [description, setDescription] = useState('');
     const [error, setError] = useState<Error | null>(null);
     const [householders, setHouseholders] = useState<Householders[]>([]);
@@ -110,8 +111,10 @@ export default function EventAddForm({ onRefresh }: EventAddFormProps) {
                 throw new Error('Network response was not ok');
             }
 
+            if (emitUpdate) {
+                emitUpdate();
+            }
             handleCancel();
-            handleRefresh();
         } catch (error) {
             setError(error instanceof Error ? error : new Error('An unknown error occurred'));
         }
