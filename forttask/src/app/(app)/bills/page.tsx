@@ -19,7 +19,7 @@ export default function Bills() {
     const [refresh, setRefresh] = React.useState<boolean>(false);
 
     const [householdId, setHouseholdId] = React.useState<number | null>(null); // moj bracie wez zaimportuj po prostu useState XDDD
-    const { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+    const { isConnected, billsRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     useEffect(() => {
         const fetchHouseholdId = async () => {
@@ -55,7 +55,7 @@ export default function Bills() {
 
     useEffect(() => {
         setRefresh(!refresh);
-    }, [socketRefresh]);
+    }, [billsRefresh]);
 
     React.useEffect(() => {
         if (refresh) {
@@ -129,7 +129,7 @@ export default function Bills() {
             })
             .then(() => {
                 if (householdId) {
-                    emitUpdate(householdId);
+                    emitUpdate(householdId, 'bills');
                 }
             })
             .catch((error) => {
@@ -291,7 +291,7 @@ export default function Bills() {
                     </div>
                     {error && <p className="text-red-500 text-sm pb-1">{error}</p>}
                 </form>
-                {!refresh && <BillsHandler emitUpdate={() => householdId && emitUpdate(householdId)} refresh={refresh}/>}
+                {!refresh && <BillsHandler emitUpdate={() => householdId && emitUpdate(householdId, 'bills')} refresh={refresh}/>}
             </div>
         
             {showCalendar && (

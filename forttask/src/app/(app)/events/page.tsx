@@ -19,7 +19,7 @@ export default function Events() {
     const [refresh, setRefresh] = useState(false);
 
     const router = useRouter();
-    const { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+    const { isConnected, eventsRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate);
@@ -78,7 +78,7 @@ export default function Events() {
 
     useEffect(() => {
         handleRefresh();
-    }, [socketRefresh]);
+    }, [eventsRefresh]);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -126,11 +126,11 @@ export default function Events() {
                     error={error}
                     setPage={handlePageChange}
                     totalItems={totalItems}
-                    emitUpdate={() => householdId && emitUpdate(householdId)}
+                    emitUpdate={() => householdId && emitUpdate(householdId, 'events')}
                 />
                 <EventAddForm
                     onRefresh={handleRefresh}
-                    emitUpdate={() => householdId && emitUpdate(householdId)}
+                    emitUpdate={() => householdId && emitUpdate(householdId, 'events')}
                 />
             </div>
         </>

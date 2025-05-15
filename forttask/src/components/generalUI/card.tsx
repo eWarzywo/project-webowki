@@ -139,8 +139,8 @@ export function Card({
                 </div>
             );
         }
-        
-        const recordsToShow = getLastThreeRecords(data);
+
+        const recordsToShow = data.slice(Math.max(data.length - 3, 0));
         
         if (dataType == DataType.events || dataType == DataType.chores) {
             let c = 1;

@@ -12,7 +12,7 @@ export default function Shopping() {
     }, [addedToggle]);
 
     const [householdId, setHouseholdId] = useState<number | null>(null);
-    const { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+    const { isConnected, shoppingRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     useEffect(() => {
         const fetchHouseholdId = async () => {
@@ -48,7 +48,7 @@ export default function Shopping() {
 
     useEffect(() => {
         setAddedToggle(!addedToggle);
-    }, [socketRefresh]);
+    }, [shoppingRefresh]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -92,7 +92,7 @@ export default function Shopping() {
                     .then((data) => {
                         console.log('Shopping item created:', data);
                         if (householdId) {
-                            emitUpdate(householdId);
+                            emitUpdate(householdId, 'shopping');
                         }
                     })
                     .catch((error) => {
@@ -178,7 +178,7 @@ export default function Shopping() {
                         </div>
                     </div>
                 </form>
-                {!addedToggle && <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId)} />}
+                {!addedToggle && <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} />}
             </div>
         </>
     );

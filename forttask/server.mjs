@@ -18,16 +18,24 @@ app.prepare().then(() => {
 
     io.on('connection', (socket) => {
 
-        socket.on('join household', (householdId) => {
+        socket.on('join-household', (householdId) => {
             socket.join(`household-${householdId}`);
         });
 
-        socket.on('leave household', (householdId) => {
+        socket.on('leave-household', (householdId) => {
             socket.leave(`household-${householdId}`);
         });
 
-        socket.on('refresh', (data) => {
-            io.to(`household-${data.householdId}`).emit('refresh', data);
+        socket.on('update-events', (householdId) => {
+            io.to(`household-${householdId}`).emit('update-events', householdId);
+        });
+
+        socket.on('update-shopping', (householdId) => {
+            io.to(`household-${householdId}`).emit('update-shopping', householdId);
+        });
+
+        socket.on('update-bills', (householdId) => {
+            io.to(`household-${householdId}`).emit('update-bills', householdId);
         });
 
         socket.on('disconnect', () => {

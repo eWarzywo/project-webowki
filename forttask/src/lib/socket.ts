@@ -4,7 +4,9 @@ import io, { Socket } from 'socket.io-client';
 export const useSocket = () => {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
-    const [socketRefresh, setSocketRefresh] = useState(false);
+    const [eventsRefresh, setEventsRefresh] = useState(false);
+    const [shoppingRefresh, setShoppingRefresh] = useState(false);
+    const [billsRefresh, setBillsRefresh] = useState(false);
 
     useEffect(() => {
         const socketIo = io();
@@ -17,8 +19,16 @@ export const useSocket = () => {
             setIsConnected(false);
         });
 
-        socketIo.on('refresh', () => {
-            setSocketRefresh((prev) => !prev);
+        socketIo.on('update-events', () => {
+            setEventsRefresh((prev) => !prev);
+        });
+
+        socketIo.on('update-shopping', () => {
+            setShoppingRefresh((prev) => !prev);
+        });
+
+        socketIo.on('update-bills', () => {
+            setBillsRefresh((prev) => !prev);
         });
 
         setSocket(socketIo);
@@ -28,9 +38,21 @@ export const useSocket = () => {
         };
     }, []);
 
-    const emitUpdate = (householdId?: number) => {
+    const emitUpdate = (householdId: number, page: string) => {
         if (socket && householdId) {
-            socket.emit('refresh', { householdId });
+            switch (page) {
+                case 'events':
+                    socket.emit('update-events', householdId);
+                    break;
+                case 'shopping':
+                    socket.emit('update-shopping', householdId);
+                    break;
+                case 'bills':
+                    socket.emit('update-bills', householdId);
+                    break;
+                default:
+                    console.error('Invalid page');
+            }
         } else {
             console.error('Socket is not initialized or missing householdId');
         }
@@ -38,7 +60,7 @@ export const useSocket = () => {
 
     const joinHousehold = (householdId: string) => {
         if (socket) {
-            socket.emit('join household', householdId);
+            socket.emit('join-household', householdId);
         } else {
             console.error('Socket is not initialized');
         }
@@ -46,11 +68,11 @@ export const useSocket = () => {
 
     const leaveHousehold = (householdId: string) => {
         if (socket) {
-            socket.emit('leave household', householdId);
+            socket.emit('leave-household', householdId);
         } else {
             console.error('Socket is not initialized');
         }
     }
 
-    return { isConnected, socketRefresh, emitUpdate, joinHousehold, leaveHousehold };
+    return { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, emitUpdate, joinHousehold, leaveHousehold };
 }
