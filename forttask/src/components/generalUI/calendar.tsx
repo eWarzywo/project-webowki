@@ -74,7 +74,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
                         className={`p-2 rounded-xl flex items-center justify-center h-10 w-10 text-lg cursor-pointer
                           ${isToday(day) ? 'bg-zinc-600 text-zinc-900 font-semibold hover:text-zinc-50' : ''} 
                           ${isBefore(day, today) && !isToday(day) ? 'text-zinc-400' : ''} 
-                          ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-zinc-900' : ''}
+                          ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-zinc-500' : ''}
                           ${format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') ? styleForSelected : ''}`}
                     >
                         {format(day, 'd')}
