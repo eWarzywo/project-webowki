@@ -148,8 +148,8 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                 <label htmlFor="choreName">Name</label>
                 <input
                     type="text"
-                    id="eventName"
-                    placeholder="Name of the event"
+                    id="choreName"
+                    placeholder="Name of the chore"
                     value={choreName}
                     onChange={(e) => {
                         setChoreName(e.target.value);
