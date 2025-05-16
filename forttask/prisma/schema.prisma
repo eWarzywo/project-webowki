@@ -83,6 +83,7 @@ model Chore {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   priority    Int      @default(1)
+  description String   @db.Text
   cycle       Int      @default(0)
   repeatCount Int      @default(0)
   done        Boolean  @default(false)

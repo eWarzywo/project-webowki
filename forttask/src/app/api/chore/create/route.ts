@@ -9,13 +9,13 @@ export async function POST(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json({ message: 'You must be logged in to view events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be logged in to create chores' }, { status: 401 });
         }
 
         const userId = parseInt(session.user.id);
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be part of a household to create events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be part of a household to create chores' }, { status: 401 });
         }
 
         const householdId = parseInt(session.user.householdId);
@@ -26,6 +26,7 @@ export async function POST(req: Request) {
             priority: number;
             cycle: number;
             repeatCount: number;
+            description: string;
         };
 
         const newChore = await prisma.chore.create({
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
                 priority: body.priority,
                 cycle: body.cycle,
                 repeatCount: body.repeatCount,
+                description: body.description,
             },
         });
 
@@ -63,6 +65,7 @@ export async function POST(req: Request) {
                     priority: body.priority,
                     cycle: body.cycle,
                     repeatCount: 0,
+                    description: body.description,
                 });
             }
 

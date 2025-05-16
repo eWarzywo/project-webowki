@@ -7,6 +7,7 @@ export const useSocket = () => {
     const [eventsRefresh, setEventsRefresh] = useState(false);
     const [shoppingRefresh, setShoppingRefresh] = useState(false);
     const [billsRefresh, setBillsRefresh] = useState(false);
+    const [choresRefresh, setChoresRefresh] = useState(false);
 
     useEffect(() => {
         const socketIo = io();
@@ -31,6 +32,10 @@ export const useSocket = () => {
             setBillsRefresh((prev) => !prev);
         });
 
+        socketIo.on('update-chores', () => {
+            setChoresRefresh((prev) => !prev);
+        })
+
         setSocket(socketIo);
 
         return () => {
@@ -49,6 +54,9 @@ export const useSocket = () => {
                     break;
                 case 'bills':
                     socket.emit('update-bills', householdId);
+                    break;
+                case 'chores':
+                    socket.emit('update-chores', householdId);
                     break;
                 default:
                     console.error('Invalid page');
@@ -74,5 +82,5 @@ export const useSocket = () => {
         }
     }
 
-    return { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, emitUpdate, joinHousehold, leaveHousehold };
+    return { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, choresRefresh, emitUpdate, joinHousehold, leaveHousehold };
 }

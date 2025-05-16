@@ -38,6 +38,10 @@ app.prepare().then(() => {
             io.to(`household-${householdId}`).emit('update-bills', householdId);
         });
 
+        socket.on('update-chores', (householdId) => {
+            io.to(`household-${householdId}`).emit('update-chores', householdId);
+        });
+
         socket.on('disconnect', () => {
         });
     });

@@ -1,43 +1,41 @@
 'use client';
-import EventCard from "@/components/eventList/eventCard";
 import Pagination from "@/components/generalUI/pagination";
-import { useEffect } from "react";
-import {useSearchParams} from "next/navigation";
+import { useEffect} from 'react';
+import { useSearchParams } from "next/navigation";
+import ChoreToDoCard from "@/components/chores/choreToDoCard";
 
 type User = {
     id: number;
     username: string;
 }
 
-type EventAttendee = {
-    userId: number;
-    eventId: number;
-    user: User;
-}
-
-type Event = {
+type Chore = {
     id: number;
     name: string;
     description: string;
-    date: Date;
+    dueDate: Date;
     createdById: number;
-    attendees: EventAttendee[];
-    location: string;
-    cycle: number;
+    priority: number;
+    done: boolean;
+    doneById?: number;
+    doneBy?: User;
 }
 
-type EventListProps = {
-    events: Event[];
+type ChoreListProps = {
+    chores: Chore[];
     loading?: boolean;
     error?: Error | null;
     setPage?: (page: number) => void;
     totalItems: number;
     emitUpdate?: () => void;
+    toggle?: () => void;
 }
 
-export default function EventList({ events, loading, error, setPage, totalItems, emitUpdate }: EventListProps) {
+export default function ChoreToDoList({ toggle, chores, loading, error, setPage, totalItems, emitUpdate }: ChoreListProps) {
     const searchParams = useSearchParams();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
+
+    const pendingChores = chores ? chores.filter(chore => !chore.done) : [];
 
     useEffect(() => {
         if (setPage) {
@@ -47,17 +45,25 @@ export default function EventList({ events, loading, error, setPage, totalItems,
 
     return (
         <div className="flex w-full h-fit flex-col border border-zinc-800 bg-zinc-950 rounded-xl p-6">
-            <p className="text-zinc-50 text-2xl font-semibold w-full text-center">Event list</p>
-            <p className="text-zinc-400 mt-1.5 text-sm pb-6 text-center">List of events you participate in</p>
+            <p className="text-zinc-50 text-2xl font-semibold w-full text-center">Chores ToDo list</p>
+            <p className="text-zinc-400 mt-1.5 text-sm pb-4 text-center">Click on any chore to see more details</p>
+            <div className="flex justify-center items-center mb-4">
+                <button
+                    onClick={toggle}
+                    className="px-4 py-2 bg-zinc-700 text-zinc-100 hover:bg-zinc-600 transition-colors rounded-xl"
+                >
+                    Toggle between lists
+                </button>
+            </div>
             <div className="flex w-full h-fit flex-col gap-2">
                 {loading ? (
                     <p className="text-zinc-400 text-center">Loading...</p>
                 ) : error ? (
                     <p className="text-zinc-400 text-center">Error: {error.message}</p>
-                ) : events && events.length > 0 ? (
-                    events.map((event) => <EventCard key={event.id} event={event} emitUpdate={emitUpdate} />)
+                ) : pendingChores.length > 0 ? (
+                    pendingChores.map((chore) => <ChoreToDoCard key={chore.id} chore={chore} emitUpdate={emitUpdate} />)
                 ) : (
-                    <p className="text-zinc-400 text-center">No events found</p>
+                    <p className="text-zinc-400 text-center">No pending chores found</p>
                 )}
             </div>
             {Math.ceil(totalItems / 5) > 1 && (

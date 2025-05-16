@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 
 type choreAddFormProps = {
     onRefresh?: () => void;
+    emitUpdate?: () => void;
 }
 
-export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
+export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProps) {
     const [error, setError] = useState<Error | null>(null);
     const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
 
@@ -15,6 +16,7 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
     const [choreDate, setChoreDate] = useState<Date | null>(null);
     const [showCalendar, setShowCalendar] = useState(false);
 
+    const [showRepetition, setShowRepetition] = useState(false);
     const [repetition, setRepetition] = useState(0);
     const [repetitionAmount, setRepetitionAmount] = useState(0);
     const [repetitionAmountInput, setRepetitionAmountInput] = useState('');
@@ -22,6 +24,8 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
     const [customRepetitionInput, setCustomRepetitionInput] = useState('');
 
     const [priority, setPriority] = useState(1);
+
+    const [description, setDescription] = useState("");
 
     const handleShowCalendar = () => {
         setShowCalendar(!showCalendar);
@@ -48,6 +52,11 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
         setIsCustomRepetition(false);
         setCustomRepetitionInput('');
         setPriority(1);
+        setDescription("");
+        setShowRepetition(false);
+        setShowCalendar(false);
+        setValidationErrors({});
+        setError(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +65,7 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
         const errors: Record<string, boolean> = {};
 
         if (choreName.length < 3) {
-            errors.name = true;
+            errors.choreName = true;
         }
 
         if (!choreDate) {
@@ -86,6 +95,7 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                     name: choreName,
                     dueDate: choreDate,
                     priority,
+                    description,
                     cycle: repetition,
                     repeatCount: repetitionAmount,
                 }),
@@ -95,7 +105,9 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                 throw new Error("Failed to create chore");
             }
 
-            handleRefresh();
+            if (emitUpdate) {
+                emitUpdate();
+            }
             handleCancel();
         } catch (error) {
             if (error instanceof Error) {
@@ -141,30 +153,29 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                     value={choreName}
                     onChange={(e) => {
                         setChoreName(e.target.value);
-                        if (validationErrors.eventName && e.target.value.trim()) {
-                            setValidationErrors({...validationErrors, eventName: false});
+                        if (validationErrors.choreName && e.target.value.trim()) {
+                            setValidationErrors({ ...validationErrors, choreName: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
-                        validationErrors.eventName ? 'border-red-500' : 'border-zinc-800'
+                        validationErrors.choreName ? 'border-red-500' : 'border-zinc-800'
                     } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
                 />
-                {validationErrors.eventName && <p className="text-red-500 text-xs mb-2">Event name is required</p>}
+                {validationErrors.choreName && <p className="text-red-500 text-xs mb-2">Event name is required</p>}
                 <label htmlFor="choreDate">Due to</label>
                 <div
                     onClick={handleShowCalendar}
-                    className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
+                        validationErrors.choreDate ? 'border-red-500' : 'border-zinc-800'
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none cursor-pointer`}
                 >
                     {choreDate ? choreDate.toLocaleDateString() : 'Select a date'}
                 </div>
                 {validationErrors.choreDate && <p className="text-red-500 text-xs mb-2">Chore date is required</p>}
-                <label
-                    htmlFor="priority"
-                    className="pt-2"
-                >
+                <label htmlFor="priority" className="pt-2">
                     Priority
                 </label>
-                <p className="text-zinc-400 text-sm mb-1 text-end">The higher the number, the more important</p>
+                <p className="text-zinc-400 text-sm mb-1 text-end">The lower the number, the more important</p>
                 <select
                     id="priority"
                     value={priority}
@@ -172,7 +183,7 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                         const value = parseInt(e.target.value, 10);
                         setPriority(value);
                         if (validationErrors.priority && value >= 1 && value <= 5) {
-                            setValidationErrors({...validationErrors, priority: false});
+                            setValidationErrors({ ...validationErrors, priority: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -185,39 +196,69 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                     <option value="4">4</option>
                     <option value="5">5</option>
                 </select>
-                <label
-                    htmlFor="repetition"
-                    className="pt-2"
-                >
-                    Repeat after x days?
+                {validationErrors.priority && <p className="text-red-500 text-xs mb-2">Priority is required</p>}
+                <label htmlFor="description" className="pt-2">
+                    Description
                 </label>
-                <select
-                    id="repetition"
-                    value={isCustomRepetition ? "-1" : repetition.toString()}
+                <textarea
+                    id="description"
+                    placeholder="Description of the event"
+                    value={description}
                     onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        if (value === -1) {
-                            setIsCustomRepetition(true);
-                            setCustomRepetitionInput("");
-                        } else {
-                            setIsCustomRepetition(false);
-                            setRepetition(value);
-                        }
-
-                        if (value === 0) {
-                            setRepetitionAmount(0);
-                            setRepetitionAmountInput("");
-                        }
+                        setDescription(e.target.value);
                     }}
-                    className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
-                >
-                    <option value="0">No Repeat</option>
-                    <option value="1">Daily</option>
-                    <option value="7">Weekly</option>
-                    <option value="-30">Monthly</option>
-                    <option value="-365">Yearly</option>
-                    <option value="-1">Custom...</option>
-                </select>
+                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                />
+                <div className="flex items-center gap-2 py-2">
+                    <label className="cursor-pointer text-zinc-50">Does this chore repeat?</label>
+                    <div
+                        onClick={() => {
+                            setShowRepetition(!showRepetition);
+                            setRepetition(0);
+                            setRepetitionAmount(0);
+                            setRepetitionAmountInput('');
+                        }}
+                        className={`w-5 h-5 flex items-center justify-center border rounded cursor-pointer ${
+                            showRepetition ? 'bg-zinc-50 border-zinc-400' : 'bg-zinc-950 border-zinc-800'
+                        }`}
+                    >
+                        {showRepetition && <span className="text-zinc-900 font-bold text-sm">✔</span>}
+                    </div>
+                </div>
+                {showRepetition && (
+                    <>
+                        <label htmlFor="repetition" className="pt-2">
+                            Repeat after x days?
+                        </label>
+                        <select
+                            id="repetition"
+                            value={isCustomRepetition ? '-1' : repetition.toString()}
+                            onChange={(e) => {
+                                const value = parseInt(e.target.value, 10);
+                                if (value === -1) {
+                                    setIsCustomRepetition(true);
+                                    setCustomRepetitionInput('');
+                                } else {
+                                    setIsCustomRepetition(false);
+                                    setRepetition(value);
+                                }
+
+                                if (value === 0) {
+                                    setRepetitionAmount(0);
+                                    setRepetitionAmountInput('');
+                                }
+                            }}
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                        >
+                            <option value="0">No Repeat</option>
+                            <option value="1">Daily</option>
+                            <option value="7">Weekly</option>
+                            <option value="-30">Monthly</option>
+                            <option value="-365">Yearly</option>
+                            <option value="-1">Custom...</option>
+                        </select>
+                    </>
+                )}
                 {isCustomRepetition && (
                     <input
                         type="number"
@@ -228,10 +269,10 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                         onChange={(e) => {
                             const newValue = e.target.value;
 
-                            if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                            if (newValue === '' || /^[0-9]+$/.test(newValue)) {
                                 setCustomRepetitionInput(newValue);
 
-                                if (newValue === "") {
+                                if (newValue === '') {
                                     setRepetition(0);
                                 } else {
                                     const value = parseInt(newValue, 10);
@@ -259,10 +300,10 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                             onChange={(e) => {
                                 const newValue = e.target.value;
 
-                                if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                                if (newValue === '' || /^[0-9]+$/.test(newValue)) {
                                     setRepetitionAmountInput(newValue);
 
-                                    if (newValue === "") {
+                                    if (newValue === '') {
                                         setRepetitionAmount(0);
                                     } else {
                                         const value = parseInt(newValue, 10);
@@ -276,18 +317,18 @@ export default function ChoreAddForm({ onRefresh }: choreAddFormProps) {
                         />
                     </>
                 )}
-                <div className="w-full flex justify-between px-6 pb-2 items-center">
+                <div className="w-full flex justify-between items-center pt-2">
                     <input
                         type="reset"
                         value="Cancel"
                         onClick={handleCancel}
-                        className="border rounded-xl gap-2.5 px-4 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                        className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
                     />
                     <input
                         type="submit"
                         value="Add"
                         onClick={handleSubmit}
-                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                        className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
                     />
                 </div>
             </form>
