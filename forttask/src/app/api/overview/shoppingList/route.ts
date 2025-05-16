@@ -11,7 +11,7 @@ export async function GET() {
         }
         const user = await prisma.user.findUnique({
             where: { id: parseInt(session.user.id) },
-            include: { household: true }
+            include: { household: true },
         });
 
         if (!user || !user.householdId) {
@@ -21,7 +21,7 @@ export async function GET() {
         const shoppingItems = await prisma.shoppingItem.findMany({
             where: {
                 householdId: user.householdId,
-                boughtById: null
+                boughtById: null,
             },
             select: {
                 id: true,
@@ -30,14 +30,14 @@ export async function GET() {
                 createdAt: true,
                 createdBy: {
                     select: {
-                        username: true
-                    }
-                }
+                        username: true,
+                    },
+                },
             },
             orderBy: {
-                createdAt: 'asc'
+                createdAt: 'asc',
             },
-            take: 3
+            take: 5,
         });
 
         return NextResponse.json({ shoppingItems });

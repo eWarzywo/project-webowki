@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '../../../../../libs/prisma';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, addDays } from 'date-fns';
 import { authOptions } from '../../../auth';
 
 export async function GET(request: NextRequest) {
@@ -16,28 +16,27 @@ export async function GET(request: NextRequest) {
 
         const user = await prisma.user.findUnique({
             where: { id: parseInt(session.user.id) },
-            include: { household: true }
+            include: { household: true },
         });
 
         if (!user || !user.householdId) {
             return NextResponse.json({ error: 'User not in a household' }, { status: 404 });
         }
 
-        let dateFilter = {};
-        if (dateParam) {
-            const date = new Date(dateParam);
-            dateFilter = {
-                date: {
-                    gte: startOfDay(date),
-                    lte: endOfDay(date),
-                }
-            };
-        }
+        const date = dateParam ? new Date(dateParam) : new Date();
+        const oneWeekLater = addDays(date, 7);
+
+        let dateFilter = {
+            date: {
+                gte: startOfDay(date),
+                lte: endOfDay(oneWeekLater),
+            },
+        };
 
         const events = await prisma.event.findMany({
             where: {
                 householdId: user.householdId,
-                ...dateFilter
+                ...dateFilter,
             },
             select: {
                 id: true,
@@ -47,14 +46,14 @@ export async function GET(request: NextRequest) {
                 location: true,
                 createdBy: {
                     select: {
-                        username: true
-                    }
-                }
+                        username: true,
+                    },
+                },
             },
             orderBy: {
-                date: 'asc'
+                date: 'asc',
             },
-            take: 3
+            take: 5,
         });
 
         return NextResponse.json({ events });
