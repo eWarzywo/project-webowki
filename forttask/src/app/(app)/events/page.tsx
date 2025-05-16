@@ -1,7 +1,7 @@
 "use client";
-import EventDatePicker from "@/components/eventList/eventDatePicker";
-import EventAddForm from "@/components/eventList/eventAddForm";
-import EventList from "@/components/eventList/eventList";
+import EventDatePicker from "@/components/events/eventDatePicker";
+import EventAddForm from "@/components/events/eventAddForm";
+import EventList from "@/components/events/eventList";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";

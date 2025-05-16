@@ -82,9 +82,11 @@ model Bill {
 model Chore {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
-  description String   @db.Text
   priority    Int      @default(1)
+  description String   @db.Text
   cycle       Int      @default(0)
+  repeatCount Int      @default(0)
+  done        Boolean  @default(false)
   dueDate     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -97,6 +99,10 @@ model Chore {
 
   householdId Int
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  parentChoreId Int?
+  parentChore   Chore?  @relation("Recurrence", fields: [parentChoreId], references: [id], onDelete: Cascade)
+  children      Chore[] @relation("Recurrence")
 }
 
 model ShoppingItem {
@@ -168,6 +174,6 @@ model ProfilePicture {
   imageUrl  String   @db.VarChar(255)
   category  String?  @db.VarChar(50)
   createdAt DateTime @default(now())
-  
+
   users User[]
 }
