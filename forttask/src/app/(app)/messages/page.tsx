@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { StreamChat, MessageResponse } from 'stream-chat';
+import { StreamChat, MessageResponse, Channel } from 'stream-chat';
 
 interface ProfilePictureData {
   id: number;
@@ -17,11 +17,6 @@ interface UserWithProfile {
   username: string;
   email: string;
   profilePicture: ProfilePictureData;
-}
-
-interface MessageGroup {
-  date: string;
-  messages: MessageResponse[];
 }
 
 const DEFAULT_AVATAR = {
@@ -41,9 +36,19 @@ export default function Messages() {
   const [usersMap, setUsersMap] = useState<Record<string, UserWithProfile>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const [error, setError] = useState('');
   const [householdUsers, setHouseholdUsers] = useState<UserWithProfile[]>([]);
-  const [householdName, setHouseholdName] = useState<string>('Household Chat');
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [messageLimit] = useState(30);
+  const [channelInstance, setChannelInstance] = useState<Channel | null>(null);
+  
+  const getUserProfilePicture = useCallback((userId: string): string => {
+    if (usersMap[userId]?.profilePicture?.imageUrl) {
+      return usersMap[userId].profilePicture.imageUrl;
+    }
+    
+    return DEFAULT_AVATAR.imageUrl;
+  }, [usersMap]);
   
   const scrollToBottom = () => {
     if (messagesContainerRef.current && messagesEndRef.current) {
@@ -59,10 +64,7 @@ export default function Messages() {
         setLoading(true);
         const householdResponse = await fetch(`/api/household?householdId=${session.user.householdId}`);
         if (householdResponse.ok) {
-          const householdData = await householdResponse.json();
-          if (householdData.name) {
-            setHouseholdName(householdData.name);
-          }
+          await householdResponse.json();
         }
 
         const usersResponse = await fetch(`/api/household/users/profiles?householdId=${session.user.householdId}`);
@@ -91,65 +93,78 @@ export default function Messages() {
 
   useEffect(() => {
     let streamClient: StreamChat | null = null;
+    let isComponentMounted = true;
     
     const initStreamChat = async () => {
       if (!session?.user?.id || !session.user?.householdId || !userDataLoaded) return;
       
       try {
-        if (client) {
-          await client.disconnectUser();
-          setClient(null);
+        if (!client) {
+          const tokenResponse = await fetch('/api/messages/token');
+          if (!tokenResponse.ok) {
+            throw new Error('Failed to get authentication token');
+          }
+          
+          const { token, userId } = await tokenResponse.json();
+          
+          streamClient = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_KEY || '');
+          
+          await streamClient.connectUser(
+            {
+              id: userId,
+              name: session.user.username || 'User',
+              image: getUserProfilePicture(userId),
+            },
+            token
+          );
+          
+          if (isComponentMounted) {
+            setClient(streamClient);
+          }
+        } else {
+          streamClient = client;
         }
-        
-        const tokenResponse = await fetch('/api/messages/token');
-        if (!tokenResponse.ok) {
-          throw new Error('Failed to get authentication token');
-        }
-        
-        const { token, userId } = await tokenResponse.json();
-        
-        streamClient = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_KEY || '');
-        
-        await streamClient.connectUser(
-          {
-            id: userId,
-            name: session.user.username || 'User',
-            image: getUserProfilePicture(userId),
-          },
-          token
-        );
-        
-        setClient(streamClient);
         
         const householdId = session.user.householdId;
         const channelId = `household-${householdId}`;
         
         const householdChannel = streamClient.channel('messaging', channelId, {
-          members: [userId],
-          created_by_id: userId,
+          members: [session.user.id],
+          created_by_id: session.user.id,
         });
         
-
-        await householdChannel.watch();
-        
-        const channelResponse = await householdChannel.query({ messages: { limit: 100 } });
-        if (channelResponse.messages) {
-          setMessages(channelResponse.messages);
-        }
-        
-        householdChannel.on('message.new', (event) => {
-          if (event.message) {
-            setMessages((prevMessages) => [...prevMessages, event.message as MessageResponse]);
-            setTimeout(scrollToBottom, 100);
+        if (isComponentMounted) {
+          setChannelInstance(householdChannel);
+          
+          await householdChannel.watch();
+          
+          const channelResponse = await householdChannel.query({ 
+            messages: { 
+              limit: messageLimit
+            } 
+          });
+          
+          if (channelResponse.messages && isComponentMounted) {
+            setMessages(channelResponse.messages);
+            setHasMoreMessages(channelResponse.messages.length >= messageLimit);
           }
-        });
-        
-        setLoading(false);
-        setTimeout(scrollToBottom, 300);
+          
+          
+          householdChannel.on('message.new', (event) => {
+            if (event.message && isComponentMounted) {
+              setMessages((prevMessages) => [...prevMessages, event.message as MessageResponse]);
+              setTimeout(scrollToBottom, 100);
+            }
+          });
+          
+          setLoading(false);
+          setTimeout(scrollToBottom, 300);
+        }
       } catch (err) {
         console.error('Error initializing chat:', err);
-        setError('Failed to initialize chat. Please try again.');
-        setLoading(false);
+        if (isComponentMounted) {
+          setLoading(false);
+        }
       }
     };
     
@@ -158,19 +173,19 @@ export default function Messages() {
     }
     
     return () => {
-      const disconnect = async () => {
-        if (client) {
-          await client.disconnectUser();
-        } else if (streamClient) {
-          await streamClient.disconnectUser();
-        }
-      };
+      isComponentMounted = false;
       
-      disconnect().catch(error => {
-        console.error('Error disconnecting user:', error);
-      });
+      const clientToDisconnect = client;
+      
+      if (clientToDisconnect) {
+        setTimeout(() => {
+          clientToDisconnect.disconnectUser().catch(error => {
+            console.error('Error disconnecting user:', error);
+          });
+        }, 0);
+      }
     };
-  }, [session, userDataLoaded]);
+  }, [session, userDataLoaded, client, getUserProfilePicture, messageLimit]);
   
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,20 +214,6 @@ export default function Messages() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
-  const formatDate = (timestamp: string | Date | undefined) => {
-    if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return `Today ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  };
-  
-  const getUserProfilePicture = (userId: string): string => {
-    if (usersMap[userId]?.profilePicture?.imageUrl) {
-      return usersMap[userId].profilePicture.imageUrl;
-    }
-    
-    return DEFAULT_AVATAR.imageUrl;
-  };
-  
   const getUserName = (userId: string): string => {
     if (usersMap[userId]?.username) {
       return usersMap[userId].username;
@@ -221,27 +222,63 @@ export default function Messages() {
     return 'User';
   };
   
-  const groupedMessages = (): MessageGroup[] => {
-    const groups: MessageGroup[] = [];
-    let currentGroup: MessageGroup | null = null;
+  const loadMoreMessages = useCallback(async () => {
+    if (loadingMoreMessages || !hasMoreMessages || !channelInstance) return;
     
-    messages.forEach(message => {
-      if (!message.created_at) return;
+    setLoadingMoreMessages(true);
+    
+    try {
+      const response = await channelInstance.query({
+        messages: {
+          limit: messageLimit,
+          id_lt: messages[0]?.id,
+        },
+      });
       
-      const date = new Date(message.created_at).toLocaleDateString();
-      
-      if (!currentGroup || currentGroup.date !== date) {
-        if (currentGroup) groups.push(currentGroup);
-        currentGroup = { date, messages: [] };
+      if (response.messages && response.messages.length > 0) {
+        const container = messagesContainerRef.current;
+        const oldScrollHeight = container?.scrollHeight || 0;
+        
+        setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+        
+        setHasMoreMessages(response.messages.length >= messageLimit);
+        
+        setTimeout(() => {
+          if (container) {
+            const newScrollHeight = container.scrollHeight;
+            const heightDiff = newScrollHeight - oldScrollHeight;
+            container.scrollTop = heightDiff;
+          }
+        }, 10);
+      } else {
+        setHasMoreMessages(false);
       }
-      
-      currentGroup.messages.push(message);
-    });
+    } catch (error) {
+      console.error('Error loading more messages:', error);
+    } finally {
+      setLoadingMoreMessages(false);
+    }
+  }, [loadingMoreMessages, hasMoreMessages, channelInstance, messageLimit, messages]);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      if (messagesContainerRef.current) {
+        const { scrollTop } = messagesContainerRef.current;
+        
+        if (scrollTop === 0 && hasMoreMessages && !loadingMoreMessages) {
+          loadMoreMessages();
+        }
+      }
+    };
     
-    if (currentGroup) groups.push(currentGroup);
-    return groups;
-  };
-
+    const container = messagesContainerRef.current;
+    container?.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      container?.removeEventListener('scroll', handleScroll);
+    };
+  }, [loadMoreMessages, hasMoreMessages, loadingMoreMessages]);
+  
   if (!session?.user?.householdId) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-zinc-950 text-zinc-50">
@@ -370,7 +407,17 @@ export default function Messages() {
       <div className="flex-1 flex flex-col">
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 bg-zinc-950">
           <div className="w-full max-w-4xl mx-auto">
-            {messages.map((message, index) => {
+            {loadingMoreMessages && (
+              <div className="flex justify-center items-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-zinc-400"></div>
+              </div>
+            )}
+            {!hasMoreMessages && messages.length > messageLimit && (
+              <div className="text-center py-2 text-sm text-zinc-500">
+                No more messages to load
+              </div>
+            )}
+            {messages.map((message) => {
               const isCurrentUser = message.user?.id === session?.user?.id;
               const userName = message.user?.id ? getUserName(message.user.id) : 'User';
               const profilePicture = message.user?.id ? getUserProfilePicture(message.user.id) : DEFAULT_AVATAR.imageUrl;
