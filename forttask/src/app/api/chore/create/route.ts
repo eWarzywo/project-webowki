@@ -66,6 +66,7 @@ export async function POST(req: Request) {
                     cycle: body.cycle,
                     repeatCount: 0,
                     description: body.description,
+                    parentChoreId: newChore.id,
                 });
             }
 
