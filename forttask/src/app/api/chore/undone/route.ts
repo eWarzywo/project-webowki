@@ -32,7 +32,7 @@ export async function PUT(req: Request) {
             return NextResponse.json({message: 'Chore not found'}, {status: 404});
         }
 
-        return NextResponse.json({message: 'Chore marked as done', chore});
+        return NextResponse.json({message: 'Chore marked as not done', chore});
     } catch (error) {
         console.error(error);
         return NextResponse.json({error: 'Invalid request'}, {status: 400});
