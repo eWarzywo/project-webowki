@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
 
         const date = dateParam ? new Date(dateParam) : new Date();
 
-        // Define date filters for different models
         const eventsFilter = {
             date: {
                 gte: startOfDay(date),
@@ -54,9 +53,7 @@ export async function GET(request: NextRequest) {
             }
         };
 
-        // Fetch data in parallel for better performance
         const [events, chores, bills, shoppingItems] = await Promise.all([
-            // Events
             prisma.event.findMany({
                 where: {
                     householdId: user.householdId,
@@ -78,7 +75,6 @@ export async function GET(request: NextRequest) {
                 take: 3
             }),
             
-            // Chores
             prisma.chore.findMany({
                 where: {
                     householdId: user.householdId,
@@ -104,7 +100,6 @@ export async function GET(request: NextRequest) {
                 take: 3
             }),
             
-            // Bills
             prisma.bill.findMany({
                 where: {
                     householdId: user.householdId,
@@ -127,7 +122,6 @@ export async function GET(request: NextRequest) {
                 take: 3
             }),
             
-            // Shopping Items
             prisma.shoppingItem.findMany({
                 where: {
                     householdId: user.householdId,
@@ -150,7 +144,6 @@ export async function GET(request: NextRequest) {
             })
         ]);
 
-        // Process the bills to convert Decimal to float for JSON
         const processedBills = bills.map(bill => ({
             ...bill,
             amount: parseFloat(bill.amount.toString())
