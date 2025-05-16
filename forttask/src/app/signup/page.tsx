@@ -96,7 +96,7 @@ function SignupForm() {
             let data;
             try {
                 data = JSON.parse(rawText);
-            } catch (e) {
+            } catch {
                 console.error('Failed to parse response as JSON:', rawText);
                 throw new Error('Invalid response from server');
             }

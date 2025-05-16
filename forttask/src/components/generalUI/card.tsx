@@ -1,6 +1,5 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { format, isSameDay } from 'date-fns';
 import { useEffect, useState } from 'react';
 
 export enum DataType {
@@ -10,35 +9,45 @@ export enum DataType {
     bills,
 }
 
-type Event = {
+// Interfaces for different data types
+interface EventItem {
     id: number;
     name: string;
     description: string;
-    date: string;
+    date: Date;
     location: string;
+    createdBy?: {
+        username: string;
+    };
 }
 
-type Chore = {
+interface ChoreItem {
     id: number;
     name: string;
-    description: string;
-    dueDate: string;
-    priority: number;
+    dueDate?: Date;
+    assignedTo?: {
+        username: string;
+    };
 }
 
-type Bill = {
+interface ShoppingItem {
+    id: number;
+    name: string;
+    cost?: number;
+    createdBy?: {
+        username: string;
+    };
+}
+
+interface BillItem {
     id: number;
     name: string;
     amount: number;
-    dueDate: string;
+    dueDate?: Date;
 }
 
-type ShoppingItem = {
-    id: number;
-    name: string;
-    cost: number;
-    createdAt: string;
-}
+// Union type for all possible item types
+type CardItemType = EventItem | ChoreItem | ShoppingItem | BillItem;
 
 export function Card({ 
     title, 
@@ -51,7 +60,7 @@ export function Card({
     dataType: DataType;
     selectedDate: Date;
 }) {
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<CardItemType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     
@@ -87,15 +96,15 @@ export function Card({
                 
                 const result = await response.json();
                 
-                let items: any[] = [];
+                let items: CardItemType[] = [];
                 if (dataType === DataType.events && result.events) {
-                    items = result.events;
+                    items = result.events as EventItem[];
                 } else if (dataType === DataType.chores && result.chores) {
-                    items = result.chores;
+                    items = result.chores as ChoreItem[];
                 } else if (dataType === DataType.shopping && result.shoppingItems) {
-                    items = result.shoppingItems;
+                    items = result.shoppingItems as ShoppingItem[];
                 } else if (dataType === DataType.bills && result.bills) {
-                    items = result.bills;
+                    items = result.bills as BillItem[];
                 }
                 
                 setData(items);
@@ -111,8 +120,21 @@ export function Card({
         fetchData();
     }, [dataType, selectedDate]);
     
-    const formattedDate = selectedDate ? format(selectedDate, 'MMM dd, yyyy') : '';
-
+    const getItemLink = (item: CardItemType) => {
+        switch(dataType) {
+            case DataType.events:
+                return `/events?id=${item.id}`;
+            case DataType.chores:
+                return `/chores?id=${item.id}`;
+            case DataType.shopping:
+                return `/shopping?id=${item.id}`;
+            case DataType.bills:
+                return `/bills?id=${item.id}`;
+            default:
+                return '#';
+        }
+    };
+    
     const last3DataRecords = () => {
         const hr = <hr className="border-[#27272A] border" />;
         
@@ -146,8 +168,8 @@ export function Card({
             let c = 1;
             return recordsToShow.map((record) => {
                 return (
-                    <span key={DataType[dataType].toString() + c++}>
-                        <Link href="#" className="flex justify-center items-center w-full">
+                    <span key={`${DataType[dataType]}-${record.id}`}>
+                        <Link href={getItemLink(record)} className="flex justify-center items-center w-full hover:bg-zinc-800 rounded-md p-1">
                             <div className="w-3/4 flex justify-start items-center">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">{record.name}</h2>
                             </div>
@@ -162,17 +184,17 @@ export function Card({
         } else if (dataType == DataType.shopping) {
             let c = 1;
             return recordsToShow.map((record) => {
+                const item = record as ShoppingItem;
                 return (
                     <span key={DataType[dataType].toString() + c++}>
-                        <Link href="#" className="flex flex-wrap justify-between items-center w-full bghover">
-                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2"></div>
-                            <div className="flex justify-start items-start space-y-1.5 flex-grow">
+                        <Link href={getItemLink(record)} className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1">
+                            <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
-                                    {record.name}
+                                    {item.name}
                                 </h2>
                             </div>
                             <div className="text-sm font-normal text-[#A1A1AA] overflow-hidden">
-                                {record.cost ? `${record.cost}$` : 'Cost not specified'}
+                                {item.cost ? `${item.cost}$` : 'Cost not specified'}
                             </div>
                         </Link>
                         {hr}
@@ -182,19 +204,19 @@ export function Card({
         } else if (dataType == DataType.bills) {
             let c = 1;
             return recordsToShow.map((record) => {
+                const bill = record as BillItem;
                 return (
                     <span key={DataType[dataType].toString() + c++}>
-                        <Link href="#" className="flex flex-wrap justify-between items-center w-full bghover">
-                            <div className="border border-[#FAFAFA] rounded-[4px] w-3 h-3 p-1 mx-2"></div>
-                            <div className="flex justify-start items-start space-y-1.5 flex-grow">
+                        <Link href={getItemLink(record)} className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1">
+                            <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
-                                    {record.name} - {record.amount}$
+                                    {bill.name} - {bill.amount}$
                                 </h2>
                             </div>
                             <div className="text-sm font-normal text-[#A1A1AA] overflow-hidden">
-                                {record.dueDate
+                                {bill.dueDate
                                     ? 'Due ' +
-                                      new Date(record.dueDate)
+                                      new Date(bill.dueDate)
                                           .toLocaleDateString('en-US', {
                                               year: 'numeric',
                                               month: 'short',

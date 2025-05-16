@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
-import { StreamChat, MessageResponse, Channel } from 'stream-chat';
+import { StreamChat, MessageResponse } from 'stream-chat';
 
 interface ProfilePictureData {
   id: number;
@@ -132,7 +132,7 @@ export default function Messages() {
 
         await householdChannel.watch();
         
-        const channelResponse = await householdChannel.query({ messages: { limit: 50 } });
+        const channelResponse = await householdChannel.query({ messages: { limit: 100 } });
         if (channelResponse.messages) {
           setMessages(channelResponse.messages);
         }
@@ -244,14 +244,14 @@ export default function Messages() {
 
   if (!session?.user?.householdId) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-black text-white">
+      <div className="flex flex-col items-center justify-center h-full bg-zinc-950 text-zinc-50">
         <h2 className="text-2xl font-bold mb-4">No Household</h2>
         <p className="text-center mb-6">
           You need to be part of a household to use the messaging feature.
         </p>
         <a
           href="/household"
-          className="bg-zinc-700 text-white px-4 py-2 rounded-[6px] hover:bg-zinc-600 text-sm font-normal"
+          className="bg-zinc-800 text-zinc-50 px-4 py-2 rounded-md hover:bg-zinc-700 text-sm font-normal"
         >
           Join or Create a Household
         </a>
@@ -261,10 +261,10 @@ export default function Messages() {
 
   if (loading || !userDataLoaded) {
     return (
-      <div className="flex justify-center items-center h-full bg-black text-white">
+      <div className="flex justify-center items-center h-full bg-zinc-950 text-zinc-50">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
-          <p className="text-white">Loading user profiles...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-zinc-50 mb-4"></div>
+          <p className="text-zinc-50">Loading user profiles...</p>
         </div>
       </div>
     );
@@ -272,17 +272,17 @@ export default function Messages() {
   
   if (messages.length === 0) {
     return (
-      <div className="flex h-full bg-black text-white">
-        <div className="w-[280px] border-r border-zinc-800 overflow-y-auto">
+      <div className="flex h-full bg-zinc-950 text-zinc-50">
+        <div className="w-72 border-r border-zinc-800 overflow-y-auto">
           <div className="p-4">
-            <h2 className="text-lg font-medium text-white mb-4">Messages</h2>
+            <h2 className="text-lg font-medium text-zinc-50 mb-4">Messages</h2>
             <div className="space-y-2">
               {householdUsers.map((user) => (
                 <div 
                   key={user.id}
                   className="flex items-center p-2 rounded hover:bg-zinc-800 cursor-pointer"
                 >
-                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-zinc-700">
+                  <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-zinc-800">
                     <Image 
                       src={user.profilePicture?.imageUrl || DEFAULT_AVATAR.imageUrl}
                       alt={user.username}
@@ -292,7 +292,7 @@ export default function Messages() {
                     />
                   </div>
                   <div>
-                    <div className="text-white font-medium">{user.username}</div>
+                    <div className="text-zinc-50 font-medium">{user.username}</div>
                     <div className="text-zinc-400 text-sm truncate">
                       {user.id === session?.user?.id ? 'You' : 'Household member'}
                     </div>
@@ -304,24 +304,24 @@ export default function Messages() {
         </div>
 
         <div className="flex-1 flex flex-col">
-          <div ref={messagesContainerRef} className="flex-1 flex items-center justify-center p-4 bg-black">
+          <div ref={messagesContainerRef} className="flex-1 flex items-center justify-center p-4 bg-zinc-950">
             <p className="text-zinc-400">No messages yet. Start a conversation!</p>
           </div>
           
-          <div className="p-3 border-t border-zinc-800">
+          <div className="p-3 border-t border-zinc-800 bg-zinc-950">
             <form onSubmit={sendMessage} className="flex items-center">
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Write your first message..."
-                className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-white focus:outline-none"
+                className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-none"
               />
               
               <button
                 type="submit"
                 disabled={!inputMessage.trim()}
-                className="ml-2 w-8 h-8 flex items-center justify-center text-gray-300 disabled:text-gray-600 rounded hover:bg-zinc-700"
+                className="ml-2 w-8 h-8 flex items-center justify-center text-zinc-400 disabled:text-zinc-600 rounded hover:bg-zinc-800"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -335,17 +335,17 @@ export default function Messages() {
   }
 
   return (
-    <div className="flex h-full bg-black text-white">
-      <div className="w-[280px] border-r border-zinc-800 overflow-y-auto">
+    <div className="flex h-full bg-zinc-950 text-zinc-50">
+      <div className="w-72 border-r border-zinc-800 overflow-y-auto">
         <div className="p-4">
-          <h2 className="text-lg font-medium text-white mb-4">Members</h2>
+          <h2 className="text-lg font-medium text-zinc-50 mb-4">Members</h2>
           <div className="space-y-2">
             {householdUsers.map((user) => (
               <div 
                 key={user.id}
                 className="flex items-center p-2 rounded hover:bg-zinc-800 cursor-pointer"
               >
-                <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-zinc-700">
+                <div className="w-10 h-10 rounded-full overflow-hidden mr-3 bg-zinc-800">
                   <Image 
                     src={user.profilePicture?.imageUrl || DEFAULT_AVATAR.imageUrl}
                     alt={user.username}
@@ -356,7 +356,7 @@ export default function Messages() {
                   />
                 </div>
                 <div>
-                  <div className="text-white font-medium">{user.username}</div>
+                  <div className="text-zinc-50 font-medium">{user.username}</div>
                   <div className="text-zinc-400 text-sm truncate">
                     {user.id === session?.user?.id ? 'You' : 'Household member'}
                   </div>
@@ -368,7 +368,7 @@ export default function Messages() {
       </div>
 
       <div className="flex-1 flex flex-col">
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 bg-black">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 bg-zinc-950">
           <div className="w-full max-w-4xl mx-auto">
             {messages.map((message, index) => {
               const isCurrentUser = message.user?.id === session?.user?.id;
@@ -381,16 +381,16 @@ export default function Messages() {
                     <div className="flex items-start">
                       <div className="text-right mr-2">
                         <div className="flex items-center justify-end mb-1">
-                          <span className="text-xs text-gray-400 mr-2">
+                          <span className="text-xs text-zinc-400 mr-2">
                             {formatTime(message.created_at)}
                           </span>
-                          <span className="text-sm text-gray-400">You</span>
+                          <span className="text-sm text-zinc-400">You</span>
                         </div>
-                        <div className="bg-blue-600 text-white px-4 py-2 rounded-2xl inline-block max-w-[300px]">
+                        <div className="bg-blue-600 text-zinc-50 px-4 py-2 rounded-2xl inline-block max-w-[300px]">
                           <p className="text-sm break-words">{message.text}</p>
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-zinc-700">
+                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-zinc-800">
                         <Image 
                           src={profilePicture}
                           alt="Your avatar"
@@ -407,7 +407,7 @@ export default function Messages() {
                 return (
                   <div key={message.id} className="mb-4 flex justify-start">
                     <div className="flex items-start">
-                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2 bg-zinc-700">
+                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2 bg-zinc-800">
                         <Image 
                           src={profilePicture}
                           alt={userName}
@@ -419,14 +419,14 @@ export default function Messages() {
                       </div>
                       <div>
                         <div className="flex items-center mb-1">
-                          <span className="text-sm text-white mr-2">
+                          <span className="text-sm text-zinc-50 mr-2">
                             {userName}
                           </span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-zinc-400">
                             {formatTime(message.created_at)}
                           </span>
                         </div>
-                        <div className="bg-zinc-800 text-white px-4 py-2 rounded-2xl inline-block max-w-[300px]">
+                        <div className="bg-zinc-800 text-zinc-50 px-4 py-2 rounded-2xl inline-block max-w-[300px]">
                           <p className="text-sm break-words">{message.text}</p>
                         </div>
                       </div>
@@ -439,20 +439,20 @@ export default function Messages() {
           </div>
         </div>
         
-        <div className="p-3 border-t border-zinc-800">
+        <div className="p-3 border-t border-zinc-800 bg-zinc-950">
           <form onSubmit={sendMessage} className="flex items-center">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Aa..."
-              className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-white focus:outline-none"
+              className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-none"
             />
             
             <button
               type="submit"
               disabled={!inputMessage.trim()}
-              className="ml-2 w-8 h-8 flex items-center justify-center text-gray-300 disabled:text-gray-600 rounded hover:bg-zinc-700"
+              className="ml-2 w-8 h-8 flex items-center justify-center text-zinc-400 disabled:text-zinc-600 rounded hover:bg-zinc-800"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

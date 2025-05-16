@@ -1,11 +1,10 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { ProfilePicture } from './profilePicture';
 
 export default function Header() {
     return (
         <span className="sticky top-0 z-50">
-            <header className="flex justify-center items-center py-8 h-8 bg-[#09090B]">
+            <header className="flex justify-center items-center py-8 h-8 bg-zinc-950">
                 <div className="flex justify-start items-center w-[70%]">
                     <div className="w-full p-0 flex justify-start items-center">
                         <nav className="flex justify-start pl-4 items-center w-full">
@@ -18,7 +17,7 @@ export default function Header() {
                     <SearchBar />
                 </div>
             </header>
-            <hr className=" border-[#27272A]" />
+            <hr className="border-zinc-800" />
         </span>
     );
 }
@@ -65,7 +64,7 @@ function SearchBar() {
         <input
             type="text"
             placeholder="Search..."
-            className="w-1/2 h-8 p-2 mx-3 bg-[#09090B] rounded-[6px] border border-[#27272A] text-sm text-gray-300 placeholder:text-[#A1A1AA]"
+            className="w-1/2 h-8 p-2 mx-3 bg-zinc-950 rounded-md border border-zinc-800 text-sm text-gray-300 placeholder:text-zinc-500"
         />
     );
 }

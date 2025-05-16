@@ -31,8 +31,7 @@ export default function Calendar({ initialDate = new Date(), onChange }: Calenda
     const endDate = endOfWeek(monthEnd);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-
-    const styleForSelected = "bg-zinc-50 text-[#18181B] font-semibold hover:bg-zinc-300 hover:text-[#FAFAFA]";
+    const styleForSelected = "bg-zinc-50 text-zinc-900 font-semibold hover:bg-zinc-300 hover:text-zinc-50";
 
     const handleDateClick = (day: Date) => {
         if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {
@@ -44,18 +43,18 @@ export default function Calendar({ initialDate = new Date(), onChange }: Calenda
     };
 
     return (
-        <div className="w-80 p-4 bg-[#09090B] text-[#FAFAFA] rounded-xl shadow-md border border-[#27272A]">
+        <div className="w-80 p-4 bg-zinc-950 text-zinc-50 rounded-xl shadow-md border border-zinc-800">
             <div className="flex justify-between items-center mb-4">
                 <button
                     onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                    className="text-[#A1A1AA] hover:text-white text-lg border border-[#27272A] rounded-xl px-3 py-1"
+                    className="text-zinc-400 hover:text-white text-lg border border-zinc-800 rounded-xl px-3 py-1"
                 >
                     {'<'}
                 </button>
                 <h2 className="text-lg font-medium">{format(currentMonth, 'MMMM yyyy')}</h2>
                 <button
                     onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                    className="text-[#A1A1AA] hover:text-white text-lg border border-[#27272A] rounded-xl px-3 py-1"
+                    className="text-zinc-400 hover:text-white text-lg border border-zinc-800 rounded-xl px-3 py-1"
                 >
                     {'>'}
                 </button>
@@ -73,9 +72,9 @@ export default function Calendar({ initialDate = new Date(), onChange }: Calenda
                         key={day.toString()}
                         onClick={() => handleDateClick(day)}
                         className={`p-2 rounded-xl flex items-center justify-center h-10 w-10 text-lg cursor-pointer
-                          ${isToday(day) ? 'bg-zinc-600 text-[#18181B] font-semibold hover:text-[#FAFAFA]' : ''} 
-                          ${isBefore(day, today) && !isToday(day) ? 'text-[#A1A1AA]' : ''} 
-                          ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-[#18181B]' : ''}
+                          ${isToday(day) ? 'bg-zinc-600 text-zinc-900 font-semibold hover:text-zinc-50' : ''} 
+                          ${isBefore(day, today) && !isToday(day) ? 'text-zinc-400' : ''} 
+                          ${!isSameMonth(day, monthStart) ? 'opacity-40' : !isToday(day) ? 'hover:bg-zinc-500' : ''}
                           ${format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') ? styleForSelected : ''}`}
                     >
                         {format(day, 'd')}
