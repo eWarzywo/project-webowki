@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '../../../../libs/prisma';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, addDays } from 'date-fns';
 import { authOptions } from '../../auth';
 
 export async function GET(request: NextRequest) {
@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
 
         const { searchParams } = new URL(request.url);
         const dateParam = searchParams.get('date');
-        
+
         const user = await prisma.user.findUnique({
             where: { id: parseInt(session.user.id) },
-            include: { household: true }
+            include: { household: true },
         });
 
         if (!user || !user.householdId) {
@@ -24,40 +24,41 @@ export async function GET(request: NextRequest) {
         }
 
         const date = dateParam ? new Date(dateParam) : new Date();
+        const oneWeekLater = addDays(date, 7);
 
         const eventsFilter = {
             date: {
                 gte: startOfDay(date),
-                lte: endOfDay(date)
-            }
+                lte: endOfDay(oneWeekLater),
+            },
         };
 
         const choresFilter = {
             dueDate: {
                 gte: startOfDay(date),
-                lte: endOfDay(date)
-            }
+                lte: endOfDay(oneWeekLater),
+            },
         };
 
         const billsFilter = {
             dueDate: {
                 gte: startOfDay(date),
-                lte: endOfDay(date)
-            }
+                lte: endOfDay(oneWeekLater),
+            },
         };
 
         const shoppingFilter = {
             createdAt: {
                 gte: startOfDay(date),
-                lte: endOfDay(date)
-            }
+                lte: endOfDay(oneWeekLater),
+            },
         };
 
         const [events, chores, bills, shoppingItems] = await Promise.all([
             prisma.event.findMany({
                 where: {
                     householdId: user.householdId,
-                    ...eventsFilter
+                    ...eventsFilter,
                 },
                 select: {
                     id: true,
@@ -67,19 +68,19 @@ export async function GET(request: NextRequest) {
                     location: true,
                     createdBy: {
                         select: {
-                            username: true
-                        }
-                    }
+                            username: true,
+                        },
+                    },
                 },
                 orderBy: { date: 'asc' },
-                take: 3
+                take: 5,
             }),
-            
+
             prisma.chore.findMany({
                 where: {
                     householdId: user.householdId,
                     doneById: null,
-                    ...choresFilter
+                    ...choresFilter,
                 },
                 select: {
                     id: true,
@@ -89,22 +90,19 @@ export async function GET(request: NextRequest) {
                     priority: true,
                     createdBy: {
                         select: {
-                            username: true
-                        }
-                    }
+                            username: true,
+                        },
+                    },
                 },
-                orderBy: [
-                    { priority: 'desc' },
-                    { dueDate: 'asc' }
-                ],
-                take: 3
+                orderBy: [{ dueDate: 'asc' }, { priority: 'desc' }],
+                take: 5,
             }),
-            
+
             prisma.bill.findMany({
                 where: {
                     householdId: user.householdId,
                     paidById: null,
-                    ...billsFilter
+                    ...billsFilter,
                 },
                 select: {
                     id: true,
@@ -114,19 +112,19 @@ export async function GET(request: NextRequest) {
                     dueDate: true,
                     createdBy: {
                         select: {
-                            username: true
-                        }
-                    }
+                            username: true,
+                        },
+                    },
                 },
                 orderBy: { dueDate: 'asc' },
-                take: 3
+                take: 5,
             }),
-            
+
             prisma.shoppingItem.findMany({
                 where: {
                     householdId: user.householdId,
                     boughtById: null,
-                    ...shoppingFilter
+                    ...shoppingFilter,
                 },
                 select: {
                     id: true,
@@ -135,25 +133,25 @@ export async function GET(request: NextRequest) {
                     createdAt: true,
                     createdBy: {
                         select: {
-                            username: true
-                        }
-                    }
+                            username: true,
+                        },
+                    },
                 },
-                orderBy: { createdAt: 'desc' },
-                take: 3
-            })
+                orderBy: { createdAt: 'asc' },
+                take: 5,
+            }),
         ]);
 
-        const processedBills = bills.map(bill => ({
+        const processedBills = bills.map((bill) => ({
             ...bill,
-            amount: parseFloat(bill.amount.toString())
+            amount: parseFloat(bill.amount.toString()),
         }));
 
         return NextResponse.json({
             events,
             chores,
             bills: processedBills,
-            shoppingItems
+            shoppingItems,
         });
     } catch (error) {
         console.error('Error fetching overview data:', error);

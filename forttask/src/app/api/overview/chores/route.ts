@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '../../../../../libs/prisma';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, addDays } from 'date-fns';
 import { authOptions } from '../../../auth';
 
 export async function GET(request: NextRequest) {
@@ -23,16 +23,15 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'User not in a household' }, { status: 404 });
         }
 
-        let dateFilter = {};
-        if (dateParam) {
-            const date = new Date(dateParam);
-            dateFilter = {
-                dueDate: {
-                    gte: startOfDay(date),
-                    lte: endOfDay(date),
-                }
-            };
-        }
+        const date = dateParam ? new Date(dateParam) : new Date();
+        const oneWeekLater = addDays(date, 7);
+
+        let dateFilter = {
+            dueDate: {
+                gte: startOfDay(date),
+                lte: endOfDay(oneWeekLater)
+            }
+        };
 
         const chores = await prisma.chore.findMany({
             where: {
@@ -53,10 +52,10 @@ export async function GET(request: NextRequest) {
                 }
             },
             orderBy: [
-                { priority: 'desc' },
-                { dueDate: 'asc' }
+                { dueDate: 'asc' },
+                { priority: 'desc' }
             ],
-            take: 3
+            take: 5
         });
 
         return NextResponse.json({ chores });
