@@ -1,30 +1,82 @@
-import { useEffect, useState } from "react";
-import { ProfilePicture } from "@/components/generalUI/profilePicture";
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+
+type UserProfile = {
+    id: number;
+    username: string;
+    profilePicture: {
+        id: number;
+        name: string;
+        imageUrl: string;
+        category: string | null;
+    } | null;
+};
 
 type leaderboardData = {
     username: string;
     choresDone: number;
-}
+    profilePicture?: {
+        id: number;
+        name: string;
+        imageUrl: string;
+        category: string | null;
+    } | null;
+};
 
 type ChoreLeaderboardProps = {
     refresh?: boolean;
-}
+};
+
+const DEFAULT_PROFILE_PICTURE = {
+    id: 0,
+    name: 'Default Avatar',
+    imageUrl: '/images/avatars/defaultAvatar.png',
+    category: 'default',
+};
 
 export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
+    const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
-
     const [leaderboardData, setLeaderboardData] = useState<leaderboardData[]>([]);
+    const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
 
     useEffect(() => {
-        const fetchLeaderboardData = async () => {
+        const fetchData = async () => {
+            setLoading(true);
             try {
-                const response = await fetch('/api/household/users/count-chores-done');
-                if (!response.ok) {
-                    throw new Error(`Error fetching leaderboard data: ${response.statusText}`);
+                const leaderboardResponse = await fetch('/api/household/users/count-chores-done');
+                if (!leaderboardResponse.ok) {
+                    throw new Error(`Error fetching leaderboard data: ${leaderboardResponse.statusText}`);
                 }
-                const data = await response.json();
-                setLeaderboardData(data);
+                const leaderboardData = await leaderboardResponse.json();
+
+                if (session?.user?.householdId) {
+                    const profilesResponse = await fetch(
+                        `/api/household/users/profiles?householdId=${session.user.householdId}`,
+                    );
+                    if (profilesResponse.ok) {
+                        const profilesData = await profilesResponse.json();
+                        setUserProfiles(profilesData);
+
+                        const mergedData = leaderboardData.map((user: leaderboardData) => {
+                            const userProfile = profilesData.find(
+                                (profile: UserProfile) => profile.username === user.username,
+                            );
+                            return {
+                                ...user,
+                                profilePicture: userProfile?.profilePicture || DEFAULT_PROFILE_PICTURE,
+                            };
+                        });
+
+                        setLeaderboardData(mergedData);
+                    } else {
+                        setLeaderboardData(leaderboardData);
+                    }
+                } else {
+                    setLeaderboardData(leaderboardData);
+                }
             } catch (error) {
                 setError(error as Error);
             } finally {
@@ -32,8 +84,8 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
             }
         };
 
-        fetchLeaderboardData();
-    }, [refresh]);
+        fetchData();
+    }, [refresh, session]);
 
     return (
         <div className="flex flex-col w-1/4 h-fit justify-center items-start rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-6">
@@ -43,19 +95,33 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
             {error && <p className="text-red-500">Error: {error.message}</p>}
             {!loading && !error && (
                 <div className="flex flex-col gap-2 w-full">
-                    {leaderboardData.sort((a, b) => b.choresDone - a.choresDone).map((user, index) => (
-                        <div key={index} className="flex justify-between align-center py-2 w-full">
-                            <div className="flex items-center">
-                                <ProfilePicture />
-                                <span className="text-zinc-50 font-semibold">{user.username}</span>
+                    {leaderboardData
+                        .sort((a, b) => b.choresDone - a.choresDone)
+                        .map((user, index) => (
+                            <div key={index} className="flex justify-between align-center py-2 w-full">
+                                <div className="flex items-center">
+                                    <div className="hover:cursor-pointer rounded-3xl w-[40px] h-[40px] mx-2 overflow-hidden">
+                                        <Image
+                                            src={user.profilePicture?.imageUrl || DEFAULT_PROFILE_PICTURE.imageUrl}
+                                            alt={user.profilePicture?.name || DEFAULT_PROFILE_PICTURE.name}
+                                            width={40}
+                                            height={40}
+                                            className="object-cover w-full h-full"
+                                        />
+                                    </div>
+                                    <span className="text-zinc-50 font-semibold">{user.username}</span>
+                                </div>
+                                {user.choresDone > 0 ? (
+                                    <span className="text-zinc-400 font-semibold flex items-center justify-center">
+                                        {user.choresDone} done
+                                    </span>
+                                ) : (
+                                    <span className="text-zinc-400 font-semibold flex items-center justify-center">
+                                        No chores
+                                    </span>
+                                )}
                             </div>
-                            {user.choresDone > 0 ? (
-                            <span className="text-zinc-400 font-semibold flex items-center justify-center">{user.choresDone} done</span>
-                            ) : (
-                                <span className="text-zinc-400 font-semibold flex items-center justify-center">No chores</span>
-                            )}
-                        </div>
-                    ))}
+                        ))}
                 </div>
             )}
         </div>
