@@ -54,6 +54,7 @@ To get started with FortTask, follow these steps:
     ```bash
     npx prisma migrate dev
     npx prisma db seed
+    npm run seed
     ```
 
 5. **Start the development server**:
