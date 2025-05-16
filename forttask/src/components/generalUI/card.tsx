@@ -168,7 +168,7 @@ export function Card({
             let c = 1;
             return recordsToShow.map((record) => {
                 return (
-                    <span key={DataType[dataType].toString() + c++}>
+                    <span key={`${DataType[dataType]}-${record.id}`}>
                         <Link href={getItemLink(record)} className="flex justify-center items-center w-full hover:bg-zinc-800 rounded-md p-1">
                             <div className="w-3/4 flex justify-start items-center">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">{record.name}</h2>
