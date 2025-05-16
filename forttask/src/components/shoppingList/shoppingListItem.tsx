@@ -7,6 +7,7 @@ import ConfirmationBox from '../generalUI/confirmation';
 interface ShoppingListItemProps {
     id: number;
     handleDelete: () => void;
+    emitUpdate?: () => void;
 }
 
 interface DetailsBoxProps {
@@ -44,7 +45,7 @@ function DetailsBox({ name, cost, userName, updatedAt, boughtBy, onClose, onUnBo
     );
 }
 
-export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemProps) {
+export default function ShoppingListItem({ id, handleDelete, emitUpdate }: ShoppingListItemProps) {
     const [showConfirm, setShowConfirm] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [data, setData] = useState<null | {
@@ -96,6 +97,9 @@ export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemP
             });
             if (!res.ok) throw new Error('Failed to toggle bought status');
             await fetchData();
+            if (emitUpdate) {
+                emitUpdate();
+            }
             setShowDetails(false);
         } catch (error) {
             console.error('Error toggling status:', error);
@@ -149,7 +153,14 @@ export default function ShoppingListItem({ id, handleDelete }: ShoppingListItemP
             </div>
 
             {showConfirm && (
-                <ConfirmationBox name={data.name} onCancel={() => setShowConfirm(false)} onConfirm={handleDelete} />
+                <ConfirmationBox
+                    name={data.name}
+                    onCancel={() => setShowConfirm(false)}
+                    onConfirm={() => {
+                        handleDelete();
+                        setShowConfirm(false);
+                    }}
+                />
             )}
 
             {showDetails && (

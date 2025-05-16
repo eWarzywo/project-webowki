@@ -161,7 +161,7 @@ export function Card({
                 </div>
             );
         }
-        
+
         const recordsToShow = data.slice(Math.max(data.length - 3, 0));
         
         if (dataType == DataType.events || dataType == DataType.chores) {

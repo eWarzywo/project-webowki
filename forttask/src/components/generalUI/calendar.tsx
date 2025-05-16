@@ -18,9 +18,9 @@ import {
 type CalendarProps = {
     initialDate?: Date;
     onChange?: (date: Date) => void;
-}
+};
 
-export default function Calendar({initialDate = new Date(), onChange}: CalendarProps) {
+export default function Calendar({ initialDate = new Date(), onChange }: CalendarProps) {
     const [currentMonth, setCurrentMonth] = useState(new Date(initialDate));
     const [selectedDate, setSelectedDate] = useState(initialDate);
     const today = new Date();
@@ -40,7 +40,7 @@ export default function Calendar({initialDate = new Date(), onChange}: CalendarP
                 onChange(startOfDay(day));
             }
         }
-    }
+    };
 
     return (
         <div className="w-80 p-4 bg-zinc-950 text-zinc-50 rounded-xl shadow-md border border-zinc-800">

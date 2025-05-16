@@ -1,13 +1,54 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ShoppingListHandler from '@/components/shoppingList/shoppingListHandler';
+import { useSocket } from '@/lib/socket';
 
 export default function Shopping() {
     const [addedToggle, setAddedToggle] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+
     React.useEffect(() => {
         setAddedToggle(false);
     }, [addedToggle]);
+
+    const [householdId, setHouseholdId] = useState<number | null>(null);
+    const { isConnected, shoppingRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
+
+    useEffect(() => {
+        const fetchHouseholdId = async () => {
+            try {
+                const response = await fetch('/api/user/get');
+                if (response.ok) {
+                    const data = await response.json();
+                    setHouseholdId(data.householdId);
+                } else {
+                    console.error(`Failed to fetch household ID, Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error fetching household ID:', error);
+            }
+        };
+
+        fetchHouseholdId();
+    }, []);
+
+    useEffect(() => {
+        if (!isConnected) return;
+
+        if (householdId) {
+            joinHousehold(householdId.toString());
+        }
+
+        return () => {
+            if (householdId) {
+                leaveHousehold(householdId.toString());
+            }
+        };
+    }, [isConnected, householdId]);
+
+    useEffect(() => {
+        setAddedToggle(prev => !prev);
+    }, [shoppingRefresh]);
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -17,7 +58,7 @@ export default function Shopping() {
 
         setErrorMessage('');
         if (name.trim().length < 3) {
-            setErrorMessage('Name must be at least 3 characters long');
+            setErrorMessage('Name must be at least 3 characters');
             return;
         }
         if (isNaN(cost) || cost <= 0) {
@@ -50,6 +91,9 @@ export default function Shopping() {
                     })
                     .then((data) => {
                         console.log('Shopping item created:', data);
+                        if (householdId) {
+                            emitUpdate(householdId, 'shopping');
+                        }
                     })
                     .catch((error) => {
                         console.error('Error creating shopping item:', error);
@@ -71,16 +115,18 @@ export default function Shopping() {
             <div className="flex w-full self-stretch gap-[10px]">
                 <form
                     id="shopping-form"
+                    autoComplete="off"
+                    autoCorrect="off"
                     onSubmit={handleSubmit}
                     className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px]"
                 >
-                    <div className="flex p-6 flex-col items-start justify-center">
+                    <div className="flex p-6 flex-col items-start justify-start w-full">
                         <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new item</h3>
                         <h4 className="text-zinc-400 mt-1.5 text-sm">Add a new item to your shopping list</h4>
                     </div>
                     <div className="px-6 pb-6 space-y-4 flex flex-col items-start">
                         <div className="flex flex-col items-start justify-start w-full gap-2.5 mt-1.5">
-                            <label className="text-zinc-50 text-sm" htmlFor="name">
+                            <label className="text-zinc-50 text-sm px-1" htmlFor="name">
                                 Name
                             </label>
                             <input
@@ -94,7 +140,7 @@ export default function Shopping() {
                             />
                         </div>
                         <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                            <label className="text-zinc-50 text-sm" htmlFor="cost">
+                            <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
                                 Cost
                             </label>
                             <div
@@ -115,24 +161,24 @@ export default function Shopping() {
                                 <span className="text-zinc-400">$</span>
                             </div>
                         </div>
-                    </div>
-                    <div className="w-full gap-2.5 flex justify-between px-9 pb-6 items-center">
-                        <input
-                            type="reset"
-                            value="Cancel"
-                            className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
-                        />
-                        <input
-                            type="submit"
-                            value="Add"
-                            className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
-                        />
-                    </div>
-                    <div id="error" className="text-red-500 text-sm px-6 pb-4">
-                        {errorMessage}
+                        <div className=" flex w-full gap-[10px] justify-between items-center">
+                            <input
+                                type="reset"
+                                value="Cancel"
+                                className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                            />
+                            <input
+                                type="submit"
+                                value="Add"
+                                className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                            />
+                        </div>
+                        <div id="error" className="text-red-500 text-sm">
+                            {errorMessage}
+                        </div>
                     </div>
                 </form>
-                {!addedToggle && <ShoppingListHandler />}
+                {!addedToggle && <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} />}
             </div>
         </>
     );

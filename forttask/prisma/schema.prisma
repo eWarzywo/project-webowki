@@ -85,7 +85,7 @@ model Chore {
   description String   @db.Text
   priority    Int      @default(1)
   cycle       Int      @default(0)
-  dueDate     DateTime 
+  dueDate     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -134,6 +134,7 @@ model Event {
   description String   @db.Text
   date        DateTime
   cycle       Int      @default(0)
+  repeatCount Int      @default(0)
   location    String   @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -145,6 +146,10 @@ model Event {
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 
   attendees EventAttendee[]
+
+  parentEventId Int?
+  parentEvent   Event?  @relation("Recurrence", fields: [parentEventId], references: [id], onDelete: Cascade)
+  children      Event[] @relation("Recurrence")
 }
 
 model EventAttendee {

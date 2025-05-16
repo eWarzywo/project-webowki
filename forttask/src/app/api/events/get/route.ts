@@ -18,33 +18,36 @@ export async function GET(req: Request) {
         const date = searchParams.get('date');
         const dateObj = date ? new Date(date) : false;
 
-        let events;
+        const limitParam = searchParams.get('limit');
+        const skipParam = searchParams.get('skip');
 
-        if (!dateObj) {
-            events = await prisma.event.findMany({
-                where: {
-                    attendees: {
-                        some: { userId: userId },
-                    },
-                },
-                include: { attendees: { include: { user: true } } },
-            });
-        } else {
-            events = await prisma.event.findMany({
-                where: {
-                    attendees: {
-                        some: { userId: userId },
-                    },
-                    date: {
-                        gte: new Date(dateObj.setHours(0, 0, 0, 0)),
-                        lte: new Date(dateObj.setHours(23, 59, 59, 999)),
-                    },
-                },
-                include: { attendees: { include: { user: true } } },
-            });
-        }
+        const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+        const skip = skipParam ? parseInt(skipParam, 10) : undefined;
 
-        return NextResponse.json(events);
+        const whereClause = {
+            attendees: {
+                some: { userId: userId },
+            },
+            ...(dateObj && {
+                date: {
+                    gte: new Date(new Date(dateObj).setHours(0, 0, 0, 0)),
+                    lte: new Date(new Date(dateObj).setHours(23, 59, 59, 999)),
+                },
+            }),
+        };
+
+        const count = await prisma.event.count({
+            where: whereClause
+        });
+
+        const events = await prisma.event.findMany({
+            where: whereClause,
+            include: { attendees: { include: { user: true } } },
+            ...(skip !== undefined && { skip }),
+            ...(limit !== undefined && { take: limit }),
+        });
+
+        return NextResponse.json({ events, count });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
