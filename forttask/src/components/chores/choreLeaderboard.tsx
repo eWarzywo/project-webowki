@@ -85,7 +85,7 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
         };
 
         fetchData();
-    }, [refresh, session]);
+    }, [refresh, session?.user?.householdId]);
 
     return (
         <div className="flex flex-col w-1/4 h-fit justify-center items-start rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-6">
