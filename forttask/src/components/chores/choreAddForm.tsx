@@ -1,6 +1,7 @@
 'use client';
 import DatePicker from "@/components/generalUI/datePicker";
 import React, { useState, useEffect } from "react";
+import { format } from 'date-fns';
 
 type choreAddFormProps = {
     onRefresh?: () => void;
@@ -13,7 +14,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
 
     const [choreName, setChoreName] = useState("");
 
-    const [choreDate, setChoreDate] = useState<Date | null>(null);
+    const [choreDate, setChoreDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
 
     const [showRepetition, setShowRepetition] = useState(false);
@@ -45,7 +46,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
 
     const handleCancel = () => {
         setChoreName("");
-        setChoreDate(null);
+        setChoreDate(new Date());
         setRepetition(0);
         setRepetitionAmount(0);
         setRepetitionAmountInput('');
@@ -93,7 +94,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                 },
                 body: JSON.stringify({
                     name: choreName,
-                    dueDate: choreDate,
+                    dueDate: format(choreDate, "yyyy-MM-dd"),
                     priority,
                     description,
                     cycle: repetition,

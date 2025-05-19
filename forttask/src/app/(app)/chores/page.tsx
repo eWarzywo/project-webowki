@@ -5,6 +5,12 @@ import ChoreToDoList from '@/components/chores/choreToDoList';
 import ChoreDoneList from '@/components/chores/choreDoneList';
 import ChoreLeaderboard from '@/components/chores/choreLeaderboard';
 import { useSocket } from '@/lib/socket';
+import { useRouter } from 'next/navigation';
+
+type User = {
+    id: number;
+    username: string;
+}
 
 type Chores = {
     id: number;
@@ -12,22 +18,26 @@ type Chores = {
     description: string;
     dueDate: Date;
     createdById: number;
+    createdBy: User;
     priority: number;
     done: boolean;
     doneById?: number;
+    doneBy?: User;
 }
 
 export default function Chores() {
     const { isConnected, choresRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
     const [householdId, setHouseholdId] = useState<number | null>(null);
+
     const [chores, setChores] = useState<Chores[]>([]);
     const [totalItems, setTotalItems] = useState(0);
-    const [choreListToggle, setChoreListToggle] = useState(false);
 
+    const [choreListToggle, setChoreListToggle] = useState(false);
     const [refresh, setRefresh] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<Error | null>(null);
     const [page, setPage] = useState(1);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchHouseholdId = async () => {
@@ -50,7 +60,8 @@ export default function Chores() {
     useEffect(() => {
         const fetchTotalItems = async () => {
             try {
-                const response = await fetch(`/api/chores/get`);
+                const route = choreListToggle ? 'done' : 'todo';
+                const response = await fetch(`/api/chores/${route}/get`);
                 if (response.ok) {
                     const { count } = await response.json();
                     setTotalItems(count);
@@ -63,7 +74,7 @@ export default function Chores() {
         }
         
         fetchTotalItems();
-    }, [refresh]);
+    }, [refresh, choreListToggle]);
 
     useEffect(() => {
         const fetchChores = async () => {
@@ -71,7 +82,8 @@ export default function Chores() {
             setError(null);
 
             try {
-                const response = await fetch(`/api/chores/get?limit=5&skip=${(page - 1) * 5}`);
+                const route = choreListToggle ? 'done' : 'todo';
+                const response = await fetch(`/api/chores/${route}/get?limit=5&skip=${(page - 1) * 5}`);
                 if (response.ok) {
                     const data = await response.json();
                     setChores(data.chores);
@@ -87,7 +99,7 @@ export default function Chores() {
         }
 
         fetchChores();
-    }, [page, refresh]);
+    }, [page, refresh, choreListToggle]);
 
     useEffect(() => {
         const fetchHouseholdId = async () => {
@@ -122,11 +134,12 @@ export default function Chores() {
     }, [isConnected, householdId]);
 
     useEffect(() => {
-        setRefresh(!refresh);
+        handleRefresh();
     }, [choresRefresh]);
 
     const handleRefresh = () => {
         setPage(1);
+        router.push('?page=1');
         setRefresh(!refresh);
     };
 

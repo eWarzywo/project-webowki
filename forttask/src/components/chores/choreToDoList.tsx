@@ -15,6 +15,7 @@ type Chore = {
     description: string;
     dueDate: Date;
     createdById: number;
+    createdBy: User;
     priority: number;
     done: boolean;
     doneById?: number;
@@ -34,8 +35,6 @@ type ChoreListProps = {
 export default function ChoreToDoList({ toggle, chores, loading, error, setPage, totalItems, emitUpdate }: ChoreListProps) {
     const searchParams = useSearchParams();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
-
-    const pendingChores = chores ? chores.filter(chore => !chore.done) : [];
 
     useEffect(() => {
         if (setPage) {
@@ -60,8 +59,8 @@ export default function ChoreToDoList({ toggle, chores, loading, error, setPage,
                     <p className="text-zinc-400 text-center">Loading...</p>
                 ) : error ? (
                     <p className="text-zinc-400 text-center">Error: {error.message}</p>
-                ) : pendingChores.length > 0 ? (
-                    pendingChores.map((chore) => <ChoreToDoCard key={chore.id} chore={chore} emitUpdate={emitUpdate} />)
+                ) : chores.length > 0 ? (
+                    chores.map((chore) => <ChoreToDoCard key={chore.id} chore={chore} emitUpdate={emitUpdate} />)
                 ) : (
                     <p className="text-zinc-400 text-center">No pending chores found</p>
                 )}
