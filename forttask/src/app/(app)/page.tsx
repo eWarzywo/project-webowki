@@ -1,14 +1,15 @@
 'use client';
 import { Card, DataType } from '@/components/generalUI/card';
 import Calendar from '@/components/generalUI/calendar';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import { useSocket } from '@/lib/socket';
 
 export default function Dashboard() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [householdId, setHouseholdId] = useState<number | null>(null);
 
-    const { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, choresRefresh, joinHousehold, leaveHousehold } = useSocket();
+    const { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, choresRefresh, joinHousehold, leaveHousehold } =
+        useSocket();
 
     useEffect(() => {
         const fetchHouseholdId = async () => {
@@ -49,13 +50,13 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center w-full pt-6 pb-8 px-8">
-            <div>
-                <h1 className="text-4xl text-white w-full justify-between items-center font-semibold">Dashboard</h1>
+        <div className="flex flex-col justify-center items-center w-full pt-6 pb-8 px-4 sm:px-8">
+            <div className="w-full">
+                <h1 className="text-3xl sm:text-4xl text-white w-full font-semibold">Dashboard</h1>
             </div>
-            <main className="flex justify-center items-center w-full pt-6 pb-8 px-8">
-                <div className="flex flex-col w-full justify-center items-center ">
-                    <div className="space-x-4 flex justify-between items-center w-full">
+            <main className="flex flex-col w-full pt-6 pb-8">
+                <div className="flex flex-col w-full justify-center items-center">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:space-x-4 sm:gap-0 justify-between items-center w-full">
                         <Card
                             title="Upcoming events"
                             subtitle="See what's happening in your household"
@@ -78,7 +79,7 @@ export default function Dashboard() {
                             refresh={billsRefresh}
                         />
                     </div>
-                    <div className="flex justify-center gap-x-3 items-start w-full mt-4">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:gap-x-3 items-start w-full mt-4">
                         <Card
                             title="Shopping list"
                             subtitle="Items that need to be purchased"
@@ -86,7 +87,9 @@ export default function Dashboard() {
                             selectedDate={selectedDate}
                             refresh={shoppingRefresh}
                         />
-                        <Calendar onChange={handleChange} initialDate={selectedDate} />
+                        <div className="w-full sm:w-auto flex justify-center">
+                            <Calendar onChange={handleChange} initialDate={selectedDate} />
+                        </div>
                     </div>
                 </div>
             </main>
