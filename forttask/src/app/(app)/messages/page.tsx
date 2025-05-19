@@ -41,6 +41,10 @@ export default function Messages() {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [messageLimit] = useState(30);
   const [channelInstance, setChannelInstance] = useState<Channel | null>(null);
+  const [isTabVisible, setIsTabVisible] = useState(true);
+  const clientRef = useRef<StreamChat | null>(null);
+  const channelRef = useRef<Channel | null>(null);
+  const reconnectingRef = useRef(false);
   
   const getUserProfilePicture = useCallback((userId: string): string => {
     if (usersMap[userId]?.profilePicture?.imageUrl) {
@@ -92,14 +96,17 @@ export default function Messages() {
   }, [session]);
 
   useEffect(() => {
-    let streamClient: StreamChat | null = null;
     let isComponentMounted = true;
     
     const initStreamChat = async () => {
       if (!session?.user?.id || !session.user?.householdId || !userDataLoaded) return;
       
       try {
-        if (!client) {
+        if (reconnectingRef.current) return;
+        
+        let streamClient = clientRef.current;
+        
+        if (!streamClient) {
           const tokenResponse = await fetch('/api/messages/token');
           if (!tokenResponse.ok) {
             throw new Error('Failed to get authentication token');
@@ -108,6 +115,7 @@ export default function Messages() {
           const { token, userId } = await tokenResponse.json();
           
           streamClient = StreamChat.getInstance(process.env.NEXT_PUBLIC_STREAM_KEY || '');
+          clientRef.current = streamClient;
           
           await streamClient.connectUser(
             {
@@ -121,50 +129,70 @@ export default function Messages() {
           if (isComponentMounted) {
             setClient(streamClient);
           }
-        } else {
-          streamClient = client;
         }
         
-        const householdId = session.user.householdId;
-        const channelId = `household-${householdId}`;
-        
-        const householdChannel = streamClient.channel('messaging', channelId, {
-          members: [session.user.id],
-          created_by_id: session.user.id,
-        });
-        
-        if (isComponentMounted) {
-          setChannelInstance(householdChannel);
+        if (streamClient && streamClient.userID) {
+          const householdId = session.user.householdId;
+          const channelId = `household-${householdId}`;
           
-          await householdChannel.watch();
-          
-          const channelResponse = await householdChannel.query({ 
-            messages: { 
-              limit: messageLimit
-            } 
+          const householdChannel = streamClient.channel('messaging', channelId, {
+            members: [session.user.id],
+            created_by_id: session.user.id,
           });
           
-          if (channelResponse.messages && isComponentMounted) {
-            setMessages(channelResponse.messages);
-            setHasMoreMessages(channelResponse.messages.length >= messageLimit);
-          }
+          channelRef.current = householdChannel;
           
-          
-          householdChannel.on('message.new', (event) => {
-            if (event.message && isComponentMounted) {
-              setMessages((prevMessages) => [...prevMessages, event.message as MessageResponse]);
-              setTimeout(scrollToBottom, 100);
+          if (isComponentMounted) {
+            setChannelInstance(householdChannel);
+            
+            try {
+              await householdChannel.watch();
+              
+              const channelResponse = await householdChannel.query({ 
+                messages: { 
+                  limit: messageLimit
+                } 
+              });
+              
+              if (channelResponse.messages && isComponentMounted) {
+                setMessages(channelResponse.messages);
+                setHasMoreMessages(channelResponse.messages.length >= messageLimit);
+              }
+              
+              householdChannel.off('message.new');
+              
+              householdChannel.on('message.new', (event) => {
+                if (event.message && isComponentMounted) {
+                  setMessages((prevMessages) => [...prevMessages, event.message as MessageResponse]);
+                  setTimeout(scrollToBottom, 100);
+                }
+              });
+              
+              setLoading(false);
+              setTimeout(scrollToBottom, 300);
+            } catch (error) {
+              console.error('Error initializing channel:', error);
+              if (!streamClient.userID) {
+                clientRef.current = null;
+                setClient(null);
+                setChannelInstance(null);
+                channelRef.current = null;
+              }
             }
-          });
-          
-          setLoading(false);
-          setTimeout(scrollToBottom, 300);
+          }
         }
       } catch (err) {
         console.error('Error initializing chat:', err);
+        clientRef.current = null;
+        setClient(null);
+        setChannelInstance(null);
+        channelRef.current = null;
+        
         if (isComponentMounted) {
           setLoading(false);
         }
+      } finally {
+        reconnectingRef.current = false;
       }
     };
     
@@ -175,27 +203,40 @@ export default function Messages() {
     return () => {
       isComponentMounted = false;
       
-      const clientToDisconnect = client;
-      
-      if (clientToDisconnect) {
-        setTimeout(() => {
-          clientToDisconnect.disconnectUser().catch(error => {
-            console.error('Error disconnecting user:', error);
-          });
-        }, 0);
-      }
     };
-  }, [session, userDataLoaded, client, getUserProfilePicture, messageLimit]);
+  }, [session, userDataLoaded, messageLimit, getUserProfilePicture]);
+  
+  useEffect(() => {
+    return () => {
+      if (clientRef.current) {
+        clientRef.current.disconnectUser().catch(error => {
+          console.error('Error disconnecting user:', error);
+        });
+        clientRef.current = null;
+      }
+      
+      channelRef.current = null;
+      setClient(null);
+      setChannelInstance(null);
+    };
+  }, []);
   
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!inputMessage.trim() || !client || !session?.user?.id) return;
+    if (!inputMessage.trim() || !session?.user?.id) return;
     
     try {
+      const currentClient = clientRef.current;
+      
+      if (!currentClient || !currentClient.userID) {
+        console.error('Cannot send message: client is not connected');
+        return;
+      }
+      
       const householdId = session.user.householdId;
       const channelId = `household-${householdId}`;
-      const channel = client.channel('messaging', channelId);
+      const channel = currentClient.channel('messaging', channelId);
       
       await channel.sendMessage({
         text: inputMessage,
@@ -205,6 +246,13 @@ export default function Messages() {
       setInputMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
+      
+      if (clientRef.current && !clientRef.current.userID) {
+        clientRef.current = null;
+        setClient(null);
+        setChannelInstance(null);
+        channelRef.current = null;
+      }
     }
   };
   
@@ -279,6 +327,43 @@ export default function Messages() {
     };
   }, [loadMoreMessages, hasMoreMessages, loadingMoreMessages]);
   
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      const visible = document.visibilityState === 'visible';
+      setIsTabVisible(visible);
+      
+      if (visible) {
+        const currentClient = clientRef.current;
+        
+        if (currentClient && !currentClient.userID) {
+          reconnectingRef.current = true;
+          
+          try {
+            clientRef.current = null;
+            setClient(null);
+            setChannelInstance(null);
+            channelRef.current = null;
+            
+            setTimeout(() => {
+              reconnectingRef.current = false;
+            }, 100);
+          } catch (error) {
+            console.error('Error resetting client on tab visibility change:', error);
+            reconnectingRef.current = false;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
+  }, []);
+
   if (!session?.user?.householdId) {
     return (
       <div className="flex flex-col items-center justify-center h-full bg-zinc-950 text-zinc-50">
