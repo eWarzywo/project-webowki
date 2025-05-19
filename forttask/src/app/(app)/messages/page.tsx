@@ -578,7 +578,7 @@ export default function Messages() {
                                 );
                             } else {
                                 return (
-                                    <div key={message.id} className="mb-4 flex justify- mx-4">
+                                    <div key={message.id} className="mb-4 flex justify-start mx-4">
                                         <div className="flex items-start">
                                             <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2 bg-zinc-800">
                                                 <Image
