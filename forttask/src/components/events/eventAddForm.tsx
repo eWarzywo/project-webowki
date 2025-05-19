@@ -1,3 +1,4 @@
+'use client';
 import DatePicker from '@/components/generalUI/datePicker';
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
@@ -13,20 +14,28 @@ type EventAddFormProps = {
 }
 
 export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProps) {
-    const [eventName, setEventName] = useState('');
-    const [eventDate, setEventDate] = useState(new Date());
-    const [participants, setParticipants] = useState<number[]>([]);
-    const [eventLocation, setLocation] = useState('');
-    const [repeat, setRepeat] = useState(0);
-    const [isCustomRepeat, setIsCustomRepeat] = useState(false);
-    const [customRepeatInput, setCustomRepeatInput] = useState("");
-    const [repeatAmount, setRepeatAmount] = useState(0);
-    const [repeatAmountInput, setRepeatAmountInput] = useState("");
-    const [description, setDescription] = useState('');
     const [error, setError] = useState<Error | null>(null);
-    const [householders, setHouseholders] = useState<Householders[]>([]);
     const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
+
     const [showCalendar, setShowCalendar] = useState(false);
+    const [householders, setHouseholders] = useState<Householders[]>([]);
+
+    const [eventName, setEventName] = useState('');
+
+    const [eventDate, setEventDate] = useState(new Date());
+
+    const [participants, setParticipants] = useState<number[]>([]);
+
+    const [eventLocation, setLocation] = useState('');
+
+    const [showRepetition, setShowRepetition] = useState(false);
+    const [repetition, setRepetition] = useState(0);
+    const [isCustomRepetition, setIsCustomRepetition] = useState(false);
+    const [customRepetitionInput, setCustomRepetitionInput] = useState("");
+    const [repetitionAmount, setRepetitionAmount] = useState(0);
+    const [repetitionAmountInput, setRepetitionAmountInput] = useState("");
+
+    const [description, setDescription] = useState('');
 
     const handleShowCalendar = () => {
         setShowCalendar(!showCalendar);
@@ -101,8 +110,8 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     date: format(eventDate, 'yyyy-MM-dd'),
                     attendees: participants,
                     location: eventLocation,
-                    repeat: repeat,
-                    repeatCount: repeatAmount,
+                    repeat: repetition,
+                    repeatCount: repetitionAmount,
                     description: description,
                 }),
             });
@@ -125,15 +134,16 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
         setEventDate(new Date());
         setParticipants([]);
         setLocation('');
-        setRepeat(0);
+        setRepetition(0);
         setDescription('');
         setValidationErrors({});
         setShowCalendar(false);
-        setIsCustomRepeat(false);
-        setCustomRepeatInput("");
-        setRepeatAmount(0);
-        setRepeatAmountInput("");
+        setIsCustomRepetition(false);
+        setCustomRepetitionInput("");
+        setRepetitionAmount(0);
+        setRepetitionAmountInput("");
         setError(null);
+        setShowRepetition(false);
     };
 
     useEffect(() => {
@@ -227,53 +237,73 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
                 />
                 {validationErrors.eventLocation && <p className="text-red-500 text-xs mb-2">Location is required</p>}
-                <label htmlFor="repeat">Repeat after x days?</label>
-                <select
-                    id="repeat"
-                    value={isCustomRepeat ? "-1" : repeat.toString()}
-                    onChange={(e) => {
-                        const value = parseInt(e.target.value, 10);
-                        if (value === -1) {
-                            setIsCustomRepeat(true);
-                            setCustomRepeatInput("");
-                        } else {
-                            setIsCustomRepeat(false);
-                            setRepeat(value);
-                        }
+                <div className="flex items-center gap-2 py-2">
+                    <label className="cursor-pointer text-zinc-50">Does this event repeat?</label>
+                    <div
+                        onClick={() => {
+                            setShowRepetition(!showRepetition);
+                            setRepetition(0);
+                            setRepetitionAmount(0);
+                            setRepetitionAmountInput('');
+                        }}
+                        className={`w-5 h-5 flex items-center justify-center border rounded cursor-pointer ${
+                            showRepetition ? 'bg-zinc-50 border-zinc-400' : 'bg-zinc-950 border-zinc-800'
+                        }`}
+                    >
+                        {showRepetition && <span className="text-zinc-900 font-bold text-sm">✔</span>}
+                    </div>
+                </div>
+                {showRepetition && (
+                    <>
+                        <label htmlFor="repeat">Repeat after x days?</label>
+                        <select
+                            id="repeat"
+                            value={isCustomRepetition ? "-1" : repetition.toString()}
+                            onChange={(e) => {
+                                const value = parseInt(e.target.value, 10);
+                                if (value === -1) {
+                                    setIsCustomRepetition(true);
+                                    setCustomRepetitionInput("");
+                                } else {
+                                    setIsCustomRepetition(false);
+                                    setRepetition(value);
+                                }
 
-                        if (value === 0) {
-                            setRepeatAmount(0);
-                            setRepeatAmountInput("");
-                        }
-                    }}
-                    className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
-                >
-                    <option value="0">No Repeat</option>
-                    <option value="1">Daily</option>
-                    <option value="7">Weekly</option>
-                    <option value="-30">Monthly</option>
-                    <option value="-365">Yearly</option>
-                    <option value="-1">Custom...</option>
-                </select>
-                {isCustomRepeat && (
+                                if (value === 0) {
+                                    setRepetitionAmount(0);
+                                    setRepetitionAmountInput("");
+                                }
+                            }}
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                        >
+                            <option value="0">No Repeat</option>
+                            <option value="1">Daily</option>
+                            <option value="7">Weekly</option>
+                            <option value="-30">Monthly</option>
+                            <option value="-365">Yearly</option>
+                            <option value="-1">Custom...</option>
+                        </select>
+                    </>
+                )}
+                {isCustomRepetition && (
                     <input
                         type="number"
                         id="customRepeat"
                         placeholder="Enter days"
                         min="1"
-                        value={customRepeatInput}
+                        value={customRepetitionInput}
                         onChange={(e) => {
                             const newValue = e.target.value;
 
                             if (newValue === "" || /^[0-9]+$/.test(newValue)) {
-                                setCustomRepeatInput(newValue);
+                                setCustomRepetitionInput(newValue);
 
                                 if (newValue === "") {
-                                    setRepeat(0);
+                                    setRepetition(0);
                                 } else {
                                     const value = parseInt(newValue, 10);
                                     if (value >= 1) {
-                                        setRepeat(value);
+                                        setRepetition(value);
                                     }
                                 }
                             }
@@ -281,7 +311,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                         className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
                     />
                 )}
-                {repeat !== 0 && (
+                {repetition !== 0 && (
                     <>
                         <label htmlFor="repeatCount" className="text-zinc-400 text-sm mb-1 text-end">
                             How many times should it repeat?
@@ -292,19 +322,19 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                             placeholder="Enter repeat count"
                             min="1"
                             max="100"
-                            value={repeatAmountInput}
+                            value={repetitionAmountInput}
                             onChange={(e) => {
                                 const newValue = e.target.value;
 
                                 if (newValue === "" || /^[0-9]+$/.test(newValue)) {
-                                    setRepeatAmountInput(newValue);
+                                    setRepetitionAmountInput(newValue);
 
                                     if (newValue === "") {
-                                        setRepeatAmount(0);
+                                        setRepetitionAmount(0);
                                     } else {
                                         const value = parseInt(newValue, 10);
                                         if (value >= 1 && value <= 365) {
-                                            setRepeatAmount(value);
+                                            setRepetitionAmount(value);
                                         }
                                     }
                                 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../../../libs/prisma';
+import prisma from '../../../../../../libs/prisma';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../auth';
+import { authOptions } from '../../../../auth';
 
 export async function GET(req: Request) {
     try {
@@ -28,13 +28,14 @@ export async function GET(req: Request) {
 
         const whereClause = {
             householdId: householdId,
+            done: false,
         };
 
         const count = await prisma.chore.count({
             where: whereClause,
         });
 
-        const choresQuery = await prisma.chore.findMany({
+        const chores = await prisma.chore.findMany({
             where: whereClause,
             include: {
                 createdBy: true,
@@ -42,17 +43,16 @@ export async function GET(req: Request) {
             },
             ...(skip !== undefined && { skip }),
             ...(limit !== undefined && { take: limit }),
+            orderBy: [
+                { priority: 'asc' },
+                { dueDate: 'asc' }
+            ],
         });
 
-        const chores = choresQuery.sort((a, b) => {
-            if (a.priority !== b.priority) {
-                return a.priority - b.priority;
-            } else {
-                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-            }
+        return NextResponse.json({
+            chores,
+            count
         });
-
-        return NextResponse.json({ chores, count });
     } catch (error) {
         console.error(error);
         return NextResponse.json({error: 'Invalid request'}, {status: 400});

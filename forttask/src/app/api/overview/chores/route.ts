@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         const date = dateParam ? new Date(dateParam) : new Date();
         const oneWeekLater = addDays(date, 7);
 
-        let dateFilter = {
+        const dateFilter = {
             dueDate: {
                 gte: startOfDay(date),
                 lte: endOfDay(oneWeekLater)

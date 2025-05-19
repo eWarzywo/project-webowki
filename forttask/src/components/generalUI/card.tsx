@@ -1,6 +1,8 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 
 export enum DataType {
     events,
@@ -53,12 +55,14 @@ export function Card({
     title, 
     subtitle, 
     dataType, 
-    selectedDate 
+    selectedDate,
+    refresh
 }: { 
     title: string; 
     subtitle: string; 
     dataType: DataType;
     selectedDate: Date;
+    refresh: boolean;
 }) {
     const [data, setData] = useState<CardItemType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -70,7 +74,7 @@ export function Card({
             setError(null);
             
             try {
-                const dateParam = selectedDate.toISOString().split('T')[0];
+                const dateParam = format(selectedDate, 'yyyy-MM-dd');
                 let endpoint = '';
                 
                 switch(dataType) {
@@ -118,7 +122,7 @@ export function Card({
         };
         
         fetchData();
-    }, [dataType, selectedDate]);
+    }, [dataType, selectedDate, refresh]);
     
     const getItemLink = (item: CardItemType) => {
         switch(dataType) {
@@ -165,7 +169,6 @@ export function Card({
         const recordsToShow = data.slice(Math.max(data.length - 3, 0));
         
         if (dataType == DataType.events || dataType == DataType.chores) {
-            let c = 1;
             return recordsToShow.map((record) => {
                 return (
                     <span key={`${DataType[dataType]}-${record.id}`}>
@@ -182,11 +185,10 @@ export function Card({
                 );
             });
         } else if (dataType == DataType.shopping) {
-            let c = 1;
             return recordsToShow.map((record) => {
                 const item = record as ShoppingItem;
                 return (
-                    <span key={DataType[dataType].toString() + c++}>
+                    <span key={`${DataType[dataType]}-${record.id}`}>
                         <Link href={getItemLink(record)} className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1">
                             <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
@@ -202,11 +204,10 @@ export function Card({
                 );
             });
         } else if (dataType == DataType.bills) {
-            let c = 1;
             return recordsToShow.map((record) => {
                 const bill = record as BillItem;
                 return (
-                    <span key={DataType[dataType].toString() + c++}>
+                    <span key={`${DataType[dataType]}-${record.id}`}>
                         <Link href={getItemLink(record)} className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1">
                             <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
