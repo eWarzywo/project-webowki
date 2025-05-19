@@ -79,7 +79,7 @@ export default function Dashboard() {
                             refresh={billsRefresh}
                         />
                     </div>
-                    <div className="flex flex-col gap-4 sm:flex-row sm:gap-x-3 items-start w-full mt-4">
+                    <div className="flex justify-center flex-col gap-4 sm:flex-row sm:gap-x-3 items-start w-full mt-4">
                         <Card
                             title="Shopping list"
                             subtitle="Items that need to be purchased"
