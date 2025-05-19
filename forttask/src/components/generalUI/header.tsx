@@ -14,7 +14,6 @@ export default function Header() {
                 </div>
                 <div className="flex flex-row-reverse items-center w-[30%]">
                     <ProfilePicture />
-                    <SearchBar />
                 </div>
             </header>
             <hr className="border-zinc-800" />
@@ -56,15 +55,5 @@ function NavMenu() {
                 </Link>
             </li>
         </ul>
-    );
-}
-
-function SearchBar() {
-    return (
-        <input
-            type="text"
-            placeholder="Search..."
-            className="w-1/2 h-8 p-2 mx-3 bg-zinc-950 rounded-md border border-zinc-800 text-sm text-gray-300 placeholder:text-zinc-500"
-        />
     );
 }
