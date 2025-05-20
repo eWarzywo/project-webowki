@@ -11,10 +11,14 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ message: 'You must be logged in to delete events' }, { status: 401 });
         }
 
+        if (!session.user?.householdId) {
+            return NextResponse.json({ message: 'You must be a part of a household to delete events' }, { status: 401 });
+        }
+
         const householdId = session.user.householdId ? parseInt(session.user.householdId) : null;
 
-        const { searchParams } = new URL(req.url);
-        const eventId = searchParams.get('eventId');
+        const body = await req.json();
+        const { eventId } = body;
 
         if (!eventId) {
             return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });

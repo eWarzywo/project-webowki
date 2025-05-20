@@ -9,13 +9,13 @@ export async function POST(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json({ message: 'You must be logged in to view events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be logged in to create events' }, { status: 401 });
         }
 
         const userId = parseInt(session.user.id);
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be part of a household to create events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be a part of a household to create events' }, { status: 401 });
         }
 
         const householdId = parseInt(session.user.householdId);
