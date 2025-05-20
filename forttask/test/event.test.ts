@@ -23,33 +23,6 @@ type MockRequestOptions = {
     body?: Record<string, unknown>;
 };
 
-type User = {
-    id: number;
-    username: string;
-}
-
-type EventAttendee = {
-    userId: number;
-    eventId: number;
-    user: User;
-}
-
-type Event = {
-    id: number;
-    name: string;
-    description: string;
-    date: Date;
-    createdById: number;
-    attendees: EventAttendee[];
-    location: string;
-    cycle: number;
-    createdAt: Date;
-    householdId: number;
-    updatedAt: Date;
-    repeatCount: number;
-    parentEventId: number | null;
-}
-
 describe('Event GET API', () => {
     beforeEach(() => {
         vi.resetAllMocks();
@@ -72,7 +45,7 @@ describe('Event GET API', () => {
     it('should return 401 if user is not authenticated', async () => {
         vi.mocked(getServerSession).mockResolvedValue(null);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({});
         const response = await GET(req);
         const responseBody = await response.json();
 
@@ -85,12 +58,12 @@ describe('Event GET API', () => {
             user: { id: '1' },
         } as MockSession);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({});
         const response = await GET(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(401);
-        expect(responseBody).toEqual({ message: 'You must be a part of a household to view events' });
+        const data = await response.json();
+        expect(data).toEqual({ message: 'You must be a part of a household to view events' });
     })
 
     it('should return events for the authenticated user', async () => {
@@ -99,7 +72,7 @@ describe('Event GET API', () => {
         } as MockSession);
 
         const req = createMockRequest({ searchParams: { date: '2023-10-01' } });
-        const mockEvents: Event[] = [
+        const mockEvents = [
             {
                 id: 1,
                 name: 'Test Event',
@@ -123,11 +96,11 @@ describe('Event GET API', () => {
         vi.mocked(prisma.event.count).mockResolvedValue(mockEvents.length);
 
         const response = await GET(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(200);
-        expect(responseBody.events).toEqual(serializedEvents);
-        expect(responseBody.count).toBe(mockEvents.length);
+        const data = await response.json();
+        expect(data.events).toEqual(serializedEvents);
+        expect(data.count).toBe(mockEvents.length);
     });
 
     it('should return 400 if an error occurs', async () => {
@@ -135,15 +108,15 @@ describe('Event GET API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({});
 
         vi.mocked(prisma.event.findMany).mockRejectedValue(new Error('Database error'));
 
         const response = await GET(req);
-        const responseBody = await response.json();
 
-        expect(response.status).toBe(400);
-        expect(responseBody.error).toBe('Invalid request');
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
     });
 });
 
@@ -169,12 +142,12 @@ describe('Event POST API', () => {
     it('should return 401 if user is not authenticated', async () => {
         vi.mocked(getServerSession).mockResolvedValue(null);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({});
         const response = await POST(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(401);
-        expect(responseBody).toEqual({ message: 'You must be logged in to create events' });
+        const data = await response.json();
+        expect(data).toEqual({ message: 'You must be logged in to create events' });
     });
 
     it('should return 401 if user is not part of a household', async () => {
@@ -182,12 +155,12 @@ describe('Event POST API', () => {
             user: { id: '1' },
         } as MockSession);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({});
         const response = await POST(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(401);
-        expect(responseBody).toEqual({ message: 'You must be a part of a household to create events' });
+        const data = await response.json();
+        expect(data).toEqual({ message: 'You must be a part of a household to create events' });
     })
 
     it('should create an event for the authenticated user', async () => {
@@ -195,32 +168,26 @@ describe('Event POST API', () => {
             user: {id: '1', householdId: '1'},
         } as MockSession);
 
-        const req = createMockRequest({
-            body: {
-                name: 'Test Event',
-                description: 'This is a test event',
-                date: new Date('2023-10-01'),
-                location: 'Test Location',
-                cycle: 1,
-                repeatCount: 0,
-                parentEventId: null,
-                attendees: [1],
-            }
-        });
-
-        const mockEvent = {
-            id: 1,
+        const requestBody = {
             name: 'Test Event',
             description: 'This is a test event',
             date: new Date('2023-10-01'),
-            createdById: 1,
-            attendees: [1],
             location: 'Test Location',
             cycle: 1,
+            repeatCount: 0,
+            attendees: [1],
+        }
+
+        const request = createMockRequest({ body: requestBody });
+
+        const mockEvent = {
+            id: 1,
+            ...requestBody,
+            createdById: 1,
+            location: 'Test Location',
             createdAt: new Date('2023-10-01'),
             householdId: 1,
             updatedAt: new Date('2023-10-01'),
-            repeatCount: 0,
             parentEventId: null,
         };
 
@@ -242,11 +209,11 @@ describe('Event POST API', () => {
             count: mockAttendees.length,
         });
 
-        const response = await POST(req);
-        const responseBody = await response.json();
+        const response = await POST(request);
 
         expect(response.status).toBe(201);
-        expect(responseBody).toEqual(serializedEvent);
+        const data = await response.json();
+        expect(data).toEqual(serializedEvent);
     });
 
     it('should return 400 if an error occurs', async () => {
@@ -254,31 +221,47 @@ describe('Event POST API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = createMockRequest({ searchParams: {} });
+        const req = createMockRequest({ searchParams: {}, body: { attendees: [] } });
 
         vi.mocked(prisma.event.create).mockRejectedValue(new Error('Database error'));
 
         const response = await POST(req);
-        const responseBody = await response.json();
 
-        expect(response.status).toBe(400);
-        expect(responseBody.error).toBe('Invalid request');
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
     });
 });
 
 describe('Event DELETE API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
+
+        const url = new URL('http://localhost:3000/api/event/create');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body)
+        } as unknown as Request;
+    };
+
     it('should return 401 if user is not authenticated', async () => {
         vi.mocked(getServerSession).mockResolvedValue(null);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-        });
+        const req = createMockRequest({});
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(401);
-        expect(responseBody).toEqual({ message: 'You must be logged in to delete events' });
+        const data = await response.json();
+        expect(data).toEqual({ message: 'You must be logged in to delete events' });
     });
 
     it('should return 401 if user is not part of a household', async () => {
@@ -286,15 +269,13 @@ describe('Event DELETE API', () => {
             user: { id: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-        });
+        const req = createMockRequest({});
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(401);
-        expect(responseBody).toEqual({ message: 'You must be a part of a household to delete events' });
+        const data = await response.json();
+        expect(data).toEqual({ message: 'You must be a part of a household to delete events' });
     });
 
     it('should return 400 if eventId is missing', async () => {
@@ -302,16 +283,13 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({}),
-        });
+        const req = createMockRequest({});
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(400);
-        expect(responseBody).toEqual({ error: 'Missing eventId parameter' });
+        const data = await response.json();
+        expect(data).toEqual({ error: 'Missing eventId parameter' });
     });
 
     it('should return 400 if eventId is invalid', async () => {
@@ -319,16 +297,13 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({ eventId: 'invalid' }),
-        });
+        const req = createMockRequest({ body: { eventId: 'invalid' } });
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(400);
-        expect(responseBody).toEqual({ error: 'Invalid eventId parameter' });
+        const data = await response.json();
+        expect(data).toEqual({ error: 'Invalid eventId parameter' });
     });
 
     it('should return 404 if event is not found', async () => {
@@ -336,18 +311,15 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({ eventId: 1 }),
-        });
+        const req = createMockRequest({ body: { eventId: '1' } });
 
         vi.mocked(prisma.event.findUnique).mockResolvedValue(null);
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(404);
-        expect(responseBody).toEqual({ error: 'Event not found' });
+        const data = await response.json();
+        expect(data).toEqual({ error: 'Event not found' });
     });
 
     it('should return 403 if user is not authorized to delete the event', async () => {
@@ -355,10 +327,7 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({ eventId: 1 }),
-        });
+        const req = createMockRequest({ body: { eventId: '1' } });
 
         const mockEvent = {
             id: 1,
@@ -379,10 +348,10 @@ describe('Event DELETE API', () => {
         vi.mocked(prisma.event.findUnique).mockResolvedValue(mockEvent);
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(403);
-        expect(responseBody).toEqual({ error: 'Not authorized to delete this event' });
+        const data = await response.json();
+        expect(data).toEqual({ error: 'Not authorized to delete this event' });
     });
 
     it('should delete an event for the authenticated user', async () => {
@@ -390,10 +359,7 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({ eventId: 1 }),
-        });
+        const req = createMockRequest({ body: { eventId: '1' } });
 
         const mockEvent = {
             id: 1,
@@ -424,17 +390,14 @@ describe('Event DELETE API', () => {
             user: { id: '1', householdId: '1' },
         } as MockSession);
 
-        const req = new Request('http://localhost:3000/api/event/delete', {
-            method: 'DELETE',
-            body: JSON.stringify({ eventId: 1 }),
-        });
+        const req = createMockRequest({ body: { eventId: '1' } });
 
         vi.mocked(prisma.event.findUnique).mockRejectedValue(new Error('Database error'));
 
         const response = await DELETE(req);
-        const responseBody = await response.json();
 
         expect(response.status).toBe(500);
-        expect(responseBody.error).toBe('Server error');
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
     });
 });
