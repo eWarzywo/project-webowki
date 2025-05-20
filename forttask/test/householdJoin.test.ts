@@ -2,6 +2,33 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { POST } from '../src/app/api/household/join/route';
 import { getServerSession } from 'next-auth/next';
 
+type User = {
+    id: number;
+    username: string;
+    email: string;
+    passwordHash: string;
+    createdAt: Date;
+    profilePictureId: number | null;
+    householdId: number | null;
+    household: Household | null;
+};
+
+type Household = {
+    id: number;
+    name: string;
+    joinCode: string;
+    createdAt: Date;
+    ownerId: number;
+    owner: User;
+    users: User[];
+};
+
+type Session = {
+    user: {
+        id: string;
+    };
+};
+
 vi.mock('next-auth/next', () => ({
     getServerSession: vi.fn(),
 }));
@@ -28,10 +55,10 @@ describe('Household Join API', () => {
 
         vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
         vi.mocked(prisma.household.findUnique).mockResolvedValue(null);
-        vi.mocked(prisma.user.update).mockResolvedValue({} as any);
+        vi.mocked(prisma.user.update).mockResolvedValue({} as User);
     });
 
-    const createMockRequest = (body: any) => {
+    const createMockRequest = (body: { joinCode: string }) => {
         return {
             json: () => Promise.resolve(body),
         } as unknown as Request;
@@ -51,7 +78,7 @@ describe('Household Join API', () => {
     it('should return 400 if join code is missing', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
         const req = createMockRequest({ joinCode: '' });
         const response = await POST(req);
@@ -64,7 +91,7 @@ describe('Household Join API', () => {
     it('should return 404 if user not found', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
         vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
@@ -79,18 +106,37 @@ describe('Household Join API', () => {
     it('should return 409 if user already belongs to a household', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
-        vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        const mockUser: User = {
             id: 1,
             username: 'testuser',
             email: 'test@example.com',
+            passwordHash: 'hashed_password',
+            createdAt: new Date(),
+            profilePictureId: null,
             householdId: 42,
             household: {
                 id: 42,
                 name: 'Existing Household',
+                joinCode: 'XYZ789',
+                createdAt: new Date(),
+                ownerId: 99,
+                owner: {
+                    id: 99,
+                    username: 'owner',
+                    email: 'owner@example.com',
+                    passwordHash: 'hashed_password',
+                    createdAt: new Date(),
+                    profilePictureId: null,
+                    householdId: 42,
+                    household: null
+                },
+                users: []
             },
-        } as any);
+        };
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
         const req = createMockRequest({ joinCode: 'ABC123' });
         const response = await POST(req);
@@ -103,21 +149,32 @@ describe('Household Join API', () => {
     it('should return 409 if user owns another household', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
-        vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        const mockUser: User = {
             id: 1,
             username: 'testuser',
             email: 'test@example.com',
+            passwordHash: 'hashed_password',
+            createdAt: new Date(),
+            profilePictureId: null,
             householdId: null,
             household: null,
-        } as any);
+        };
 
-        vi.mocked(prisma.household.findUnique).mockResolvedValue({
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+
+        const mockHousehold: Household = {
             id: 99,
             name: 'Owned Household',
+            joinCode: 'OWNER123',
+            createdAt: new Date(),
             ownerId: 1,
-        } as any);
+            owner: mockUser,
+            users: [mockUser],
+        };
+
+        vi.mocked(prisma.household.findUnique).mockResolvedValue(mockHousehold);
 
         const req = createMockRequest({ joinCode: 'ABC123' });
         const response = await POST(req);
@@ -130,15 +187,20 @@ describe('Household Join API', () => {
     it('should return 404 if household with join code not found', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
-        vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        const mockUser: User = {
             id: 1,
             username: 'testuser',
             email: 'test@example.com',
+            passwordHash: 'hashed_password',
+            createdAt: new Date(),
+            profilePictureId: null,
             householdId: null,
             household: null,
-        } as any);
+        };
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -164,17 +226,20 @@ describe('Household Join API', () => {
     it('should successfully join a household', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
-        const mockUser = {
+        const mockUser: User = {
             id: 1,
             username: 'testuser',
             email: 'test@example.com',
+            passwordHash: 'hashed_password',
+            createdAt: new Date(),
+            profilePictureId: null,
             householdId: null,
             household: null,
         };
 
-        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser as any);
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
@@ -184,7 +249,7 @@ describe('Household Join API', () => {
                 return Promise.resolve(null);
             }
             if (params.where.joinCode) {
-                return Promise.resolve({
+                const mockHousehold: Household = {
                     id: 42,
                     name: 'Test Household',
                     joinCode: 'ABC123',
@@ -194,23 +259,37 @@ describe('Household Join API', () => {
                         id: 99,
                         username: 'owner',
                         email: 'owner@example.com',
-                    },
+                        passwordHash: 'hashed_password',
+                        createdAt: new Date(),
+                        profilePictureId: null,
+                        householdId: 42,
+                        household: null,
+                    } as User,
                     users: [
                         {
                             id: 99,
                             username: 'owner',
                             email: 'owner@example.com',
-                        },
+                            passwordHash: 'hashed_password',
+                            createdAt: new Date(),
+                            profilePictureId: null,
+                            householdId: 42,
+                            household: null,
+                        } as User,
                     ],
-                } as any);
+                };
+                return Promise.resolve(mockHousehold);
             }
             return Promise.resolve(null);
         });
 
-        vi.mocked(prisma.user.update).mockResolvedValue({
+        const updatedUser: User = {
             ...mockUser,
             householdId: 42,
-        } as any);
+            household: null,
+        };
+        
+        vi.mocked(prisma.user.update).mockResolvedValue(updatedUser);
 
         const req = createMockRequest({ joinCode: 'ABC123' });
         const response = await POST(req);
@@ -231,7 +310,7 @@ describe('Household Join API', () => {
     it('should handle errors and return 500', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
             user: { id: '1' },
-        } as any);
+        } as Session);
 
         vi.mocked(prisma.user.findUnique).mockRejectedValue(new Error('Database error'));
 
