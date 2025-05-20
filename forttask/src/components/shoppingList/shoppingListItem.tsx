@@ -23,7 +23,7 @@ interface DetailsBoxProps {
 function DetailsBox({ name, cost, userName, updatedAt, boughtBy, onClose, onUnBought }: DetailsBoxProps) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-96">
+            <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-6 w-11/12 max-w-md">
                 <h2 className="text-lg font-semibold mb-4">Item Details</h2>
                 <p className="text-zinc-400 mb-2">Item name: {name}</p>
                 <p className="text-zinc-400 mb-2">Cost: {cost}$</p>
@@ -32,7 +32,7 @@ function DetailsBox({ name, cost, userName, updatedAt, boughtBy, onClose, onUnBo
                 <p className="text-zinc-400 mb-4">
                     Bought at: {updatedAt ? new Date(updatedAt).toLocaleString() : 'N/A'}
                 </p>
-                <div className="flex justify-between gap-4">
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
                     <button onClick={onUnBought} className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 transition">
                         Mark as Unbought
                     </button>
@@ -113,16 +113,50 @@ export default function ShoppingListItem({ id, handleDelete, emitUpdate }: Shopp
 
     return (
         <>
-            <div className="flex flex-col w-full gap-2.5 items-start py-4">
-                <div className="flex justify-between w-full py-2">
-                    <div className="text-zinc-50 w-1/3 flex justify-start items-center">
+            <div className="w-full py-4">
+                <div className="flex w-full justify-between items-center sm:hidden gap-2.5">
+                    <div className="flex flex-col">
+                        <div className="text-zinc-50 text-base break-words">
+                            {data.name + (data.cost ? ` - ${data.cost}$` : '')}
+                        </div>
+                        <div className="text-zinc-400 text-sm">{`Added by ${data.createdBy.username}`}</div>
+                    </div>
+                    <div className="flex gap-4 items-center">
+                        {!isBought ? (
+                            <div
+                                onClick={() => toggleBoughtStatus(`/api/shoppingList/bought?id=${id}`)}
+                                className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                            />
+                        ) : (
+                            <div
+                                onClick={() => setShowDetails(true)}
+                                className="bg-blue-600 text-zinc-50 rounded-[15px] size-6 flex justify-center items-center cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out text-xl"
+                            >
+                                ?
+                            </div>
+                        )}
+                        <Image
+                            onClick={() => setShowConfirm(true)}
+                            src="/shopping-list-vector.svg"
+                            alt="delete"
+                            width={20}
+                            height={20}
+                            className="cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                            style={{
+                                filter: 'invert(16%) sepia(91%) saturate(7496%) hue-rotate(0deg) brightness(96%) contrast(104%)',
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className="hidden sm:flex flex-row w-full gap-2 sm:gap-0 sm:items-center">
+                    <div className="text-zinc-50 w-full sm:w-1/3 flex justify-start items-center text-lg break-words">
                         {data.name + (data.cost ? ` - ${data.cost}$` : '')}
                     </div>
-                    <div className="text-zinc-400 w-1/3 flex justify-center items-center">
+                    <div className="text-zinc-400 w-full sm:w-1/3 flex justify-start sm:justify-center items-center text-base">
                         {`Added by ${data.createdBy.username}`}
                     </div>
-                    <div className="w-1/3 flex justify-end items-center">
-                        <span className="flex gap-2.5">
+                    <div className="w-full sm:w-1/3 flex justify-start sm:justify-end items-center">
+                        <span className="flex gap-4">
                             {!isBought ? (
                                 <div
                                     onClick={() => toggleBoughtStatus(`/api/shoppingList/bought?id=${id}`)}
