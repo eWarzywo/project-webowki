@@ -1,5 +1,4 @@
 import { DefaultSession, DefaultUser } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
     interface Session {
@@ -10,9 +9,25 @@ declare module 'next-auth' {
         } & DefaultSession['user'];
     }
 
-    interface User extends DefaultUser {
+    // Make User type compatible with AdapterUser
+    interface User extends Omit<DefaultUser, 'email' | 'image'> {
+        id: string;
         username: string;
         householdId: string | null;
+        emailVerified: Date | null;
+        // Ensure email is always a string as required by AdapterUser
+        email: string;
+        // Ensure image is nullable but not undefined
+        image?: string | null;
+    }
+    
+    // Add credential provider type
+    interface CredentialsConfig {
+        id: string;
+        name: string;
+        type: 'credentials';
+        credentials: Record<string, unknown>;
+        authorize(credentials: Record<string, string> | undefined): Promise<User | null>;
     }
 }
 
