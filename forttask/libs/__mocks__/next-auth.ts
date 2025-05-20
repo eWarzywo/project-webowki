@@ -97,7 +97,7 @@ export const resetMocks = () => {
   });
 };
 
-export default {
+const nextAuth = {
   getToken,
   getSession,
   useSession,
@@ -107,3 +107,5 @@ export default {
   setMockSession,
   resetMocks
 };
+
+export default nextAuth;
