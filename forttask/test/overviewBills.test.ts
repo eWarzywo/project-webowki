@@ -250,16 +250,18 @@ test('GET should handle database errors gracefully', async () => {
     expires: new Date().toISOString(),
   });
   
+  // The key is to make prisma.user.findUnique succeed but prisma.bill.findMany fail
   prisma.user.findUnique.mockResolvedValue({
     id: 1,
     username: 'testuser',
     email: 'test@example.com',
-    householdId: null,
+    householdId: 1,
     createdAt: new Date(),
     passwordHash: 'hash123',
     profilePictureId: null
   });
   
+  // This ensures we reach the database error part
   prisma.bill.findMany.mockRejectedValue(new Error('Database connection error'));
   
   const req = createMockRequest();
