@@ -11,6 +11,10 @@ export async function PUT(req: Request) {
             return NextResponse.json({message: 'You must be logged in to modify chores'}, {status: 401});
         }
 
+        if (!session.user?.householdId) {
+            return NextResponse.json({message: 'You must be part of a household to modify chores'}, {status: 401});
+        }
+
         const body = await req.json();
         const {choreId} = body;
 
@@ -35,6 +39,6 @@ export async function PUT(req: Request) {
         return NextResponse.json({message: 'Chore marked as not done', chore});
     } catch (error) {
         console.error(error);
-        return NextResponse.json({error: 'Invalid request'}, {status: 400});
+        return NextResponse.json({error: 'Internal Server Error'}, {status: 500});
     }
 }

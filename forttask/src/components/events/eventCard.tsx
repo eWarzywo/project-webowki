@@ -165,8 +165,12 @@ export default function EventCard({ event, emitUpdate }: EventCardProps) {
                     document.body.removeChild(confirmationBox);
 
                     try {
-                        const response = await fetch(`/api/event/delete?eventId=${event.id}`, {
+                        const response = await fetch(`/api/event/delete`, {
                             method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ eventId: event.id })
                         });
                         if (!response.ok) {
                             throw new Error(`Failed to delete event: ${response.status}`);

@@ -160,14 +160,14 @@ export default function ChoreDoneCard({ chore, emitUpdate }: ChoreCardProps) {
                         });
 
                         if (!response.ok) {
-                            throw new Error('Failed to mark chore as undone');
+                            throw new Error('Failed to mark chore as todo');
                         }
 
                         if (emitUpdate) {
                             emitUpdate();
                         }
                     } catch (error) {
-                        console.error('Error marking chore as undone:', error);
+                        console.error('Error marking chore as todo:', error);
                     }
                 }}
                 onCancel={() => {

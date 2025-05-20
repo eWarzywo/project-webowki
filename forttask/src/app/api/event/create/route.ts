@@ -9,20 +9,20 @@ export async function POST(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json({ message: 'You must be logged in to view events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be logged in to create events' }, { status: 401 });
         }
 
         const userId = parseInt(session.user.id);
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be part of a household to create events' }, { status: 401 });
+            return NextResponse.json({ message: 'You must be a part of a household to create events' }, { status: 401 });
         }
 
         const householdId = parseInt(session.user.householdId);
 
         const body = (await req.json()) as {
             name: string;
-            description?: string;
+            description: string;
             date: string;
             attendees: number[];
             location: string;
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         const newEvent = await prisma.event.create({
             data: {
                 name: body.name,
-                description: body.description || '',
+                description: body.description,
                 date: new Date(body.date),
                 householdId: householdId,
                 createdById: userId,
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
                 childEvents.push({
                     name: body.name,
-                    description: body.description || '',
+                    description: body.description,
                     date: nextDate,
                     householdId: householdId,
                     createdById: userId,
@@ -116,6 +116,6 @@ export async function POST(req: Request) {
         return NextResponse.json(completeEvent, { status: 201 });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

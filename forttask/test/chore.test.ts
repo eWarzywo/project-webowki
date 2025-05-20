@@ -1,177 +1,726 @@
-import { expect, test, vi } from 'vitest';
-import { POST, GET, DELETE } from '../src/app/api/chore/route';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { POST } from '../src/app/api/chore/create/route';
+import { GET as GET_ToDo } from '../src/app/api/chores/todo/get/route';
+import { GET as GET_Done } from '../src/app/api/chores/done/get/route';
+import { PUT as PUT_ToDo } from '../src/app/api/chore/todo/route';
+import { PUT as PUT_Done } from '../src/app/api/chore/done/route';
+import { DELETE } from '../src/app/api/chore/delete/route';
 import prisma from '../libs/__mocks__/prisma';
+import { getServerSession } from 'next-auth/next';
 
 vi.mock('../libs/prisma');
+vi.mock('next-auth/next', () => ({
+    getServerSession: vi.fn(),
+}));
 
-test('POST Chore with correct data should return new Chore and status 201', async () => {
-    const mockChore = {
-        name: 'Test Chore',
-        description: 'Test Description',
-        priority: 1,
-        dueDate: '2023-10-01',
-        householdId: 1,
-        createdById: 1,
+type MockSession = {
+    user?: {
+        id?: string;
+        householdId?: string;
+    };
+    expires?: string;
+};
+
+type MockRequestOptions = {
+    searchParams?: Record<string, string>;
+    body?: Record<string, unknown>;
+};
+
+describe('Chore POST API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
+
+        const url = new URL('http://localhost:3000/api/chore/create');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
     };
 
-    const req = new Request('http://localhost/api/chore', {
-        method: 'POST',
-        body: JSON.stringify(mockChore),
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await POST(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to create chores');
     });
 
-    const mockResponse = { ...mockChore, id: 1 };
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // tajpskript diff
-    prisma.chore.create.mockResolvedValue(mockResponse);
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    const response = await POST(req as Request);
-    const data = await response.json();
+        const request = createMockRequest({});
 
-    expect(response.status).toBe(201);
-    expect(data).toStrictEqual(mockResponse);
-});
+        const response = await POST(request);
 
-test('POST Chore with missing fields should return 400', async () => {
-    const req = new Request('http://localhost/api/chore', {
-        method: 'POST',
-        body: JSON.stringify({}),
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be part of a household to create chores');
     });
 
-    const response = await POST(req as Request);
-    const data = await response.json();
+    it('should create a new chore and return it', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid request' });
+        const requestBody = {
+            name: 'Test Chore',
+            dueDate: new Date('2023-10-01'),
+            priority: 1,
+            cycle: 0,
+            repeatCount: 0,
+            description: 'Test Description',
+        };
+
+        const request = createMockRequest({ body: requestBody });
+
+        const mockChore = {
+            id: 1,
+            ...requestBody,
+            createdById: 1,
+            householdId: 1,
+            createdAt: new Date('2023-09-01'),
+            updatedAt: new Date('2023-09-01'),
+            done: false,
+            doneById: null,
+            parentChoreId: null,
+        };
+
+        const serializedChore = JSON.parse(JSON.stringify(mockChore));
+
+        vi.mocked(prisma.chore.create).mockResolvedValueOnce(mockChore);
+
+        const response = await POST(request);
+
+        expect(response.status).toBe(201);
+        const data = await response.json();
+        expect(data).toEqual(serializedChore);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const requestBody = {
+            name: 'Test Chore',
+            dueDate: new Date('2023-10-01'),
+            priority: 1,
+            cycle: 0,
+            repeatCount: 0,
+            description: 'Test Description',
+        };
+
+        const request = createMockRequest({ body: requestBody });
+
+        vi.mocked(prisma.chore.create).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await POST(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });
 
-test('POST Chore with invalid data should return 400', async () => {
-    const mockInvalidChore = {
-        name: 'Test Chore',
-        description: 'Test Description',
-        priority: 'invalid_priority', // Not number
-        dueDate: '2023-10-01',
-        createdAt: '2023-09-01',
-        householdId: 1,
-        createdById: 1,
+describe('Chore GET ToDo API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
+
+        const url = new URL('http://localhost:3000/api/chores/todo/get');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
     };
 
-    const req = new Request('http://localhost/api/chore', {
-        method: 'POST',
-        body: JSON.stringify(mockInvalidChore),
-        headers: {
-            'Content-Type': 'application/json',
-        },
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_ToDo(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to view chores');
     });
 
-    const response = await POST(req as Request);
-    const data = await response.json();
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid request' });
+        const request = createMockRequest({});
+
+        const response = await GET_ToDo(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be a part of a household to view chores');
+    });
+
+    it('should return a list of chores', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        const mockChores = [
+            {
+                id: 1,
+                name: 'Test Chore 1',
+                dueDate: new Date('2023-10-01'),
+                priority: 1,
+                cycle: 0,
+                repeatCount: 0,
+                description: 'Test Description 1',
+                createdAt: new Date('2023-09-01'),
+                updatedAt: new Date('2023-09-01'),
+                done: false,
+                doneById: null,
+                parentChoreId: null,
+                householdId: 1,
+                createdById: 1,
+            },
+            {
+                id: 2,
+                name: 'Test Chore 2',
+                dueDate: new Date('2023-10-02'),
+                priority: 2,
+                cycle: 0,
+                repeatCount: 0,
+                description: 'Test Description 2',
+                createdAt: new Date('2023-09-02'),
+                updatedAt: new Date('2023-09-02'),
+                done: false,
+                doneById: null,
+                parentChoreId: null,
+                householdId: 1,
+                createdById: 1,
+            },
+        ];
+
+        const serializedChores = JSON.parse(JSON.stringify(mockChores));
+
+        vi.mocked(prisma.chore.findMany).mockResolvedValueOnce(mockChores);
+        vi.mocked(prisma.chore.count).mockResolvedValueOnce(mockChores.length);
+
+        const response = await GET_ToDo(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.chores).toEqual(serializedChores);
+        expect(data.count).toBe(mockChores.length);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        vi.mocked(prisma.chore.findMany).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await GET_ToDo(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });
 
-test('GET Chore with correct householdId should return list of chores and status 200', async () => {
-    const mockChores = [
-        { id: 1, name: 'Chore 1', householdId: 1 },
-        { id: 2, name: 'Chore 2', householdId: 1 },
-    ];
-
-    const req = new Request('http://localhost/api/chore?householdId=1', {
-        method: 'GET',
+describe('Chore GET Done API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // tajpskript diff
-    prisma.chore.findMany.mockResolvedValue(mockChores);
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
 
-    const response = await GET(req as Request);
-    const data = await response.json();
+        const url = new URL('http://localhost:3000/api/chores/done/get');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
 
-    expect(response.status).toBe(200);
-    expect(data).toStrictEqual(mockChores);
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
+
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Done(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to view chores');
+    });
+
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Done(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be a part of a household to view chores');
+    });
+
+    it('should return a list of done chores', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        const mockChores = [
+            {
+                id: 1,
+                name: 'Test Chore 1',
+                dueDate: new Date('2023-10-01'),
+                priority: 1,
+                cycle: 0,
+                repeatCount: 0,
+                description: 'Test Description 1',
+                createdAt: new Date('2023-09-01'),
+                updatedAt: new Date('2023-09-01'),
+                done: true,
+                doneById: 1,
+                parentChoreId: null,
+                householdId: 1,
+                createdById: 1,
+            },
+            {
+                id: 2,
+                name: 'Test Chore 2',
+                dueDate: new Date('2023-10-02'),
+                priority: 2,
+                cycle: 0,
+                repeatCount: 0,
+                description: 'Test Description 2',
+                createdAt: new Date('2023-09-02'),
+                updatedAt: new Date('2023-09-02'),
+                done: true,
+                doneById: 1,
+                parentChoreId: null,
+                householdId: 1,
+                createdById: 1,
+            },
+        ];
+
+        const serializedChores = JSON.parse(JSON.stringify(mockChores));
+
+        vi.mocked(prisma.chore.findMany).mockResolvedValueOnce(mockChores);
+        vi.mocked(prisma.chore.count).mockResolvedValueOnce(mockChores.length);
+
+        const response = await GET_Done(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.chores).toEqual(serializedChores);
+        expect(data.count).toBe(mockChores.length);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        vi.mocked(prisma.chore.findMany).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await GET_Done(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });
 
-test('GET Chore with missing householdId should return 400', async () => {
-    const req = new Request('http://localhost/api/chore', {
-        method: 'GET',
+describe('Chore PUT ToDo API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
     });
 
-    const response = await GET(req as Request);
-    const data = await response.json();
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Missing householdId parameter' });
+        const url = new URL('http://localhost:3000/api/chore/todo');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
+
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await PUT_ToDo(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to modify chores');
+    });
+
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        const response = await PUT_ToDo(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be part of a household to modify chores');
+    });
+
+    it('should return 400 if choreId is not provided', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: {} });
+
+        const response = await PUT_ToDo(request);
+
+        expect(response.status).toBe(400);
+        const data = await response.json();
+        expect(data.message).toBe('Chore ID is required');
+    });
+
+    it('should update a chore and return it', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        const mockChore = {
+            id: 1,
+            name: 'Updated Chore',
+            dueDate: new Date('2023-10-01'),
+            priority: 1,
+            cycle: 0,
+            repeatCount: 0,
+            description: 'Updated Description',
+            createdById: 1,
+            householdId: 1,
+            createdAt: new Date('2023-09-01'),
+            updatedAt: new Date('2023-09-01'),
+            done: true,
+            doneById: null,
+            parentChoreId: null,
+        };
+
+        const serializedChore = JSON.parse(JSON.stringify(mockChore));
+
+        vi.mocked(prisma.chore.update).mockResolvedValueOnce(mockChore);
+
+        const response = await PUT_ToDo(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.chore).toEqual(serializedChore);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        vi.mocked(prisma.chore.update).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await PUT_ToDo(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });
 
-test('GET Chore with invalid householdId should return 400', async () => {
-    const req = new Request('http://localhost/api/chore?householdId=invalid', {
-        method: 'GET',
+describe('Chore PUT Done API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
     });
 
-    const response = await GET(req as Request);
-    const data = await response.json();
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid householdId parameter' });
+        const url = new URL('http://localhost:3000/api/chore/done');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
+
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await PUT_Done(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to modify chores');
+    });
+
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        const response = await PUT_Done(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be part of a household to modify chores');
+    });
+
+    it('should return 400 if choreId is not provided', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: {} });
+
+        const response = await PUT_Done(request);
+
+        expect(response.status).toBe(400);
+        const data = await response.json();
+        expect(data.message).toBe('Chore ID is required');
+    });
+
+    it('should update a chore and return it', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        const mockChore = {
+            id: 1,
+            name: 'Updated Chore',
+            dueDate: new Date('2023-10-01'),
+            priority: 1,
+            cycle: 0,
+            repeatCount: 0,
+            description: 'Updated Description',
+            createdById: 1,
+            householdId: 1,
+            createdAt: new Date('2023-09-01'),
+            updatedAt: new Date('2023-09-01'),
+            done: false,
+            doneById: null,
+            parentChoreId: null,
+        };
+
+        const serializedChore = JSON.parse(JSON.stringify(mockChore));
+
+        vi.mocked(prisma.chore.update).mockResolvedValueOnce(mockChore);
+
+        const response = await PUT_Done(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.chore).toEqual(serializedChore);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        vi.mocked(prisma.chore.update).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await PUT_Done(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });
 
-test('GET Chore rejected by database should return 400', async () => {
-    const req = new Request('http://localhost/api/chore?householdId=1', {
-        method: 'GET',
+describe('Chore DELETE API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
     });
 
-    prisma.chore.findMany.mockRejectedValue(new Error('Database error'));
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const { searchParams = {}, body = {} } = options;
 
-    const response = await GET(req as Request);
-    const data = await response.json();
+        const url = new URL('http://localhost:3000/api/chore/delete');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid request' });
-});
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
 
-test('DELETE Chore with correct choreId should return status 204', async () => {
-    const req = new Request('http://localhost/api/chore?choreId=1', {
-        method: 'DELETE',
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await DELETE(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be logged in to delete chores');
     });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    // tajpskript diff
-    prisma.chore.delete.mockResolvedValue({});
+    it('should return 401 if user is not part of a household', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    const response = await DELETE(req as Request);
+        const request = createMockRequest({});
 
-    expect(response.status).toBe(204);
-});
+        const response = await DELETE(request);
 
-test('DELETE Chore with missing choreId should return 400', async () => {
-    const req = new Request('http://localhost/api/chore', {
-        method: 'DELETE',
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data.message).toBe('You must be part of a household to delete chores');
     });
 
-    const response = await DELETE(req as Request);
-    const data = await response.json();
+    it('should return 400 if choreId is not provided', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Missing choreId parameter' });
-});
+        const request = createMockRequest({ body: {} });
 
-test('DELETE Chore with invalid choreId should return 400', async () => {
-    const req = new Request('http://localhost/api/chore?choreId=invalid', {
-        method: 'DELETE',
+        const response = await DELETE(request);
+
+        expect(response.status).toBe(400);
+        const data = await response.json();
+        expect(data.message).toBe('Chore ID is required');
     });
 
-    const response = await DELETE(req as Request);
-    const data = await response.json();
+    it('should delete a chore and return it', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-    expect(response.status).toBe(400);
-    expect(data).toStrictEqual({ error: 'Invalid choreId parameter' });
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        const mockChore = {
+            id: 1,
+            name: 'Deleted Chore',
+            dueDate: new Date('2023-10-01'),
+            priority: 1,
+            cycle: 0,
+            repeatCount: 0,
+            description: 'Deleted Description',
+            createdById: 1,
+            householdId: 1,
+            createdAt: new Date('2023-09-01'),
+            updatedAt: new Date('2023-09-01'),
+            done: false,
+            doneById: null,
+            parentChoreId: null,
+        };
+
+        const serializedChore = JSON.parse(JSON.stringify(mockChore));
+
+        vi.mocked(prisma.chore.delete).mockResolvedValueOnce(mockChore);
+
+        const response = await DELETE(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data.message).toBe('Chore deleted successfully');
+        expect(data.chore).toEqual(serializedChore);
+    });
+
+    it('should handle errors and return 500', async () => {
+        const mockSession: MockSession = {
+            user: { id: '1', householdId: '1' },
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({ body: { choreId: 1 } });
+
+        vi.mocked(prisma.chore.delete).mockRejectedValueOnce(new Error('Database error'));
+
+        const response = await DELETE(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data.error).toBe('Internal Server Error');
+    });
 });

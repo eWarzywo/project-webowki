@@ -13,6 +13,10 @@ export async function GET(req: Request) {
 
         const userId = parseInt(session.user.id);
 
+        if (!session.user?.householdId) {
+            return NextResponse.json({ message: 'You must be a part of a household to view events' }, { status: 401 });
+        }
+
         const url = new URL(req.url)
         const searchParams = url.searchParams;
         const date = searchParams.get('date');
@@ -50,6 +54,6 @@ export async function GET(req: Request) {
         return NextResponse.json({ events, count });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
