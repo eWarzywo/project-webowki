@@ -25,30 +25,26 @@ export default function LogoutPage() {
     };
 
     return (
-        <div className="font-['Inter'] flex justify-center items-center w-full pt-6 pb-8 px-8 h-full border-zinc-800 border rounded-[6px]">
-            <div className="px-8 md:px-32 flex-col items-center">
-                <div className="flex items-center justify-center flex-wrap flex-col">
-                    <h1 className="mb-6 justify-start text-zinc-50 text-2xl font-semibold font-['Inter']">Logout</h1>
-                    <p className="mb-6 text-center justify-start text-zinc-400 text-sm font-normal font-['Inter']">
-                        Are you sure you want to log out?
-                    </p>
-
-                    <div className="flex gap-4">
-                        <button
-                            onClick={handleLogout}
-                            disabled={isLoggingOut}
-                            className="px-4 py-2 bg-red-600 font-['Inter'] text-white hover:bg-red-700 transition disabled:opacity-50 rounded-[6px]"
-                        >
-                            {isLoggingOut ? 'Logging out...' : 'Log out'}
-                        </button>
-
-                        <button
-                            onClick={handleCancel}
-                            className="px-4 py-2 bg-zinc-50 font-['Inter'] text-gray-800 hover:bg-zinc-100 transition rounded-[6px]"
-                        >
-                            Cancel
-                        </button>
-                    </div>
+        <div className="flex justify-center items-center w-full min-h-screen px-4 py-8 sm:py-12 bg-transparent">
+            <div className="w-full max-w-md bg-zinc-900 border-zinc-800 border rounded-[6px] p-6 sm:p-8 flex flex-col items-center">
+                <h1 className="mb-6 text-zinc-50 text-2xl font-semibold font-['Inter'] w-full text-center">Logout</h1>
+                <p className="mb-6 text-center text-zinc-400 text-sm font-normal font-['Inter'] w-full">
+                    Are you sure you want to log out?
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 w-full">
+                    <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="flex-1 px-4 py-2 bg-red-600 font-['Inter'] text-white hover:bg-red-700 transition disabled:opacity-50 rounded-[6px]"
+                    >
+                        {isLoggingOut ? 'Logging out...' : 'Log out'}
+                    </button>
+                    <button
+                        onClick={handleCancel}
+                        className="flex-1 px-4 py-2 bg-zinc-50 font-['Inter'] text-gray-800 hover:bg-zinc-100 transition rounded-[6px]"
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

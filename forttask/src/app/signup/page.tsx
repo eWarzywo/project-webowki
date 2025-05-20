@@ -5,28 +5,30 @@ import { useRouter } from 'next/navigation';
 
 export default function Page() {
     return (
-        <div className="flex justify-center items-center w-full pt-6 pb-8 px-8 h-full border-zinc-800 border rounded-[6px]">
-            <div className="px-8 md:px-32 flex-col items-center">
-                <div className="flex items-center justify-center flex-wrap flex-col">
-                    <div className="self-stretch inline-flex flex-col justify-start items-center">
-                        <div className="inline-flex justify-center items-center gap-2.5">
-                            <div className="justify-start text-zinc-50 text-2xl font-semibold font-['Inter']">
-                                Sign Up
-                            </div>
+        <div className="flex justify-center items-end w-full px-4 py-8 sm:py-12 bg-zinc-950">
+            <div className="w-full max-w-md bg-zinc-900 border-zinc-800 border rounded-[6px] p-6 sm:p-8 flex flex-col items-center">
+                <div className="w-full flex flex-col items-center">
+                    <div className="w-full flex flex-col items-center">
+                        <div className="flex justify-center items-center gap-2.5">
+                            <div className="text-zinc-50 text-2xl font-semibold font-['Inter']">Sign Up</div>
                         </div>
-                        <div className="self-stretch pt-2 flex flex-col justify-start items-start gap-2.5">
-                            <div className="self-stretch inline-flex justify-center items-center gap-2.5">
-                                <div className="justify-start text-zinc-400 text-sm font-normal font-['Inter']">
-                                    Create an account to get started
-                                </div>
+                        <div className="w-full pt-2 flex flex-col items-center gap-2.5">
+                            <div className="text-zinc-400 text-sm font-normal font-['Inter'] text-center">
+                                Create an account to get started
                             </div>
                         </div>
                     </div>
-                    <div className="w-full flex flex-col justify-center items-center gap-2.5 mt-6 space-y-2">
+                    <div className="w-full flex flex-col items-center gap-2.5 mt-6">
                         <SignupForm />
+                        <button
+                            onClick={() => (window.location.href = '/login')}
+                            className="w-full h-10 px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800"
+                        >
+                            Log In
+                        </button>
                     </div>
-                    <div className="flex flex-col self-stretch px-8 mt-6 gap-2.5">
-                        <div className="self-stretch text-center justify-center font-['Inter'] font-normal text-sm text-zinc-400">
+                    <div className="w-full mt-6">
+                        <div className="text-center font-['Inter'] font-normal text-sm text-zinc-400">
                             <span>By clicking continue, you agree to our </span>
                             <span className="underline">Terms of Service</span>
                             <span> and </span>
@@ -76,8 +78,6 @@ function SignupForm() {
         setError('');
 
         try {
-            console.log('Submitting signup data:', { firstName, lastName, email });
-
             const response = await fetch('/api/user', {
                 method: 'POST',
                 headers: {
@@ -97,11 +97,8 @@ function SignupForm() {
             try {
                 data = JSON.parse(rawText);
             } catch {
-                console.error('Failed to parse response as JSON:', rawText);
                 throw new Error('Invalid response from server');
             }
-
-            console.log('API response:', data);
 
             if (!response.ok) {
                 throw new Error(data.message || 'Something went wrong');
@@ -110,73 +107,56 @@ function SignupForm() {
             router.push('/login');
         } catch (error) {
             setError(error instanceof Error ? error.message : 'An error occurred during sign up');
-            console.error('Signup error:', error);
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <form
-            onSubmit={handleSubmit}
-            className="self-stretch inline-flex flex-col justify-start items-start gap-2.5 w-full"
-        >
-            <div className="w-full self-stretch inline-flex flex-col justify-start items-start gap-2.5">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2.5">
+            <div className="w-full flex flex-col gap-2.5">
                 <input
                     type="text"
                     value={firstName}
                     placeholder="First Name"
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
+                    className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
-
                 <input
                     type="text"
                     value={lastName}
                     placeholder="Last Name"
                     onChange={(e) => setLastName(e.target.value)}
-                    className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
+                    className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
-
                 <input
                     type="email"
                     value={email}
                     placeholder="Email"
                     onChange={(e) => setEmail(e.target.value)}
-                    className="self-stretch inline-flex justify-start items-center h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
+                    className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
-
                 <input
                     type="password"
                     value={password}
                     placeholder="Password"
                     onChange={(e) => setPassword(e.target.value)}
-                    className="self-stretch inline-flex justify-start items-center h-10 w-full px-4 text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
+                    className="h-10 w-full px-4 text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
             </div>
-
+            <button
+                type="submit"
+                disabled={isLoading}
+                className="h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {isLoading ? 'Creating Account...' : 'Sign Up'}
+            </button>
             {error && (
-                <div className="self-stretch inline-flex justify-start items-start mt-2 w-full">
-                    <div className="justify-start text-sm font-normal font-['Inter'] text-red-500">{error}</div>
-                </div>
+                <>
+                    <div className="mt-2 w-full"></div>
+                    <div className="text-sm font-normal font-['Inter'] text-red-500">{error}</div>
+                </>
             )}
-
-            <div className="self-stretch inline-flex justify-start items-start w-full mt-4">
-                <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="self-stretch inline-flex justify-center items-center h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isLoading ? 'Creating Account...' : 'Sign Up'}
-                </button>
-            </div>
-
-            <div className="self-stretch text-center mt-4">
-                <span className="text-zinc-400 text-sm font-['Inter']">Already have an account? </span>
-                <a href="/login" className="text-zinc-50 text-sm font-['Inter'] hover:underline cursor-pointer">
-                    Log in
-                </a>
-            </div>
         </form>
     );
 }

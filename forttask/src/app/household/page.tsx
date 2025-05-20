@@ -2,20 +2,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import  LogoutButton from '../../components/generalUI/logoutButton';
+import LogoutButton from '../../components/generalUI/logoutButton';
 
 export default function Page() {
     return (
-        <div className="font-['Inter'] flex flex-col md:flex-row justify-center items-center w-full pt-6 pb-16 md:pb-8 px-4 sm:px-8 h-full border-zinc-800 border rounded-[6px] relative">
+        <div className="font-['Inter'] flex flex-col min-h-screen justify-center items-center w-full pt-6 pb-16 md:pb-8 px-2 sm:px-4 md:px-8 border-zinc-800 border rounded-[6px] relative">
             <div className="fixed sm:absolute bottom-4 left-4 z-10">
                 <LogoutButton />
             </div>
-
             <div className="w-full max-w-5xl">
-                <h2 className="text-2xl font-semibold text-center text-zinc-50 mb-4 sm:mb-8">Household Management</h2>
-                <div className="flex flex-col sm:flex-row flex-wrap justify-center items-stretch gap-4 sm:gap-8">
-                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-8 flex flex-col w-full max-w-md">
-                        <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
+                <h2 className="text-xl sm:text-2xl font-semibold text-center text-zinc-50 mb-4 sm:mb-8">
+                    Household Management
+                </h2>
+                <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 md:flex-row flex-wrap justify-center items-stretch">
+                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-6 md:p-8 flex flex-col w-full max-w-md min-w-0 flex-1">
+                        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
                             Create new household
                         </h3>
                         <p className="text-center text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
@@ -25,9 +26,8 @@ export default function Page() {
                             <AddHousehold />
                         </div>
                     </div>
-
-                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-8 flex flex-col w-full max-w-md">
-                        <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
+                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-6 md:p-8 flex flex-col w-full max-w-md min-w-0 flex-1">
+                        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
                             Join existing household
                         </h3>
                         <p className="text-center text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
@@ -84,7 +84,6 @@ export function AddHousehold() {
             }
 
             setSuccess(true);
-            console.log('Household created:', data.household);
 
             await update({
                 ...session,
@@ -95,7 +94,6 @@ export function AddHousehold() {
                 router.push('/');
             }, 1500);
         } catch (err) {
-            console.error(err);
             setError(err instanceof Error ? err.message : 'Failed to create household');
         } finally {
             setIsLoading(false);
@@ -163,7 +161,6 @@ export function JoinHousehold() {
             }
 
             setSuccess(true);
-            console.log('Joined household:', data.household);
 
             await update({
                 ...session,
@@ -174,7 +171,6 @@ export function JoinHousehold() {
                 router.push('/');
             }, 1500);
         } catch (err) {
-            console.error(err);
             setError(err instanceof Error ? err.message : 'Failed to join household');
         } finally {
             setIsLoading(false);
