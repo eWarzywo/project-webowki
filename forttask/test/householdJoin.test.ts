@@ -204,7 +204,6 @@ describe('Household Join API', () => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        // tajpskript diff
         vi.mocked(prisma.household.findUnique).mockImplementation((params) => {
             if (params.where.ownerId) {
                 return Promise.resolve(null);
@@ -243,7 +242,6 @@ describe('Household Join API', () => {
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        // tajpskript diff
         vi.mocked(prisma.household.findUnique).mockImplementation((params) => {
             if (params.where.ownerId) {
                 return Promise.resolve(null);

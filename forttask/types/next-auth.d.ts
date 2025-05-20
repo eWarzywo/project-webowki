@@ -9,19 +9,15 @@ declare module 'next-auth' {
         } & DefaultSession['user'];
     }
 
-    // Make User type compatible with AdapterUser
     interface User extends Omit<DefaultUser, 'email' | 'image'> {
         id: string;
         username: string;
         householdId: string | null;
         emailVerified: Date | null;
-        // Ensure email is always a string as required by AdapterUser
         email: string;
-        // Ensure image is nullable but not undefined
         image?: string | null;
     }
     
-    // Add credential provider type
     interface CredentialsConfig {
         id: string;
         name: string;
