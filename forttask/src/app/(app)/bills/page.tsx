@@ -5,6 +5,7 @@ import DatePicker from '@/components/generalUI/datePicker';
 import BillsHandler from '@/components/bills/billsHandler';
 import Image from 'next/image';
 import { useSocket } from '@/lib/socket';
+import { useRouter } from "next/navigation";
 
 export default function Bills() {
     const [showCalendar, setShowCalendar] = React.useState(false);
@@ -17,6 +18,13 @@ export default function Bills() {
     const [description, setDescription] = React.useState<string>('');
     const [error, setError] = React.useState<string | null>(null);
     const [refresh, setRefresh] = React.useState<boolean>(false);
+
+    const [page, setPage] = React.useState<number>(1);
+    const router = useRouter();
+
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+    };
 
     const [householdId, setHouseholdId] = React.useState<number | null>(null);
     const { isConnected, billsRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
@@ -54,6 +62,8 @@ export default function Bills() {
     }, [isConnected, householdId]);
 
     useEffect(() => {
+        setPage(1);
+        router.push('?page=1');
         setRefresh(!refresh);
     }, [billsRefresh]);
 
@@ -296,6 +306,8 @@ export default function Bills() {
                         <BillsHandler
                             emitUpdate={() => householdId && emitUpdate(householdId, 'bills')}
                             refresh={refresh}
+                            setPage={handlePageChange}
+                            page={page}
                         />
                     )}
                 </div>

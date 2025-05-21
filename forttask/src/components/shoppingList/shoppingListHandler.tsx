@@ -21,18 +21,25 @@ interface ShoppingItem {
 
 type ShoppingListHandlerProps = {
     emitUpdate?: () => void;
+    setPage?: (page: number) => void;
+    refresh: boolean;
+    page: number;
 };
 
-export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerProps) {
+export default function ShoppingListHandler({ emitUpdate, refresh, setPage, page }: ShoppingListHandlerProps) {
     const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
 
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
-    const page = parseInt(searchParams?.get('page') || '1', 10);
+    const currentPage = parseInt(searchParams?.get('page') || '1', 10);
 
-    noStore();
+    useEffect(() => {
+        if (setPage) {
+            setPage(currentPage);
+        }
+    }, [searchParams, setPage]);
 
     useEffect(() => {
         const fetchTotalItems = async () => {
@@ -126,7 +133,7 @@ export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerP
             <div className="flex items-start flex-col self-stretch px-8">{renderContent()}</div>
             {Math.ceil(totalItems / itemsPerPage) > 1 && (
                 <span className="flex justify-center items-center w-full mt-5">
-                    <Pagination totalNumberOfItems={totalItems} itemsPerPage={itemsPerPage} />
+                    <Pagination totalNumberOfItems={totalItems} itemsPerPage={itemsPerPage} key={`pagination-${currentPage}`} />
                 </span>
             )}
         </div>
