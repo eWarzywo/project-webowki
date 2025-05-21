@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         return NextResponse.json(newBill, { status: 201 });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
@@ -109,7 +109,7 @@ export async function GET(req: Request) {
         return NextResponse.json(bills, { status: 200 });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
@@ -158,6 +158,6 @@ export async function DELETE(req: Request) {
         return NextResponse.json({ message: 'Bill deleted successfully' }, { status: 200 });
     } catch (error) {
         console.error('Error deleting bill:', error);
-        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
     }
 }

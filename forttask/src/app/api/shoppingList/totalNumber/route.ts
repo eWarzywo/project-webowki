@@ -9,7 +9,7 @@ export async function GET(req: Request) {
 
         if (!session || !session.user?.id) {
             return NextResponse.json(
-                { message: 'You must be logged in to view the shopping list count' },
+                { message: 'You must be logged in to view shopping list count' },
                 { status: 401 },
             );
         }
@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 
         if (!user.householdId) {
             return NextResponse.json(
-                { message: 'You must be a member of a household to view the shopping list count' },
+                { message: 'You must be a member of a household to view shopping list count' },
                 { status: 403 },
             );
         }
