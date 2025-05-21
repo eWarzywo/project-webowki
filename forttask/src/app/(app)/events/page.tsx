@@ -34,7 +34,9 @@ export default function Events() {
                     const data = await response.json();
                     setHouseholdId(data.householdId);
                 }
-            } catch {}
+            } catch (err) {
+                console.error('Failed to fetch household ID:', err);
+            }
         };
         fetchHouseholdId();
     }, []);
