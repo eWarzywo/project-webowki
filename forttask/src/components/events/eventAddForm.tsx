@@ -11,7 +11,7 @@ interface Householders {
 type EventAddFormProps = {
     onRefresh?: () => void;
     emitUpdate?: () => void;
-}
+};
 
 export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProps) {
     const [error, setError] = useState<Error | null>(null);
@@ -31,9 +31,9 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
     const [showRepetition, setShowRepetition] = useState(false);
     const [repetition, setRepetition] = useState(0);
     const [isCustomRepetition, setIsCustomRepetition] = useState(false);
-    const [customRepetitionInput, setCustomRepetitionInput] = useState("");
+    const [customRepetitionInput, setCustomRepetitionInput] = useState('');
     const [repetitionAmount, setRepetitionAmount] = useState(0);
-    const [repetitionAmountInput, setRepetitionAmountInput] = useState("");
+    const [repetitionAmountInput, setRepetitionAmountInput] = useState('');
 
     const [description, setDescription] = useState('');
 
@@ -139,9 +139,9 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
         setValidationErrors({});
         setShowCalendar(false);
         setIsCustomRepetition(false);
-        setCustomRepetitionInput("");
+        setCustomRepetitionInput('');
         setRepetitionAmount(0);
-        setRepetitionAmountInput("");
+        setRepetitionAmountInput('');
         setError(null);
         setShowRepetition(false);
     };
@@ -154,17 +154,22 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
 
     if (error) {
         return (
-            <div className="flex flex-col items-center w-1/5">
+            <div className="flex flex-col items-center w-full max-w-md mx-auto">
                 <div className="flex flex-col w-full justify-center items-center rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-2">
                     <p className="mb-2 text-4m text-zinc-400 w-full text-center pl-1">Error: {error.message}</p>
-                    <input type="button" value="Retry" onClick={handleRefresh} className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium" />
+                    <input
+                        type="button"
+                        value="Retry"
+                        onClick={handleRefresh}
+                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                    />
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col w-1/5 justify-center items-end rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-6">
+        <div className="flex flex-col w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl justify-center items-end rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-4 sm:p-6 mx-auto">
             <p className="text-zinc-50 text-2xl font-semibold w-full text-end">Add Event</p>
             <p className="text-zinc-400 mt-1.5 text-sm pb-6 text-end">Add a new event for you or your buddy</p>
             <form className="flex flex-col w-full justify-center items-end">
@@ -177,7 +182,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     onChange={(e) => {
                         setEventName(e.target.value);
                         if (validationErrors.eventName && e.target.value.trim()) {
-                            setValidationErrors({...validationErrors, eventName: false});
+                            setValidationErrors({ ...validationErrors, eventName: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -204,7 +209,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                         const selectedOptions = Array.from(e.target.selectedOptions, (option) => Number(option.value));
                         setParticipants(selectedOptions);
                         if (validationErrors.participants && selectedOptions.length > 0) {
-                            setValidationErrors({...validationErrors, participants: false});
+                            setValidationErrors({ ...validationErrors, participants: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -229,7 +234,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     onChange={(e) => {
                         setLocation(e.target.value);
                         if (validationErrors.eventLocation && e.target.value.trim()) {
-                            setValidationErrors({...validationErrors, eventLocation: false});
+                            setValidationErrors({ ...validationErrors, eventLocation: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -258,12 +263,12 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                         <label htmlFor="repeat">Repeat after x days?</label>
                         <select
                             id="repeat"
-                            value={isCustomRepetition ? "-1" : repetition.toString()}
+                            value={isCustomRepetition ? '-1' : repetition.toString()}
                             onChange={(e) => {
                                 const value = parseInt(e.target.value, 10);
                                 if (value === -1) {
                                     setIsCustomRepetition(true);
-                                    setCustomRepetitionInput("");
+                                    setCustomRepetitionInput('');
                                 } else {
                                     setIsCustomRepetition(false);
                                     setRepetition(value);
@@ -271,7 +276,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
 
                                 if (value === 0) {
                                     setRepetitionAmount(0);
-                                    setRepetitionAmountInput("");
+                                    setRepetitionAmountInput('');
                                 }
                             }}
                             className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
@@ -295,10 +300,10 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                         onChange={(e) => {
                             const newValue = e.target.value;
 
-                            if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                            if (newValue === '' || /^[0-9]+$/.test(newValue)) {
                                 setCustomRepetitionInput(newValue);
 
-                                if (newValue === "") {
+                                if (newValue === '') {
                                     setRepetition(0);
                                 } else {
                                     const value = parseInt(newValue, 10);
@@ -326,10 +331,10 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                             onChange={(e) => {
                                 const newValue = e.target.value;
 
-                                if (newValue === "" || /^[0-9]+$/.test(newValue)) {
+                                if (newValue === '' || /^[0-9]+$/.test(newValue)) {
                                     setRepetitionAmountInput(newValue);
 
-                                    if (newValue === "") {
+                                    if (newValue === '') {
                                         setRepetitionAmount(0);
                                     } else {
                                         const value = parseInt(newValue, 10);
@@ -352,7 +357,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     onChange={(e) => {
                         setDescription(e.target.value);
                         if (validationErrors.description && e.target.value.trim()) {
-                            setValidationErrors({...validationErrors, description: false});
+                            setValidationErrors({ ...validationErrors, description: false });
                         }
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
@@ -360,18 +365,18 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
                 />
                 {validationErrors.description && <p className="text-red-500 text-xs mb-2">Description is required</p>}
-                <div className="w-full flex justify-between px-6 pb-2 items-center">
+                <div className="w-full flex flex-col sm:flex-row justify-between px-0 sm:px-6 pb-2 items-center gap-2">
                     <input
                         type="reset"
                         value="Cancel"
                         onClick={handleCancel}
-                        className="border rounded-xl gap-2.5 px-4 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                        className="border rounded-xl gap-2.5 px-4 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
                     />
                     <input
                         type="submit"
                         value="Add"
                         onClick={handleSubmit}
-                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-full sm:w-auto"
                     />
                 </div>
             </form>
