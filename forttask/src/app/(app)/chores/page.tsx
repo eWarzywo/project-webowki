@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 type User = {
     id: number;
     username: string;
-}
+};
 
 type Chores = {
     id: number;
@@ -23,7 +23,7 @@ type Chores = {
     done: boolean;
     doneById?: number;
     doneBy?: User;
-}
+};
 
 export default function Chores() {
     const { isConnected, choresRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
@@ -71,8 +71,8 @@ export default function Chores() {
             } catch (error) {
                 console.error('Error fetching total items:', error);
             }
-        }
-        
+        };
+
         fetchTotalItems();
     }, [refresh, choreListToggle]);
 
@@ -96,7 +96,7 @@ export default function Chores() {
             } finally {
                 setLoading(false);
             }
-        }
+        };
 
         fetchChores();
     }, [page, refresh, choreListToggle]);
@@ -149,18 +149,41 @@ export default function Chores() {
 
     const handleChoreListToggle = () => {
         setChoreListToggle(!choreListToggle);
-    }
+    };
 
     return (
         <>
-            <div className="flex w-full self-stretch gap-[10px]">
-                <ChoreLeaderboard refresh={refresh}/>
-                {choreListToggle ? (
-                    <ChoreDoneList toggle={handleChoreListToggle} chores={chores} loading={loading} error={error} setPage={handlePageChange} totalItems={totalItems} emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}/>
+            <div className="flex flex-col md:flex-row w-full self-stretch gap-[10px]">
+                <ChoreLeaderboard refresh={refresh} />
+                <div className="flex-1 flex flex-col">
+                    {choreListToggle ? (
+                        <ChoreDoneList
+                            toggle={handleChoreListToggle}
+                            chores={chores}
+                            loading={loading}
+                            error={error}
+                            setPage={handlePageChange}
+                            totalItems={totalItems}
+                            emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}
+                        />
                     ) : (
-                    <ChoreToDoList toggle={handleChoreListToggle} chores={chores} loading={loading} error={error} setPage={handlePageChange} totalItems={totalItems} emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}/>
-                )}
-                <ChoreAddForm onRefresh={handleRefresh} emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}/>
+                        <ChoreToDoList
+                            toggle={handleChoreListToggle}
+                            chores={chores}
+                            loading={loading}
+                            error={error}
+                            setPage={handlePageChange}
+                            totalItems={totalItems}
+                            emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}
+                        />
+                    )}
+                </div>
+                <div className="w-full md:w-auto">
+                    <ChoreAddForm
+                        onRefresh={handleRefresh}
+                        emitUpdate={() => householdId && emitUpdate(householdId, 'chores')}
+                    />
+                </div>
             </div>
         </>
     );

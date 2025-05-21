@@ -1,18 +1,18 @@
 'use client';
-import DatePicker from "@/components/generalUI/datePicker";
-import React, { useState, useEffect } from "react";
+import DatePicker from '@/components/generalUI/datePicker';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 
 type choreAddFormProps = {
     onRefresh?: () => void;
     emitUpdate?: () => void;
-}
+};
 
 export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProps) {
     const [error, setError] = useState<Error | null>(null);
     const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
 
-    const [choreName, setChoreName] = useState("");
+    const [choreName, setChoreName] = useState('');
 
     const [choreDate, setChoreDate] = useState(new Date());
     const [showCalendar, setShowCalendar] = useState(false);
@@ -26,7 +26,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
 
     const [priority, setPriority] = useState(1);
 
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState('');
 
     const handleShowCalendar = () => {
         setShowCalendar(!showCalendar);
@@ -45,7 +45,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
     };
 
     const handleCancel = () => {
-        setChoreName("");
+        setChoreName('');
         setChoreDate(new Date());
         setRepetition(0);
         setRepetitionAmount(0);
@@ -53,7 +53,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
         setIsCustomRepetition(false);
         setCustomRepetitionInput('');
         setPriority(1);
-        setDescription("");
+        setDescription('');
         setShowRepetition(false);
         setShowCalendar(false);
         setValidationErrors({});
@@ -87,14 +87,14 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
         }
 
         try {
-            const response = await fetch("/api/chore/create", {
-                method: "POST",
+            const response = await fetch('/api/chore/create', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     name: choreName,
-                    dueDate: format(choreDate, "yyyy-MM-dd"),
+                    dueDate: format(choreDate, 'yyyy-MM-dd'),
                     priority,
                     description,
                     cycle: repetition,
@@ -103,7 +103,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
             });
 
             if (!response.ok) {
-                throw new Error("Failed to create chore");
+                throw new Error('Failed to create chore');
             }
 
             if (emitUpdate) {
@@ -114,20 +114,20 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
             if (error instanceof Error) {
                 setError(error);
             } else {
-                setError(new Error("An unknown error occurred"));
+                setError(new Error('An unknown error occurred'));
             }
         }
-    }
-    
+    };
+
     useEffect(() => {
         if (error) {
-            console.error("Error: ", error);
+            console.error('Error: ', error);
         }
     }, [error]);
-    
+
     if (error) {
         return (
-            <div className="flex flex-col items-center w-1/5">
+            <div className="flex flex-col items-center w-full max-w-md sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto">
                 <div className="flex flex-col w-full justify-center items-center rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-2">
                     <p className="mb-2 text-4m text-zinc-400 w-full text-center pl-1">Error: {error.message}</p>
                     <input
@@ -142,7 +142,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
     }
 
     return (
-        <div className="flex flex-col w-1/5 justify-center items-end rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-6">
+        <div className="flex flex-col w-full max-w-md sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl mx-auto justify-center items-end rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-4 sm:p-6">
             <p className="text-zinc-50 text-2xl font-semibold w-full text-end">Add Chore</p>
             <p className="text-zinc-400 mt-1.5 text-sm pb-6 text-end">Add a new chore for your dirty ahh crib</p>
             <form className="flex flex-col w-full justify-center items-end">
@@ -210,7 +210,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
                 />
-                <div className="flex items-center gap-2 py-2">
+                <div className="flex flex-row gap-2 py-2 sm:flex-col sm:items-center sm:gap-2 w-full">
                     <label className="cursor-pointer text-zinc-50">Does this chore repeat?</label>
                     <div
                         onClick={() => {
@@ -318,18 +318,18 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                         />
                     </>
                 )}
-                <div className="w-full flex justify-between items-center pt-2">
+                <div className="w-full flex flex-col sm:flex-row justify-between items-center pt-2 gap-2">
                     <input
                         type="reset"
                         value="Cancel"
                         onClick={handleCancel}
-                        className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                        className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
                     />
                     <input
                         type="submit"
                         value="Add"
                         onClick={handleSubmit}
-                        className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                        className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-full sm:w-auto"
                     />
                 </div>
             </form>

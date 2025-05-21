@@ -1,11 +1,11 @@
 'use client';
-import React from "react";
-import { createRoot } from "react-dom/client";
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 type User = {
     id: number;
     username: string;
-}
+};
 
 type Chore = {
     id: number;
@@ -18,12 +18,12 @@ type Chore = {
     done: boolean;
     doneById?: number;
     doneBy?: User;
-}
+};
 
 type ChoreCardProps = {
     chore: Chore;
     emitUpdate?: () => void;
-}
+};
 
 type DetailsBoxProps = {
     name: string;
@@ -33,21 +33,21 @@ type DetailsBoxProps = {
     createdBy: string;
     onClose: () => void;
     onDelete: () => void;
-}
+};
 
 type ConfirmationBoxProps = {
     onConfirm: () => void;
     onCancel: () => void;
-}
+};
 
 function ConfirmationBox({ onConfirm, onCancel }: ConfirmationBoxProps) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 text-zinc-100 rounded-xl p-6 w-1/4 relative">
+            <div className="bg-zinc-900 text-zinc-100 rounded-xl p-6 w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl relative">
                 <h2 className="text-xl font-semibold mb-4">Confirm Your Action</h2>
                 <p className="mb-6">Are you sure you want to do this?</p>
 
-                <div className="flex justify-center gap-4">
+                <div className="flex justify-center gap-4 flex-wrap">
                     <button
                         onClick={onCancel}
                         className="px-6 py-2 bg-zinc-700 text-zinc-100 hover:bg-zinc-600 transition-colors rounded-xl"
@@ -62,10 +62,7 @@ function ConfirmationBox({ onConfirm, onCancel }: ConfirmationBoxProps) {
                     </button>
                 </div>
 
-                <button
-                    className="absolute top-4 right-4 text-gray-300 hover:text-white"
-                    onClick={onCancel}
-                >
+                <button className="absolute top-4 right-4 text-gray-300 hover:text-white" onClick={onCancel}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-6 w-6"
@@ -73,12 +70,7 @@ function ConfirmationBox({ onConfirm, onCancel }: ConfirmationBoxProps) {
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -97,33 +89,30 @@ function DetailsBox({ name, description, dueDate, priority, createdBy, onClose, 
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 text-zinc-100 rounded-xl p-6 w-1/3 relative">
+            <div className="bg-zinc-900 text-zinc-100 rounded-xl p-6 w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl relative">
                 <h2 className="text-2xl font-semibold mb-3">{name}</h2>
                 <p className="mb-2">{description}</p>
                 <p className="mb-2">Due date: {formattedDate}</p>
                 <p className="mb-2">Priority: {priority}</p>
                 <p className="mb-4">Created by: {createdBy}</p>
 
-                <div className="flex justify-between items-center mt-6 pt-4 border-t border-zinc-800">
+                <div className="flex flex-col sm:flex-row justify-between items-center mt-6 pt-4 border-t border-zinc-800 gap-2">
                     <button
                         onClick={onDelete}
-                        className="px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors rounded-xl font-medium"
+                        className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white hover:bg-red-700 transition-colors rounded-xl font-medium mb-2 sm:mb-0"
                     >
                         Delete Chore
                     </button>
 
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 bg-zinc-700 text-white hover:bg-zinc-600 transition-colors rounded-xl"
+                        className="w-full sm:w-auto px-4 py-2 bg-zinc-700 text-white hover:bg-zinc-600 transition-colors rounded-xl"
                     >
                         Close
                     </button>
                 </div>
 
-                <button
-                    className="absolute top-4 right-4 text-gray-300 hover:text-white"
-                    onClick={onClose}
-                >
+                <button className="absolute top-4 right-4 text-gray-300 hover:text-white" onClick={onClose}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-6 w-6"
@@ -131,12 +120,7 @@ function DetailsBox({ name, description, dueDate, priority, createdBy, onClose, 
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -188,9 +172,9 @@ export default function ChoreToDoCard({ chore, emitUpdate }: ChoreCardProps) {
                     root.unmount();
                     document.body.removeChild(confirmationBox);
                 }}
-            />
+            />,
         );
-    }
+    };
 
     const showDetails = () => {
         const detailsBox = document.createElement('div');
@@ -236,7 +220,7 @@ export default function ChoreToDoCard({ chore, emitUpdate }: ChoreCardProps) {
                         confirmRoot.unmount();
                         document.body.removeChild(confirmationBox);
                     }}
-                />
+                />,
             );
         };
 
@@ -252,26 +236,26 @@ export default function ChoreToDoCard({ chore, emitUpdate }: ChoreCardProps) {
                     document.body.removeChild(detailsBox);
                 }}
                 onDelete={handleDelete}
-            />
+            />,
         );
-    }
+    };
 
     return (
         <div
-            className="flex w-full h-fit gap-2 border border-zinc-800 bg-zinc-950 rounded-xl p-4 cursor-pointer hover:bg-zinc-900 transition-colors"
+            className="flex flex-col sm:flex-row w-full h-fit gap-2 border border-zinc-800 bg-zinc-950 rounded-xl p-4 cursor-pointer hover:bg-zinc-900 transition-colors"
             key={chore.id}
             onClick={showDetails}
         >
-            <div className="flex flex-col w-4/5">
+            <div className="flex flex-col w-full sm:w-4/5">
                 <h2 className="text-lg font-semibold text-zinc-100">{chore.name}</h2>
                 <p className="text-zinc-400 text-sm">Due: {formattedDate}</p>
             </div>
-            <div className="flex flex-col w-1/5 justify-center">
+            <div className="flex flex-col w-full sm:w-1/5 justify-center mt-2 sm:mt-0">
                 <input
                     type="button"
                     value="Done"
                     onClick={handleDone}
-                    className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                    className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-full"
                 />
             </div>
         </div>
