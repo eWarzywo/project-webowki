@@ -31,7 +31,7 @@ export default function Calendar({ initialDate = new Date(), onChange }: Calenda
     const endDate = endOfWeek(monthEnd);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-    const styleForSelected = "bg-zinc-50 text-zinc-900 font-semibold hover:bg-zinc-300 hover:text-zinc-50";
+    const styleForSelected = 'bg-zinc-50 text-zinc-900 font-semibold hover:bg-zinc-300 hover:text-zinc-50';
 
     const handleDateClick = (day: Date) => {
         if (isSameMonth(day, monthStart) && (isToday(day) || !isBefore(day, today))) {

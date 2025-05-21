@@ -18,7 +18,7 @@ export default function Bills() {
     const [error, setError] = React.useState<string | null>(null);
     const [refresh, setRefresh] = React.useState<boolean>(false);
 
-    const [householdId, setHouseholdId] = React.useState<number | null>(null); // moj bracie wez zaimportuj po prostu useState XDDD
+    const [householdId, setHouseholdId] = React.useState<number | null>(null);
     const { isConnected, billsRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
 
     useEffect(() => {
@@ -148,19 +148,19 @@ export default function Bills() {
 
     return (
         <>
-            <div className="flex w-full self-stretch gap-[10px]">
+            <div className="flex flex-col md:flex-row w-full self-stretch gap-[10px]">
                 <form
                     onSubmit={handleSubmit}
                     autoComplete="off"
                     autoCorrect="off"
                     id="bills-form"
-                    className="gap-0 self-start w-1/6 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950"
+                    className="gap-0 self-start w-full md:w-1/3 lg:w-1/4 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950"
                 >
                     <div className="flex p-6 flex-col items-start justify-start w-full">
                         <h3 className="text-zinc-50 flex text-2xl font-semibold">Add new bill</h3>
                         <h4 className="text-zinc-400 mt-1.5 text-sm">Add an upcoming bill to pay</h4>
                     </div>
-                    <div className="px-6 pb-6 space-y-4 flex flex-col items-start">
+                    <div className="px-6 pb-6 space-y-4 flex flex-col items-start w-full">
                         <div className="flex flex-col items-start justify-start w-full gap-2.5 mt-1.5">
                             <label className="text-zinc-50 text-sm px-1" htmlFor="name">
                                 Name
@@ -172,7 +172,7 @@ export default function Bills() {
                                 id="name"
                                 name="name"
                                 placeholder="Name of the bill"
-                                className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                                className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none w-full"
                             />
                         </div>
                         <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
@@ -181,7 +181,7 @@ export default function Bills() {
                             </label>
                             <div
                                 id="costdiv"
-                                className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between"
+                                className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between w-full"
                             >
                                 <input
                                     value={cost || ''}
@@ -192,9 +192,9 @@ export default function Bills() {
                                     placeholder="Cost of the bill"
                                     min="1"
                                     step="1"
-                                    className="bg-zinc-950 no-spinner focus:border-none focus:outline-none"
+                                    className="bg-zinc-950 no-spinner focus:border-none focus:outline-none w-full"
                                 />
-                                <span className="text-zinc-400">$</span>
+                                <span className="text-zinc-400 ml-2">$</span>
                             </div>
                         </div>
                         <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
@@ -276,24 +276,31 @@ export default function Bills() {
                                 </div>
                             </div>
                         )}
-                        <div className=" flex w-full gap-[10px] justify-between items-center">
+                        <div className="flex w-full gap-[10px] justify-between items-center">
                             <input
                                 type="reset"
                                 value="Cancel"
-                                className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                                className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-1/2"
                             />
                             <input
                                 type="submit"
                                 value="Add"
-                                className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium"
+                                className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-1/2"
                             />
                         </div>
                     </div>
                     {error && <p className="text-red-500 text-sm pb-1">{error}</p>}
                 </form>
-                {!refresh && <BillsHandler emitUpdate={() => householdId && emitUpdate(householdId, 'bills')} refresh={refresh}/>}
+                <div className="w-full md:w-2/3 lg:w-3/4">
+                    {!refresh && (
+                        <BillsHandler
+                            emitUpdate={() => householdId && emitUpdate(householdId, 'bills')}
+                            refresh={refresh}
+                        />
+                    )}
+                </div>
             </div>
-        
+
             {showCalendar && (
                 <DatePicker
                     selectedDate={selectedDate}

@@ -21,13 +21,12 @@ interface ShoppingItem {
 
 type ShoppingListHandlerProps = {
     emitUpdate?: () => void;
-}
+};
 
 export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerProps) {
     const [data, setData] = useState<ShoppingItem[]>([]);
     const [totalItems, setTotalItems] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [refresh, setRefresh] = useState(false);
 
     const itemsPerPage = 6;
     const searchParams = useSearchParams();
@@ -74,7 +73,7 @@ export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerP
         };
 
         fetchData();
-    }, [page, refresh]);
+    }, [page]);
 
     const handleDelete = (id: number) => {
         fetch(`/api/shoppingList?id=${id}`, {
@@ -117,7 +116,7 @@ export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerP
     };
 
     return (
-        <div className="w-5/6 flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5">
+        <div className="w-full flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5">
             <div className="flex p-6 flex-col justify-center items-start">
                 <h2 className="text-2xl font-semibold text-zinc-50 self-stretch gap-2.5 flex items-center">
                     Your shopping List

@@ -18,7 +18,7 @@ interface Bill {
 type BillHandlerProps = {
     emitUpdate?: () => void;
     refresh?: boolean;
-}
+};
 
 export default function ShoppingListHandler({ emitUpdate, refresh }: BillHandlerProps) {
     const [totalItems, setTotalItems] = useState(0);
@@ -118,7 +118,7 @@ export default function ShoppingListHandler({ emitUpdate, refresh }: BillHandler
 
     return (
         <div
-            className={`min-h-80 w-5/6 flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5`}
+            className={`min-h-80 w-full flex flex-[1_0_0] flex-col items-start rounded-xl border bg-zinc-950 border-zinc-800 text-zinc-50 pb-5`}
             style={{ maxHeight: `${data?.length * 10 + (Math.ceil(totalItems / itemsPerPage) > 1 ? 12 : 0)}rem` }}
         >
             <div className="flex p-6 flex-col justify-center items-start">
