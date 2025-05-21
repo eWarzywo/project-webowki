@@ -42,6 +42,6 @@ export async function GET(req: Request) {
         return NextResponse.json({ count }, { status: 200 });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
