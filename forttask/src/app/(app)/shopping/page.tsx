@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import ShoppingListHandler from '@/components/shoppingList/shoppingListHandler';
 import { useSocket } from '@/lib/socket';
+import { useRouter } from 'next/navigation';
 
 export default function Shopping() {
     const [addedToggle, setAddedToggle] = useState<boolean>(false);
@@ -9,6 +10,8 @@ export default function Shopping() {
     React.useEffect(() => {
         setAddedToggle(false);
     }, [addedToggle]);
+    const [page, setPage] = useState<number>(1);
+    const router = useRouter();
     const [householdId, setHouseholdId] = useState<number | null>(null);
     const { isConnected, shoppingRefresh, emitUpdate, joinHousehold, leaveHousehold } = useSocket();
     useEffect(() => {
@@ -39,8 +42,13 @@ export default function Shopping() {
         };
     }, [isConnected, householdId]);
     useEffect(() => {
+        setPage(1);
+        router.push(`?page=1`);
         setAddedToggle((prev) => !prev);
     }, [shoppingRefresh]);
+    const handlePageChange = (newPage: number) => {
+        setPage(newPage);
+    };
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
@@ -165,7 +173,7 @@ export default function Shopping() {
             </form>
             <div className="w-full md:flex-1">
                 {!addedToggle && (
-                    <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} />
+                    <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} refresh={shoppingRefresh} setPage={handlePageChange} page={page} />
                 )}
             </div>
         </div>
