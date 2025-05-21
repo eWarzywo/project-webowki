@@ -125,12 +125,12 @@ export default function ShoppingListItem({ id, handleDelete, emitUpdate }: Shopp
                         {!isBought ? (
                             <div
                                 onClick={() => toggleBoughtStatus(`/api/shoppingList/bought?id=${id}`)}
-                                className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] size-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
+                                className="hover:bg-zinc-100 border-2 border-zinc-200 rounded-[5px] h-5 w-5 cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out"
                             />
                         ) : (
                             <div
                                 onClick={() => setShowDetails(true)}
-                                className="bg-blue-600 text-zinc-50 rounded-[15px] size-6 flex justify-center items-center cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out text-xl"
+                                className="bg-blue-600 text-zinc-50 rounded-[15px] h-6 w-6 flex justify-center items-center cursor-pointer hover:scale-110 transition-transform duration-200 ease-in-out text-xl"
                             >
                                 ?
                             </div>
