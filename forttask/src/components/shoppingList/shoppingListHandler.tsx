@@ -50,7 +50,7 @@ export default function ShoppingListHandler({ emitUpdate }: ShoppingListHandlerP
         };
 
         fetchTotalItems();
-    }, []);
+    }, [refresh]);
 
     useEffect(() => {
         const fetchData = async () => {
