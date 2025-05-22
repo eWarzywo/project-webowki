@@ -659,7 +659,7 @@ function HouseholdContent() {
                                         type="text"
                                         value={newJoinCode}
                                         onChange={(e) => setNewJoinCode(e.target.value.toUpperCase())}
-                                        className="flex-grow bg-zinc-950 border border-zinc-800 rounded-l-[6px] p-2 text-zinc-400 text-sm font-normal mr-1"
+                                        className="grow bg-zinc-950 border border-zinc-800 rounded-l-[6px] p-2 text-zinc-400 text-sm font-normal mr-1"
                                         disabled={!isOwner}
                                         maxLength={8}
                                     />

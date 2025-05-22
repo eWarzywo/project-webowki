@@ -187,7 +187,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.eventName ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 {validationErrors.eventName && <p className="text-red-500 text-xs mb-2">Event name is required</p>}
                 <label htmlFor="eventDate">Date</label>
@@ -214,7 +214,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.participants ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 >
                     {householders.map((householder) => (
                         <option key={householder.id} value={householder.id} className="rounded-xl text-center">
@@ -239,7 +239,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.eventLocation ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 {validationErrors.eventLocation && <p className="text-red-500 text-xs mb-2">Location is required</p>}
                 <div className="flex items-center gap-2 py-2">
@@ -279,7 +279,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                                     setRepetitionAmountInput('');
                                 }
                             }}
-                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                         >
                             <option value="0">No Repeat</option>
                             <option value="1">Daily</option>
@@ -313,7 +313,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                                 }
                             }
                         }}
-                        className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                        className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                     />
                 )}
                 {repetition !== 0 && (
@@ -344,7 +344,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                                     }
                                 }
                             }}
-                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                         />
                     </>
                 )}
@@ -362,7 +362,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.description ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 {validationErrors.description && <p className="text-red-500 text-xs mb-2">Description is required</p>}
                 <div className="w-full flex flex-col sm:flex-row justify-between px-0 sm:px-6 pb-2 items-center gap-2">

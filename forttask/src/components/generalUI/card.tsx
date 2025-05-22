@@ -176,7 +176,7 @@ export function Card({
                             href={getItemLink(record)}
                             className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1"
                         >
-                            <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
+                            <div className="flex justify-start items-start space-y-1.5 grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">{item.name}</h2>
                             </div>
                             <div className="text-sm font-normal text-[#A1A1AA] overflow-hidden">
@@ -196,7 +196,7 @@ export function Card({
                             href={getItemLink(record)}
                             className="flex flex-wrap justify-between items-center w-full hover:bg-zinc-800 rounded-md p-1"
                         >
-                            <div className="flex justify-start items-start space-y-1.5 flex-grow ml-2">
+                            <div className="flex justify-start items-start space-y-1.5 grow ml-2">
                                 <h2 className="text-sm font-medium text-[#FAFAFA]">
                                     {bill.name} - {bill.amount}$
                                 </h2>

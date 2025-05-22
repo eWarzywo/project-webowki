@@ -7,7 +7,7 @@ export default function LogoutButton() {
     return (
         <button
             onClick={() => router.push('/logout')}
-            className="group flex items-center gap-2 px-2.5 py-2 sm:px-3.5 sm:py-2.5 bg-red-800/80 hover:bg-zinc-700 active:bg-red-900/80 rounded-full text-xs font-medium text-zinc-300 hover:text-white transition-all duration-200 border border-transparent hover:border-red-800/30 shadow-sm"
+            className="group flex items-center gap-2 px-2.5 py-2 sm:px-3.5 sm:py-2.5 bg-red-800/80 hover:bg-zinc-700 active:bg-red-900/80 rounded-full text-xs font-medium text-zinc-300 hover:text-white transition-all duration-200 border border-transparent hover:border-red-800/30 shadow-xs"
             aria-label="Logout"
             title="Logout"
         >

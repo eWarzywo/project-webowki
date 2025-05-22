@@ -71,7 +71,7 @@ function DetailsBox({ id, onCancel, emitUpdate }: DetailsBoxProps) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-4 sm:p-6 w-[95vw] max-w-xl sm:max-w-2xl md:w-[40rem]">
+            <div className="bg-zinc-900 text-white rounded-xl shadow-lg p-4 sm:p-6 w-[95vw] max-w-xl sm:max-w-2xl md:w-160">
                 {loading ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 border-solid"></div>
