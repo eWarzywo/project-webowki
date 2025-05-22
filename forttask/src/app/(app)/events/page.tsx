@@ -107,7 +107,7 @@ export default function Events() {
                 <div className="w-full sm:w-auto">
                     <EventDatePicker onChange={handleDateChange} />
                 </div>
-                <div className="flex-1 w-full mt-8 sm:mt-0">
+                <div className="flex-1 w-full mt-6 sm:mt-0">
                     <EventList
                         events={events}
                         loading={loading}

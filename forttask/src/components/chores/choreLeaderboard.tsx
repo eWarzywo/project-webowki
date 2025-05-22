@@ -41,7 +41,6 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const [leaderboardData, setLeaderboardData] = useState<leaderboardData[]>([]);
-    const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,7 +58,6 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
                     );
                     if (profilesResponse.ok) {
                         const profilesData = await profilesResponse.json();
-                        setUserProfiles(profilesData);
 
                         const mergedData = leaderboardData.map((user: leaderboardData) => {
                             const userProfile = profilesData.find(
@@ -89,7 +87,7 @@ export default function ChoreLeaderboard({ refresh }: ChoreLeaderboardProps) {
     }, [refresh, session?.user?.householdId]);
 
     return (
-        <div className="flex flex-col w-full max-w-md sm:max-w-lg md:w-1/2 lg:w-1/3 xl:w-1/4 h-fit justify-center items-start rounded-xl border border-zinc-800 bg-zinc-950 mb-2 p-4 sm:p-6">
+        <div className="flex flex-col w-full max-w-md sm:max-w-lg md:w-1/2 lg:w-1/3 xl:w-1/4 h-fit justify-center items-start rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-6">
             <h2 className="text-zinc-50 text-xl sm:text-2xl font-semibold w-full text-start">Chore Leaderboard</h2>
             <p className="text-zinc-400 mt-1.5 text-xs sm:text-sm pb-4 sm:pb-6 text-start">
                 See who is winning the chore game!

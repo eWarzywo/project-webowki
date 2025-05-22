@@ -50,7 +50,7 @@ export default function ChoreToDoList({
     }, [searchParams, setPage]);
 
     return (
-        <div className="flex w-full max-w-2xl mx-auto h-fit flex-col border border-zinc-800 bg-zinc-950 rounded-xl p-4 sm:p-6">
+        <div className="flex w-full mx-auto h-fit flex-col border border-zinc-800 bg-zinc-950 rounded-xl p-4 sm:p-6">
             <p className="text-zinc-50 text-xl sm:text-2xl font-semibold w-full text-center">Chores done list</p>
             <p className="text-zinc-400 mt-1 text-xs sm:text-sm pb-4 text-center">
                 Click on any chore to see more details
