@@ -81,14 +81,18 @@ export default function Messages() {
                     const users = await usersResponse.json();
 
                     const userMap: Record<string, UserWithProfile> = {};
-                    users.forEach((user: UserWithProfile) => {
-                        if (!user.profilePicture) {
-                            user.profilePicture = DEFAULT_AVATAR;
-                        }
-                        userMap[user.id] = user;
-                    });
+                    if (Array.isArray(users)) {
+                        users.forEach((user: UserWithProfile) => {
+                            if (!user.profilePicture) {
+                                user.profilePicture = DEFAULT_AVATAR;
+                            }
+                            userMap[user.id] = user;
+                        });
+                    } else {
+                        console.error('Expected users to be an array but received:', users);
+                    }
 
-                    setHouseholdUsers(users);
+                    setHouseholdUsers(Array.isArray(users) ? users : []);
                     setUsersMap(userMap);
                     setUserDataLoaded(true);
                 }
@@ -163,7 +167,7 @@ export default function Messages() {
                                 setMessages(channelResponse.messages);
                                 setHasMoreMessages(channelResponse.messages.length >= messageLimit);
                             }
-
+                            
                             householdChannel.off('message.new');
 
                             householdChannel.on('message.new', (event) => {
