@@ -81,14 +81,18 @@ export default function Messages() {
                     const users = await usersResponse.json();
 
                     const userMap: Record<string, UserWithProfile> = {};
-                    users.forEach((user: UserWithProfile) => {
-                        if (!user.profilePicture) {
-                            user.profilePicture = DEFAULT_AVATAR;
-                        }
-                        userMap[user.id] = user;
-                    });
+                    if (Array.isArray(users)) {
+                        users.forEach((user: UserWithProfile) => {
+                            if (!user.profilePicture) {
+                                user.profilePicture = DEFAULT_AVATAR;
+                            }
+                            userMap[user.id] = user;
+                        });
+                    } else {
+                        console.error('Expected users to be an array but received:', users);
+                    }
 
-                    setHouseholdUsers(users);
+                    setHouseholdUsers(Array.isArray(users) ? users : []);
                     setUsersMap(userMap);
                     setUserDataLoaded(true);
                 }
@@ -163,7 +167,7 @@ export default function Messages() {
                                 setMessages(channelResponse.messages);
                                 setHasMoreMessages(channelResponse.messages.length >= messageLimit);
                             }
-
+                            
                             householdChannel.off('message.new');
 
                             householdChannel.on('message.new', (event) => {
@@ -467,7 +471,7 @@ export default function Messages() {
                                 value={inputMessage}
                                 onChange={(e) => setInputMessage(e.target.value)}
                                 placeholder="Write your first message..."
-                                className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-hidden"
+                                className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-none"
                             />
 
                             <button
@@ -563,7 +567,7 @@ export default function Messages() {
                                                     <p className="text-sm break-words">{message.text}</p>
                                                 </div>
                                             </div>
-                                            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-zinc-800">
+                                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-zinc-800">
                                                 <Image
                                                     src={profilePicture}
                                                     alt="Your avatar"
@@ -580,7 +584,7 @@ export default function Messages() {
                                 return (
                                     <div key={message.id} className="mb-4 flex justify-start mx-4">
                                         <div className="flex items-start">
-                                            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 mr-2 bg-zinc-800">
+                                            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2 bg-zinc-800">
                                                 <Image
                                                     src={profilePicture}
                                                     alt={userName}
@@ -617,7 +621,7 @@ export default function Messages() {
                             value={inputMessage}
                             onChange={(e) => setInputMessage(e.target.value)}
                             placeholder="Aa..."
-                            className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-hidden"
+                            className="flex-1 bg-zinc-800 border-0 rounded-full px-4 py-2 text-zinc-50 focus:outline-none"
                         />
 
                         <button

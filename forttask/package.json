@@ -37,6 +37,7 @@
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "@types/supertest": "^6.0.2",
+        "@types/testing-library__jest-dom": "^5.14.9",
         "@vitejs/plugin-react": "^4.4.1",
         "jsdom": "^26.1.0",
         "nodemon": "^3.1.10",

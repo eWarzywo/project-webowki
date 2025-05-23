@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../auth';
+import { authOptions } from '@/app/auth';
 import { StreamChat } from 'stream-chat';
 
 const serverClient = StreamChat.getInstance(
