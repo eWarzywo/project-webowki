@@ -22,12 +22,12 @@ export default function Management() {
     const [activeSection, setActiveSection] = useState('Account');
 
     return (
-        <div className="flex flex-col w-full h-full bg-zinc-950 text-white p-4">
+        <div className="flex flex-col w-full bg-zinc-950 text-white p-4">
             <div>
                 <h1 className="text-2xl font-bold">Management</h1>
                 <p className="text-zinc-400 mb-6">Manage your account settings and set email preferences.</p>
             </div>
-            <div className="flex flex-row w-full">
+            <div className="flex flex-col md:flex-row w-full">
                 <ManagementSideBar activeSection={activeSection} setActiveSection={setActiveSection} />
                 <ContentSection activeSection={activeSection} />
             </div>
@@ -44,12 +44,12 @@ function ManagementSideBar({ activeSection, setActiveSection }: SideBarProps) {
     const sections = ['Account', 'Profile Picture', 'Household'];
 
     return (
-        <div className="flex flex-col w-1/4">
-            <ul className="space-y-2">
+        <div className="w-full md:w-48 lg:w-56 mb-6 md:mb-0">
+            <ul className="flex md:flex-col overflow-x-auto md:overflow-visible space-x-2 md:space-x-0 md:space-y-2 pb-2 md:pb-0">
                 {sections.map((section) => (
                     <li
                         key={section}
-                        className={`p-2 rounded-[6px] cursor-pointer transition-colors duration-200 ${
+                        className={`p-2 rounded-[6px] cursor-pointer transition-colors duration-200 whitespace-nowrap md:whitespace-normal ${
                             activeSection === section ? 'bg-zinc-800' : 'hover:bg-zinc-900'
                         }`}
                         onClick={() => setActiveSection(section)}
@@ -67,16 +67,13 @@ interface ContentProps {
 }
 
 function ContentSection({ activeSection }: ContentProps) {
-    switch (activeSection) {
-        case 'Account':
-            return <AccountContent />;
-        case 'Profile Picture':
-            return <ProfilePicture />;
-        case 'Household':
-            return <HouseholdContent />;
-        default:
-            return <AccountContent />;
-    }
+    return (
+        <div className="flex-1 pb-8"> {/* Reduced padding from pb-16 to pb-8 */}
+            {activeSection === 'Account' && <AccountContent />}
+            {activeSection === 'Profile Picture' && <ProfilePicture />}
+            {activeSection === 'Household' && <HouseholdContent />}
+        </div>
+    );
 }
 
 function AccountContent() {
@@ -150,7 +147,7 @@ function AccountContent() {
     };
 
     return (
-        <div className="flex-1 ml-6">
+        <div className="flex-1 md:ml-6 ml-0">
             <div className="mb-8">
                 <h2 className="text-xl font-bold mb-1">Account</h2>
                 <p className="text-zinc-400 text-sm">Manage your account.</p>
@@ -311,7 +308,7 @@ function ProfilePicture() {
     };
 
     return (
-        <div className="flex-1 ml-6">
+        <div className="flex-1 md:ml-6 ml-0">
             <div className="mb-8">
                 <h2 className="text-xl font-bold mb-1">Profile Picture</h2>
                 <p className="text-zinc-400 text-sm">Choose an avatar for your profile.</p>
@@ -334,7 +331,7 @@ function ProfilePicture() {
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold mb-3">Current Avatar</h3>
                         <div className="flex items-center">
-                            <div className="w-20 h-20 rounded-full overflow-hidden bg-zinc-800">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-zinc-800">
                                 <img
                                     src={currentPicture?.imageUrl || defaultAvatar.imageUrl}
                                     alt={currentPicture?.name || 'Default Avatar'}
@@ -350,7 +347,7 @@ function ProfilePicture() {
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold mb-3">Choose a New Avatar</h3>
                         
-                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-4">
                             <div
                                 key="default-avatar"
                                 onClick={() => handleSelectPicture(0)}
@@ -360,7 +357,7 @@ function ProfilePicture() {
                                         : 'hover:bg-zinc-800'
                                 }`}
                             >
-                                <div className="w-16 h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
                                     <img
                                         src={defaultAvatar.imageUrl}
                                         alt={defaultAvatar.name}
@@ -380,7 +377,7 @@ function ProfilePicture() {
                                             : 'hover:bg-zinc-800'
                                     }`}
                                 >
-                                    <div className="w-16 h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
+                                    <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
                                         <img
                                             src={picture.imageUrl}
                                             alt={picture.name}
@@ -616,7 +613,7 @@ function HouseholdContent() {
     }
 
     return (
-        <div className="flex-1 ml-6">
+        <div className="flex-1 md:ml-6 ml-0">
             <div className="mb-8">
                 <h2 className="text-xl font-bold mb-1">Household</h2>
                 <p className="text-zinc-400 text-sm">Manage your household settings.</p>
@@ -706,9 +703,9 @@ function HouseholdContent() {
                             ) : (
                                 <ul className="divide-y divide-zinc-800">
                                     {users.map((user) => (
-                                        <li key={user.id} className="py-3 flex items-center justify-between">
-                                            <div>
-                                                <span>{user.username || user.email}</span>
+                                        <li key={user.id} className="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between">
+                                            <div className="w-full sm:w-auto mb-2 sm:mb-0">
+                                                <span className="break-all">{user.username || user.email}</span>
                                                 {user.id === household.ownerId && (
                                                     <span className="ml-2 bg-amber-900/50 text-amber-200 px-2 py-0.5 rounded-full text-xs">
                                                         Owner
@@ -749,13 +746,13 @@ function HouseholdContent() {
                                 </p>
 
                                 {confirmDelete ? (
-                                    <div>
-                                        <p className="text-red-300 mb-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        <p className="text-red-300 mb-2 w-full">
                                             Are you sure? This will permanently delete your household.
                                         </p>
                                         <button
                                             onClick={handleDeleteHousehold}
-                                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-[6px] mr-2 text-sm"
+                                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-[6px] text-sm"
                                         >
                                             Yes, Delete Household
                                         </button>
@@ -787,13 +784,13 @@ function HouseholdContent() {
                                 </p>
 
                                 {confirmLeave ? (
-                                    <div>
-                                        <p className="text-amber-300 mb-2">
+                                    <div className="flex flex-wrap gap-2">
+                                        <p className="text-amber-300 mb-2 w-full">
                                             Are you sure you want to leave this household?
                                         </p>
                                         <button
                                             onClick={handleLeaveHousehold}
-                                            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-[6px] mr-2 text-sm"
+                                            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-[6px] text-sm"
                                         >
                                             Yes, Leave Household
                                         </button>
