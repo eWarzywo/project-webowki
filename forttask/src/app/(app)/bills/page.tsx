@@ -182,7 +182,7 @@ export default function Bills() {
                                 id="name"
                                 name="name"
                                 placeholder="Name of the bill"
-                                className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none w-full"
+                                className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden w-full"
                             />
                         </div>
                         <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
@@ -202,7 +202,7 @@ export default function Bills() {
                                     placeholder="Cost of the bill"
                                     min="1"
                                     step="1"
-                                    className="bg-zinc-950 no-spinner focus:border-none focus:outline-none w-full"
+                                    className="bg-zinc-950 no-spinner focus:border-none focus:outline-hidden w-full"
                                 />
                                 <span className="text-zinc-400 ml-2">$</span>
                             </div>
@@ -228,7 +228,7 @@ export default function Bills() {
                                 id="description"
                                 name="description"
                                 placeholder="Description of the bill"
-                                className="w-full py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none min-h-14 max-h-40"
+                                className="w-full py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden min-h-14 max-h-40"
                             />
                         </div>
                         <div className="flex items-start justify-start w-full mt-1.5 gap-2.5 ">
@@ -259,7 +259,7 @@ export default function Bills() {
                                 <div className="relative w-full">
                                     <button
                                         type="button"
-                                        className="w-full py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none flex justify-between items-center"
+                                        className="w-full py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden flex justify-between items-center"
                                         onClick={() => setShowDropdown(!showDropdown)}
                                     >
                                         {selectedOption || 'Select an option'}

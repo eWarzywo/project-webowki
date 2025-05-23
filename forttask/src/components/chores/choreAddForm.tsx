@@ -160,7 +160,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.choreName ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 {validationErrors.choreName && <p className="text-red-500 text-xs mb-2">Event name is required</p>}
                 <label htmlFor="choreDate">Due to</label>
@@ -168,7 +168,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     onClick={handleShowCalendar}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.choreDate ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none cursor-pointer`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden cursor-pointer`}
                 >
                     {choreDate ? choreDate.toLocaleDateString() : 'Select a date'}
                 </div>
@@ -189,7 +189,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
                         validationErrors.priority ? 'border-red-500' : 'border-zinc-800'
-                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 >
                     <option value="1">1</option>
                     <option value="2">2</option>
@@ -208,7 +208,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     onChange={(e) => {
                         setDescription(e.target.value);
                     }}
-                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none`}
+                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 <div className="flex flex-row gap-2 py-2 sm:flex-col sm:items-center sm:gap-2 w-full">
                     <label className="cursor-pointer text-zinc-50">Does this chore repeat?</label>
@@ -249,7 +249,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                                     setRepetitionAmountInput('');
                                 }
                             }}
-                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                         >
                             <option value="0">No Repeat</option>
                             <option value="1">Daily</option>
@@ -283,7 +283,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                                 }
                             }
                         }}
-                        className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                        className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                     />
                 )}
                 {repetition !== 0 && (
@@ -314,7 +314,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                                     }
                                 }
                             }}
-                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none"
+                            className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden"
                         />
                     </>
                 )}

@@ -107,7 +107,7 @@ export function AddHousehold() {
                 value={householdName}
                 onChange={(e) => setHouseholdName(e.target.value)}
                 placeholder="Enter household name"
-                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-hidden focus:ring-1 focus:ring-zinc-600"
                 disabled={isLoading || success}
             />
             {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
@@ -184,7 +184,7 @@ export function JoinHousehold() {
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 placeholder="Enter join code"
-                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-hidden focus:ring-1 focus:ring-zinc-600"
                 disabled={isLoading || success}
                 maxLength={8}
             />

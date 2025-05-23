@@ -14,7 +14,7 @@ export default function Header() {
             <header className="flex justify-between items-center py-4 px-4 bg-zinc-950">
                 <div className="flex items-center w-auto">
                     <button
-                        className="md:hidden mr-2 p-2 rounded hover:bg-zinc-900 focus:outline-none"
+                        className="md:hidden mr-2 p-2 rounded hover:bg-zinc-900 focus:outline-hidden"
                         onClick={() => setMenuOpen((open) => !open)}
                         aria-label="Toggle navigation menu"
                     >

@@ -129,7 +129,7 @@ export default function Shopping() {
                             id="name"
                             name="name"
                             placeholder="Name of the item"
-                            className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-none w-full"
+                            className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden w-full"
                         />
                     </div>
                     <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
@@ -149,7 +149,7 @@ export default function Shopping() {
                                 placeholder="Cost of the item"
                                 min="0.1"
                                 step="0.1"
-                                className="bg-zinc-950 no-spinner focus:border-none focus:outline-none w-full"
+                                className="bg-zinc-950 no-spinner focus:border-none focus:outline-hidden w-full"
                             />
                             <span className="text-zinc-400 ml-2">$</span>
                         </div>
