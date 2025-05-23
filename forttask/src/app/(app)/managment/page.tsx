@@ -68,7 +68,7 @@ interface ContentProps {
 
 function ContentSection({ activeSection }: ContentProps) {
     return (
-        <div className="flex-1 pb-8"> {/* Reduced padding from pb-16 to pb-8 */}
+        <div className="flex-1 pb-8">
             {activeSection === 'Account' && <AccountContent />}
             {activeSection === 'Profile Picture' && <ProfilePicture />}
             {activeSection === 'Household' && <HouseholdContent />}
