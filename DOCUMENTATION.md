@@ -43,7 +43,7 @@ The project was developed by a team of three members, with responsibilities dist
 - **Frontend Developer and UI/UX Designer**
 - Designed and implemented the user interface using React and TailwindCSS
 - Developed the dashboard and overview components
-- Created the event planning and calendar functionality
+- Created the shopping list page and calendar functionality
 - Implemented bill tracking and payment features
 - Designed responsive layouts for various device sizes
 - Created reusable UI components and styled elements
