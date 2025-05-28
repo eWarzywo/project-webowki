@@ -12,6 +12,11 @@ export async function middleware(req: NextRequest) {
 
     const path = req.nextUrl.pathname;
 
+    const response = NextResponse.next();
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     if (
         path.startsWith('/api/') ||
         path === '/household' ||
@@ -19,7 +24,7 @@ export async function middleware(req: NextRequest) {
         path === '/logout' ||
         path === '/signup'
     ) {
-        return NextResponse.next();
+        return response;
     }
 
     if (!token) {
@@ -33,7 +38,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(householdUrl);
     }
 
-    return NextResponse.next();
+    return response;
 }
 
 export const config = {
