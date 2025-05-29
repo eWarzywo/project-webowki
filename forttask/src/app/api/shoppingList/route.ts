@@ -31,13 +31,13 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const skip = parseInt(searchParams.get('skip') || '0');
-        const limit = parseInt(searchParams.get('limit') || '0');
+        const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
 
         if (isNaN(skip) || skip < 0) {
             return NextResponse.json({ message: 'Invalid skip parameter' }, { status: 400 });
         }
 
-        if (isNaN(limit) || limit <= 0) {
+        if (limit !== undefined && (isNaN(limit) || limit <= 0)) {
             return NextResponse.json({ message: 'Invalid limit parameter' }, { status: 400 });
         }
 
@@ -46,7 +46,9 @@ export async function GET(req: Request) {
             orderBy: { createdAt: 'desc' },
             skip: skip,
             take: limit,
-            include: { createdBy: true },
+            include: { createdBy: true,
+                boughtBy: true,
+             },
         });
 
         return NextResponse.json(shoppingItems, { status: 200 });

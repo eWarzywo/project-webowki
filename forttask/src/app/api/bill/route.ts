@@ -86,7 +86,7 @@ export async function GET(req: Request) {
 
         const { searchParams } = new URL(req.url);
         const skip = parseInt(searchParams.get('skip') || '0');
-        const limit = parseInt(searchParams.get('limit') || '0');
+        const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
 
         const bills = await prisma.bill.findMany({
             where: {
