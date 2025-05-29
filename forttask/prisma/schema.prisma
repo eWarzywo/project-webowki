@@ -122,18 +122,6 @@ model ShoppingItem {
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 }
 
-model HouseholdDM {
-  id   Int      @id @default(autoincrement())
-  text String   @db.Text
-  time DateTime @default(now())
-
-  sentById Int
-  sentBy   User @relation(fields: [sentById], references: [id], onDelete: Cascade)
-
-  householdId Int
-  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
-}
-
 model Event {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
