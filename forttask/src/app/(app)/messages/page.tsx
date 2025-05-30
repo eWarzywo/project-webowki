@@ -153,7 +153,6 @@ export default function Messages() {
                         try {
                             await householdChannel.watch();
 
-                            // Load initial batch of messages with a smaller batch size
                             const initialMessageLimit = Math.min(20, messageLimit);
                             const channelResponse = await householdChannel.query({
                                 messages: {
@@ -162,12 +161,10 @@ export default function Messages() {
                             });
 
                             if (channelResponse.messages && isComponentMounted) {
-                                // Set messages in a timeout to prevent UI freeze
                                 setTimeout(() => {
                                     setMessages(channelResponse.messages);
                                     setHasMoreMessages(channelResponse.messages.length >= initialMessageLimit);
                                     setLoading(false);
-                                    // Scroll to bottom after messages are rendered
                                     setTimeout(scrollToBottom, 200);
                                 }, 10);
                             } else {
@@ -327,12 +324,10 @@ export default function Messages() {
                 const container = messagesContainerRef.current;
                 const oldScrollHeight = container?.scrollHeight || 0;
 
-                // Add new messages to state in batches to prevent UI freezing
                 setTimeout(() => {
                     setMessages((prevMessages) => [...response.messages, ...prevMessages]);
                     setHasMoreMessages(response.messages.length >= messageLimit);
 
-                    // Maintain scroll position after loading more messages
                     setTimeout(() => {
                         if (container) {
                             const newScrollHeight = container.scrollHeight;

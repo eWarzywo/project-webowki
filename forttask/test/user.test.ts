@@ -44,12 +44,10 @@ test('POST User with correct data should return new User and status 201', async 
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     bcrypt.hash.mockResolvedValue('hashed_password');
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.findUnique.mockImplementation(({ where }) => {
         return Promise.resolve(null);
     });
@@ -64,7 +62,6 @@ test('POST User with correct data should return new User and status 201', async 
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.create.mockResolvedValue(mockCreatedUser);
 
     try {
@@ -83,11 +80,9 @@ test('POST User with correct data should return new User and status 201', async 
     } finally {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        // tajpskript diff
         if (console.error.mock.calls.length > 0) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
-            // tajpskript diff
             console.log('Captured errors:', console.error.mock.calls);
         }
         console.error = originalConsoleError;
@@ -138,7 +133,7 @@ test('POST User with too short password should return 400', async () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@email.com',
-        password: '123', // Too short
+        password: '123',
     };
 
     const req = new Request('http://localhost/api/user', {
@@ -174,7 +169,6 @@ test('POST User with existing email should return 409', async () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.findFirst.mockResolvedValue({ id: 1, email: 'existing@email.com' });
 
     const response = await POST(req as Request);
@@ -189,7 +183,7 @@ test('POST User with invalid data should return 400', async () => {
         username: 'invalid_name',
         email: 'invalid_email',
         passwordHash: 'hashed_password',
-        householdId: 'invalid_id', // Not number
+        householdId: 'invalid_id',
     };
 
     const req = new Request('http://localhost/api/user', {
@@ -225,7 +219,6 @@ test('GET User with valid userId should return User', async () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.findUnique.mockResolvedValue(mockUser);
 
     const response = await GET(req as Request);
@@ -302,7 +295,6 @@ test('PUT User with correct data should return updated User and status 200', asy
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.update.mockResolvedValue(mockResponse);
 
     const response = await PUT(req as Request);
@@ -334,7 +326,7 @@ test('PUT User with invalid data should return 400', async () => {
         username: 'invalid_name',
         email: 'invalid_email',
         passwordHash: 'hashed_password',
-        householdId: 'invalid_id', // Not number
+        householdId: 'invalid_id',
     };
 
     const req = new Request('http://localhost/api/user', {
@@ -368,19 +360,16 @@ test('DELETE User with valid userId should return 200', async () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.household.findUnique.mockResolvedValue(mockHousehold);
 
     prisma.user.deleteMany.mockResolvedValue({ count: 1 });
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.household.delete.mockResolvedValue({});
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    // tajpskript diff
     prisma.user.delete.mockResolvedValue({});
 
     const response = await DELETE(req as Request);
