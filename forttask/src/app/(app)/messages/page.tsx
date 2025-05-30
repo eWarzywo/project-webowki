@@ -157,15 +157,22 @@ export default function Messages() {
                         try {
                             await householdChannel.watch();
 
+                            const initialMessageLimit = Math.min(20, messageLimit);
                             const channelResponse = await householdChannel.query({
                                 messages: {
-                                    limit: messageLimit,
+                                    limit: initialMessageLimit,
                                 },
                             });
 
                             if (channelResponse.messages && isComponentMounted) {
-                                setMessages(channelResponse.messages);
-                                setHasMoreMessages(channelResponse.messages.length >= messageLimit);
+                                setTimeout(() => {
+                                    setMessages(channelResponse.messages);
+                                    setHasMoreMessages(channelResponse.messages.length >= initialMessageLimit);
+                                    setLoading(false);
+                                    setTimeout(scrollToBottom, 200);
+                                }, 10);
+                            } else {
+                                setLoading(false);
                             }
                             
                             householdChannel.off('message.new');
@@ -176,9 +183,6 @@ export default function Messages() {
                                     setTimeout(scrollToBottom, 100);
                                 }
                             });
-
-                            setLoading(false);
-                            setTimeout(scrollToBottom, 300);
                         } catch (error) {
                             console.error('Error initializing channel:', error);
                             if (!streamClient.userID) {
@@ -187,6 +191,7 @@ export default function Messages() {
                                 setChannelInstance(null);
                                 channelRef.current = null;
                             }
+                            setLoading(false);
                         }
                     }
                 }
@@ -323,23 +328,25 @@ export default function Messages() {
                 const container = messagesContainerRef.current;
                 const oldScrollHeight = container?.scrollHeight || 0;
 
-                setMessages((prevMessages) => [...response.messages, ...prevMessages]);
-
-                setHasMoreMessages(response.messages.length >= messageLimit);
-
                 setTimeout(() => {
-                    if (container) {
-                        const newScrollHeight = container.scrollHeight;
-                        const heightDiff = newScrollHeight - oldScrollHeight;
-                        container.scrollTop = heightDiff;
-                    }
+                    setMessages((prevMessages) => [...response.messages, ...prevMessages]);
+                    setHasMoreMessages(response.messages.length >= messageLimit);
+
+                    setTimeout(() => {
+                        if (container) {
+                            const newScrollHeight = container.scrollHeight;
+                            const heightDiff = newScrollHeight - oldScrollHeight;
+                            container.scrollTop = heightDiff;
+                        }
+                        setLoadingMoreMessages(false);
+                    }, 50);
                 }, 10);
             } else {
                 setHasMoreMessages(false);
+                setLoadingMoreMessages(false);
             }
         } catch (error) {
             console.error('Error loading more messages:', error);
-        } finally {
             setLoadingMoreMessages(false);
         }
     }, [loadingMoreMessages, hasMoreMessages, channelInstance, messageLimit, messages]);
@@ -534,7 +541,7 @@ export default function Messages() {
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col h-[calc(100%-200px)] md:h-full">
+            <div className="flex-1 flex flex-col h-[calc(100vh-240px)] md:h-full">
                 <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 bg-zinc-950">
                     <div className="w-full mx-auto">
                         {loadingMoreMessages && (
@@ -574,7 +581,7 @@ export default function Messages() {
                                                     width={32}
                                                     height={32}
                                                     className="object-cover"
-                                                    priority={true}
+                                                    loading="lazy"
                                                 />
                                             </div>
                                         </div>
@@ -591,7 +598,7 @@ export default function Messages() {
                                                     width={32}
                                                     height={32}
                                                     className="object-cover"
-                                                    priority={true}
+                                                    loading="lazy"
                                                 />
                                             </div>
                                             <div>
@@ -614,7 +621,7 @@ export default function Messages() {
                     </div>
                 </div>
 
-                <div className="p-3 border-t border-zinc-800 bg-zinc-950">
+                <div className="p-3 border-t border-zinc-800 bg-zinc-950 sticky bottom-0">
                     <form onSubmit={sendMessage} className="flex items-center">
                         <input
                             type="text"

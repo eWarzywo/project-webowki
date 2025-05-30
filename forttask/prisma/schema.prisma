@@ -27,7 +27,6 @@ model Household {
   chores   Chore[]
   shopping ShoppingItem[]
   events   Event[]
-  messages HouseholdDM[]
 }
 
 model User {
@@ -55,7 +54,6 @@ model User {
   eventsCreated  Event[]
   eventsAttended EventAttendee[]
 
-  householdMessages HouseholdDM[]
   householdOwner    Household?    @relation("HouseholdOwner")
 }
 
@@ -117,18 +115,6 @@ model ShoppingItem {
 
   boughtById Int?
   boughtBy   User? @relation("ShoppingBought", fields: [boughtById], references: [id], onDelete: SetNull)
-
-  householdId Int
-  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
-}
-
-model HouseholdDM {
-  id   Int      @id @default(autoincrement())
-  text String   @db.Text
-  time DateTime @default(now())
-
-  sentById Int
-  sentBy   User @relation(fields: [sentById], references: [id], onDelete: Cascade)
 
   householdId Int
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)

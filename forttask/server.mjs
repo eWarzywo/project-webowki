@@ -14,7 +14,14 @@ app.prepare().then(() => {
         const parsedUrl = parse(req.url, true);
         handle(req, res, parsedUrl);
     });
-    const io = new Server(server);
+    const io = new Server(server, {
+        cors: {
+            origin: '*',
+            methods: ['GET', 'POST'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true,
+        },
+    });
 
     io.on('connection', (socket) => {
 
