@@ -6,34 +6,43 @@ import LogoutButton from '../../components/generalUI/logoutButton';
 
 export default function Page() {
     return (
-        <div className="font-['Inter'] flex flex-col min-h-screen justify-center items-center w-full pt-6 pb-16 md:pb-8 px-2 sm:px-4 md:px-8 border-zinc-800 border rounded-[6px] relative">
-            <div className="fixed sm:absolute bottom-4 left-4 z-10">
+        <div className="flex justify-center items-center w-full px-4 py-8 sm:py-12 bg-zinc-950 relative">
+            <div className="fixed bottom-4 left-4 z-10">
                 <LogoutButton />
             </div>
             <div className="w-full max-w-5xl">
-                <h2 className="text-xl sm:text-2xl font-semibold text-center text-zinc-50 mb-4 sm:mb-8">
-                    Household Management
-                </h2>
-                <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 md:flex-row flex-wrap justify-center items-stretch">
-                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-6 md:p-8 flex flex-col w-full max-w-md min-w-0 flex-1">
-                        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
-                            Create new household
-                        </h3>
-                        <p className="text-center text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
+                <div className="text-center mb-6 sm:mb-8">
+                    <div className="text-zinc-50 text-xl sm:text-2xl font-semibold font-['Inter'] mb-2">
+                        Household Management
+                    </div>
+                    <div className="text-zinc-400 text-sm font-normal font-['Inter']">
+                        Create a new household or join an existing one
+                    </div>
+                </div>
+                <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 justify-center items-center lg:items-stretch">
+                    <div className="w-full max-w-sm bg-zinc-900 border-zinc-800 border rounded-[6px] p-4 sm:p-6 flex flex-col">
+                        <div className="flex justify-center items-center gap-2.5 mb-2">
+                            <div className="text-zinc-50 text-lg sm:text-xl font-semibold font-['Inter']">
+                                Create Household
+                            </div>
+                        </div>
+                        <div className="text-center text-zinc-400 text-xs sm:text-sm font-normal font-['Inter'] mb-4 sm:mb-6">
                             You will become an owner of new household with full administrative privileges.
-                        </p>
+                        </div>
                         <div className="mt-auto w-full">
                             <AddHousehold />
                         </div>
                     </div>
-                    <div className="border-zinc-800 border rounded-[6px] p-4 sm:p-6 md:p-8 flex flex-col w-full max-w-md min-w-0 flex-1">
-                        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-2 sm:mb-4 text-zinc-50 text-center">
-                            Join existing household
-                        </h3>
-                        <p className="text-center text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
+                    <div className="w-full max-w-sm bg-zinc-900 border-zinc-800 border rounded-[6px] p-4 sm:p-6 flex flex-col">
+                        <div className="flex justify-center items-center gap-2.5 mb-2">
+                            <div className="text-zinc-50 text-lg sm:text-xl font-semibold font-['Inter']">
+                                Join Household
+                            </div>
+                        </div>
+                        <div className="text-center text-zinc-400 text-xs sm:text-sm font-normal font-['Inter'] mb-4 sm:mb-6">
                             You are required to have a join code provided by the household owner to connect to an
                             existing group.
-                        </p>
+                        </div>
                         <div className="mt-auto w-full">
                             <JoinHousehold />
                         </div>
@@ -99,28 +108,29 @@ export function AddHousehold() {
             setIsLoading(false);
         }
     };
-
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col w-full">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2.5">
             <input
                 type="text"
                 value={householdName}
                 onChange={(e) => setHouseholdName(e.target.value)}
                 placeholder="Enter household name"
-                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-hidden focus:ring-1 focus:ring-zinc-600"
+                className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] focus:outline-none focus:ring-1 focus:ring-zinc-600"
                 disabled={isLoading || success}
             />
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-sm mb-4">Household created successfully! Redirecting...</p>}
             <button
                 type="submit"
                 disabled={isLoading || success}
-                className={`h-10 w-full px-4 py-2 text-zinc-50 text-sm font-medium bg-zinc-800 rounded-[6px] transition-colors ${
-                    isLoading || success ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'
-                }`}
+                className={`h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
                 {isLoading ? 'Creating...' : success ? 'Created!' : 'Create Household'}
             </button>
+            {error && <div className="text-sm font-normal font-['Inter'] text-red-500 mt-2">{error}</div>}
+            {success && (
+                <div className="text-sm font-normal font-['Inter'] text-green-500 mt-2">
+                    Household created successfully! Redirecting...
+                </div>
+            )}
         </form>
     );
 }
@@ -176,29 +186,30 @@ export function JoinHousehold() {
             setIsLoading(false);
         }
     };
-
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col w-full">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2.5">
             <input
                 type="text"
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 placeholder="Enter join code"
-                className="border border-zinc-800 bg-zinc-950 text-zinc-400 rounded-[6px] p-3 mb-4 w-full focus:outline-hidden focus:ring-1 focus:ring-zinc-600"
+                className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] focus:outline-none focus:ring-1 focus:ring-zinc-600"
                 disabled={isLoading || success}
                 maxLength={8}
             />
-            {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-            {success && <p className="text-green-500 text-sm mb-4">Successfully joined household! Redirecting...</p>}
             <button
                 type="submit"
                 disabled={isLoading || success}
-                className={`h-10 w-full px-4 py-2 text-zinc-50 text-sm font-medium bg-zinc-800 rounded-[6px] transition-colors ${
-                    isLoading || success ? 'opacity-50 cursor-not-allowed' : 'hover:bg-zinc-700'
-                }`}
+                className={`h-10 w-full px-4 text-zinc-900 text-sm font-normal font-['Inter'] bg-zinc-50 border rounded-[6px] hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
                 {isLoading ? 'Joining...' : success ? 'Joined!' : 'Join Household'}
             </button>
+            {error && <div className="text-sm font-normal font-['Inter'] text-red-500 mt-2">{error}</div>}
+            {success && (
+                <div className="text-sm font-normal font-['Inter'] text-green-500 mt-2">
+                    Successfully joined household! Redirecting...
+                </div>
+            )}
         </form>
     );
 }
