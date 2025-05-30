@@ -27,7 +27,6 @@ model Household {
   chores   Chore[]
   shopping ShoppingItem[]
   events   Event[]
-  messages HouseholdDM[]
 }
 
 model User {
@@ -55,7 +54,6 @@ model User {
   eventsCreated  Event[]
   eventsAttended EventAttendee[]
 
-  householdMessages HouseholdDM[]
   householdOwner    Household?    @relation("HouseholdOwner")
 }
 
