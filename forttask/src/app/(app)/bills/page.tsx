@@ -158,7 +158,7 @@ export default function Bills() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row w-full self-stretch gap-[10px]">
+            <div className="flex flex-col md:flex-row w-full self-stretch gap-3 py-3">
                 <form
                     onSubmit={handleSubmit}
                     autoComplete="off"

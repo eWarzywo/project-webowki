@@ -102,8 +102,8 @@ export default function Events() {
     };
 
     return (
-        <div className="flex flex-col gap-4 w-full px-2 sm:px-0">
-            <div className="flex flex-col sm:flex-row w-full gap-4">
+        <div className="flex flex-col gap-4 w-full px-2 sm:px-0 py-3">
+            <div className="flex flex-col sm:flex-row w-full gap-3">
                 <div className="w-full sm:w-auto">
                     <EventDatePicker onChange={handleDateChange} />
                 </div>

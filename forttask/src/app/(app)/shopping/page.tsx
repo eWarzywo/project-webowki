@@ -105,7 +105,7 @@ export default function Shopping() {
     const [name, setName] = useState<string>('');
     const [cost, setCost] = useState<number>();
     return (
-        <div className="flex flex-col md:flex-row w-full self-stretch gap-4 md:gap-[10px]">
+        <div className="flex flex-col md:flex-row w-full self-stretch gap-3 md:gap-[10px] py-3">
             <form
                 id="shopping-form"
                 autoComplete="off"

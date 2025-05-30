@@ -153,7 +153,7 @@ export default function Chores() {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row w-full self-stretch gap-[10px]">
+            <div className="flex flex-col md:flex-row w-full self-stretch gap-3 py-3">
                 <ChoreLeaderboard refresh={refresh} />
                 <div className="flex-1 flex flex-col">
                     {choreListToggle ? (
