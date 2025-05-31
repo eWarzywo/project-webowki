@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Page() {
+    const router = useRouter();
     return (
         <div className="flex justify-center items-end w-full px-4 py-8 sm:py-12 bg-zinc-950">
             <div className="w-full max-w-md bg-zinc-900 border-zinc-800 border rounded-[6px] p-6 sm:p-8 flex flex-col items-center">
@@ -21,7 +22,7 @@ export default function Page() {
                     <div className="w-full flex flex-col items-center gap-2.5 mt-6">
                         <SignupForm />
                         <button
-                            onClick={() => (window.location.href = '/login')}
+                            onClick={() => router.push('/login')}
                             className="w-full h-10 px-4 py-2 text-zinc-50 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px] hover:bg-zinc-800"
                         >
                             Log In
@@ -130,7 +131,7 @@ function SignupForm() {
                     className="h-10 px-4 w-full text-zinc-400 text-sm font-normal font-['Inter'] bg-zinc-950 border border-zinc-800 rounded-[6px]"
                 />
                 <input
-                    type="email"
+                    type="text"
                     value={email}
                     placeholder="Email"
                     onChange={(e) => setEmail(e.target.value)}

@@ -156,11 +156,23 @@ export default function Bills() {
         setSelectedDate(date);
     };
 
+    const handleReset = () => {
+        setName('');
+        setCost(null);
+        setRecurring(false);
+        setSelectedOption(null);
+        setDescription('');
+        setSelectedDate(null);
+        setError(null);
+        setShowDropdown(false);
+    };
+
     return (
         <>
             <div className="flex flex-col md:flex-row w-full self-stretch gap-3 py-3">
                 <form
                     onSubmit={handleSubmit}
+                    onReset={handleReset}
                     autoComplete="off"
                     autoCorrect="off"
                     id="bills-form"
