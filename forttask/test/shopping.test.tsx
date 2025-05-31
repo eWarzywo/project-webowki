@@ -6,18 +6,6 @@ import ShoppingListHandler from '../src/components/shoppingList/shoppingListHand
 import ShoppingListItem from '../src/components/shoppingList/shoppingListItem';
 import '@testing-library/jest-dom';
 
-vi.mock('../src/components/generalUI/confirmation', () => {
-    return {
-        default: ({ name, onCancel, onConfirm }) => (
-            <div data-testid="mock-confirmation">
-                <p>Mocked confirmation for {name}</p>
-                <button onClick={onCancel} data-testid="cancel-button">Cancel</button>
-                <button onClick={onConfirm} data-testid="confirm-button">Confirm</button>
-            </div>
-        )
-    };
-});
-
 const mockGet = vi.fn().mockImplementation((param) => {
     if (param === 'page') return '1';
     if (param === 'size') return '10';
@@ -64,15 +52,16 @@ vi.mock('next-auth/react', () => ({
 }));
 
 vi.mock('next/image', () => ({
-    default: ({ src, alt, width, height, className, style }: {
+    default: ({ src, alt, width, height, className, style, onClick }: {
         src: string;
         alt: string;
         width: number | string;
         height: number | string;
+        onClick?: () => void;
         className?: string;
         style?: React.CSSProperties;
     }) => {
-        return <img src={src} alt={alt} width={width} height={height} className={className} style={style} />;
+        return <img src={src} alt={alt} width={width} height={height} className={className} style={style} onClick={onClick} />;
     },
 }));
 
@@ -432,62 +421,27 @@ describe('ShoppingListItem Component Tests', () => {
     });
 
     it('should handle delete confirmation', async () => {
-        // Track calls to handleDelete
         const handleDelete = vi.fn();
 
-        // Mock the confirmation component here to make it easily testable
-        vi.mock('../src/components/generalUI/confirmation', () => ({
-            default: ({ name, onCancel, onConfirm }) => (
-                <div data-testid="confirmation-dialog">
-                    <h2>Are you sure?</h2>
-                    <p>Do you really want to delete {name}?</p>
-                    <div>
-                        <button data-testid="cancel-button" onClick={onCancel}>Cancel</button>
-                        <button data-testid="confirm-button" onClick={onConfirm}>Delete</button>
-                    </div>
-                </div>
-            )
-        }));
+        render(<ShoppingListItem id={1} handleDelete={handleDelete} />);
 
-        // We need to re-import the component to use the mocked confirmation
-        const { default: ShoppingListItemWithMock } = await import('../src/components/shoppingList/shoppingListItem');
+        await waitFor(() => expect(screen.queryByText('Loading...')).not.toBeInTheDocument());
 
-        const { container } = render(<ShoppingListItemWithMock id={1} handleDelete={handleDelete} />);
+        expect(screen.queryByText('Are you sure?')).not.toBeInTheDocument();
 
-        // Wait for the item to load
-        await waitFor(() => {
-            expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-        });
+        const deleteButton = screen.getAllByAltText('delete')[0];
+        fireEvent.click(deleteButton);
 
-        // Initially no confirmation dialog should be visible
-        expect(screen.queryByTestId('confirmation-dialog')).not.toBeInTheDocument();
+        await waitFor(() => expect(screen.getByText('Are you sure?')).toBeInTheDocument());
 
-        // Find and click the delete button
-        const deleteButtons = screen.getAllByAltText('delete');
-        expect(deleteButtons.length).toBeGreaterThan(0);
+        fireEvent.click(screen.getByText('Delete'));
 
-        // Click the delete button to open the confirmation dialog
-        fireEvent.click(deleteButtons[0]);
-
-        // Now the confirmation dialog should be visible
-        const dialog = await screen.findByTestId('confirmation-dialog');
-        expect(dialog).toBeInTheDocument();
-
-        // Find the confirm button and click it
-        const confirmButton = screen.getByTestId('confirm-button');
-        fireEvent.click(confirmButton);
-
-        // Verify handleDelete was called
         expect(handleDelete).toHaveBeenCalledTimes(1);
-
-        // Clean up mocks
-        vi.resetModules();
     });
 
     it('should show details box for bought items and handle unbought', async () => {
         const emitUpdate = vi.fn();
 
-        // Mock fetch to return a bought item
         global.fetch = createMockFetch({
             shoppingItemDetailsResponse: {
                 id: 3,
@@ -505,11 +459,9 @@ describe('ShoppingListItem Component Tests', () => {
             expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
         });
 
-        // Should show question mark button for bought items
-        const detailsButton = screen.getByText('?');
-        fireEvent.click(detailsButton);
+        const detailsButton = screen.getAllByText('?');
+        fireEvent.click(detailsButton[0]);
 
-        // Details box should appear
         expect(screen.getByText('Item Details')).toBeInTheDocument();
         expect(screen.getByText('Item name: Eggs')).toBeInTheDocument();
         expect(screen.getByText('Cost: 3.49$')).toBeInTheDocument();
@@ -517,7 +469,6 @@ describe('ShoppingListItem Component Tests', () => {
         expect(screen.getByText('Bought by: testuser')).toBeInTheDocument();
         expect(screen.getByText(/Bought at: .+/)).toBeInTheDocument();
 
-        // Click unbought button
         const unboughtButton = screen.getByText('Mark as Unbought');
         fireEvent.click(unboughtButton);
 
@@ -534,7 +485,6 @@ describe('ShoppingListItem Component Tests', () => {
     });
 
     it('should close details box when close button is clicked', async () => {
-        // Mock fetch to return a bought item
         global.fetch = createMockFetch({
             shoppingItemDetailsResponse: {
                 id: 3,
@@ -552,13 +502,11 @@ describe('ShoppingListItem Component Tests', () => {
             expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
         });
 
-        // Open details box
-        const detailsButton = screen.getByText('?');
-        fireEvent.click(detailsButton);
+        const detailsButton = screen.getAllByText('?');
+        fireEvent.click(detailsButton[0]);
 
         expect(screen.getByText('Item Details')).toBeInTheDocument();
 
-        // Close details box
         const closeButton = screen.getByText('Close');
         fireEvent.click(closeButton);
 
