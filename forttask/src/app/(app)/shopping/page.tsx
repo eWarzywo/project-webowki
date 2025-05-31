@@ -104,13 +104,20 @@ export default function Shopping() {
     }
     const [name, setName] = useState<string>('');
     const [cost, setCost] = useState<number>();
+
+    const handleReset = () => {
+        setName('');
+        setCost(undefined);
+    };
+
     return (
-        <div className="flex flex-col md:flex-row w-full self-stretch gap-4 md:gap-[10px]">
+        <div className="flex flex-col md:flex-row w-full self-stretch gap-3 md:gap-[10px] py-3">
             <form
                 id="shopping-form"
                 autoComplete="off"
                 autoCorrect="off"
                 onSubmit={handleSubmit}
+                onReset={handleReset}
                 className="w-full md:w-1/3 lg:w-1/4 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px] mb-4 md:mb-0"
             >
                 <div className="flex p-6 flex-col items-start justify-start w-full">
@@ -118,8 +125,8 @@ export default function Shopping() {
                     <h4 className="text-zinc-400 mt-1.5 text-sm">Add a new item to your shopping list</h4>
                 </div>
                 <div className="px-6 pb-6 space-y-4 flex flex-col items-start w-full">
-                    <div className="flex flex-col items-start justify-start w-full gap-2.5 mt-1.5">
-                        <label className="text-zinc-50 text-sm px-1" htmlFor="name">
+                    <div className="flex flex-col items-start justify-start w-full">
+                        <label htmlFor="name">
                             Name
                         </label>
                         <input
@@ -132,8 +139,8 @@ export default function Shopping() {
                             className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden w-full"
                         />
                     </div>
-                    <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                        <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
+                    <div className="flex flex-col items-start justify-start w-full">
+                        <label htmlFor="cost">
                             Cost
                         </label>
                         <div
@@ -154,7 +161,7 @@ export default function Shopping() {
                             <span className="text-zinc-400 ml-2">$</span>
                         </div>
                     </div>
-                    <div className="flex w-full gap-[10px] justify-between items-center">
+                    <div className="flex w-full gap-2 justify-between items-center">
                         <input
                             type="reset"
                             value="Cancel"
@@ -166,9 +173,7 @@ export default function Shopping() {
                             className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-1/2"
                         />
                     </div>
-                    <div id="error" className="text-red-500 text-sm">
-                        {errorMessage}
-                    </div>
+                    {errorMessage && <p className="text-red-500 text-sm pb-1">{errorMessage}</p>}
                 </div>
             </form>
             <div className="w-full md:flex-1">

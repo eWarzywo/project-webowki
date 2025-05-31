@@ -272,6 +272,8 @@ FortTask provides the following API endpoints:
 - `/api/bill/details` - Gets details of a bill
 - `/api/bill/paidToggle` - Changes status of a bill to paid or not paid
 - `/api/bill/totalNumber` - Returns number of all bills in household
+- `/api/bill/mobile/paid` - Retrieves paid bills for mobile version of Forttask
+- - `/api/bill/mobile/notpaid` - Retrieves not paid bills for mobile version of Forttask 
 
 ### Shopping List
 - `/api/shoppingList` - Shopping list management
