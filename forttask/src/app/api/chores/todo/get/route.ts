@@ -8,11 +8,11 @@ export async function GET(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json({message: 'You must be logged in to view chores'}, {status: 401});
+            return NextResponse.json({ message: 'You must be logged in to view chores' }, { status: 401 });
         }
 
         if (!session.user?.householdId) {
-            return NextResponse.json({message: 'You must be a part of a household to view chores'}, {status: 401});
+            return NextResponse.json({ message: 'You must be a part of a household to view chores' }, { status: 401 });
         }
 
         const householdId = parseInt(session.user.householdId);
@@ -43,18 +43,15 @@ export async function GET(req: Request) {
             },
             ...(skip !== undefined && { skip }),
             ...(limit !== undefined && { take: limit }),
-            orderBy: [
-                { priority: 'asc' },
-                { dueDate: 'asc' }
-            ],
+            orderBy: [{ priority: 'asc' }, { dueDate: 'asc' }],
         });
 
         return NextResponse.json({
             chores,
-            count
+            count,
         });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({error: 'Internal Server Error'}, {status: 500});
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

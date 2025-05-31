@@ -24,7 +24,6 @@ app.prepare().then(() => {
     });
 
     io.on('connection', (socket) => {
-
         socket.on('join-household', (householdId) => {
             socket.join(`household-${householdId}`);
         });
@@ -49,8 +48,7 @@ app.prepare().then(() => {
             io.to(`household-${householdId}`).emit('update-chores', householdId);
         });
 
-        socket.on('disconnect', () => {
-        });
+        socket.on('disconnect', () => {});
     });
 
     server.listen(PORT, (err) => {

@@ -15,7 +15,7 @@ vi.mock('next/navigation', () => ({
 
 const mockSignOut = vi.fn();
 vi.mock('next-auth/react', () => ({
-    signOut: (options?: { callbackUrl?: string; redirect?: boolean }) => mockSignOut(options)
+    signOut: (options?: { callbackUrl?: string; redirect?: boolean }) => mockSignOut(options),
 }));
 
 describe('Logout Functionality Tests', () => {
@@ -25,23 +25,23 @@ describe('Logout Functionality Tests', () => {
 
     it('should render the logout button', () => {
         render(<LogoutButton />);
-        
+
         const logoutButton = screen.getByRole('button', { name: /logout/i });
         expect(logoutButton).toBeInTheDocument();
     });
 
     it('should navigate to logout page when logout button is clicked', () => {
         render(<LogoutButton />);
-        
+
         const logoutButton = screen.getByRole('button', { name: /logout/i });
         fireEvent.click(logoutButton);
-        
+
         expect(mockPush).toHaveBeenCalledWith('/logout');
     });
 
     it('should render the logout confirmation page', () => {
         render(<LogoutPage />);
-        
+
         expect(screen.getByText('Logout')).toBeInTheDocument();
         expect(screen.getByText('Are you sure you want to log out?')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /log out/i })).toBeInTheDocument();
@@ -50,12 +50,12 @@ describe('Logout Functionality Tests', () => {
 
     it('should handle logout when confirmed', async () => {
         mockSignOut.mockResolvedValueOnce({});
-        
+
         render(<LogoutPage />);
-        
+
         const logoutButton = screen.getByRole('button', { name: /log out/i });
         fireEvent.click(logoutButton);
-        
+
         await waitFor(() => {
             expect(mockSignOut).toHaveBeenCalledWith({ redirect: false });
             expect(mockPush).toHaveBeenCalledWith('/login');
@@ -64,24 +64,24 @@ describe('Logout Functionality Tests', () => {
 
     it('should navigate back to dashboard when cancelled', () => {
         render(<LogoutPage />);
-        
+
         const cancelButton = screen.getByRole('button', { name: /cancel/i });
         fireEvent.click(cancelButton);
-        
+
         expect(mockPush).toHaveBeenCalledWith('/');
     });
 
     it('should show loading state while logging out', async () => {
-        const signOutPromise = new Promise(resolve => setTimeout(() => resolve({}), 100));
+        const signOutPromise = new Promise((resolve) => setTimeout(() => resolve({}), 100));
         mockSignOut.mockReturnValueOnce(signOutPromise);
-        
+
         render(<LogoutPage />);
-        
+
         const logoutButton = screen.getByRole('button', { name: /log out/i });
         fireEvent.click(logoutButton);
-        
+
         expect(screen.getByText('Logging out...')).toBeInTheDocument();
-        
+
         await waitFor(() => {
             expect(mockSignOut).toHaveBeenCalled();
         });

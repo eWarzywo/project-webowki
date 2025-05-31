@@ -46,9 +46,7 @@ export async function GET(req: Request) {
             orderBy: { createdAt: 'desc' },
             skip: skip,
             take: limit,
-            include: { createdBy: true,
-                boughtBy: true,
-             },
+            include: { createdBy: true, boughtBy: true },
         });
 
         return NextResponse.json(shoppingItems, { status: 200 });

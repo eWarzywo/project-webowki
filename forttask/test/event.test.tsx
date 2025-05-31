@@ -59,7 +59,7 @@ const mockEvents = [
         attendees: [{ userId: 1, eventId: 1, user: { id: 1, username: 'testuser' } }],
         createdById: 1,
         cycle: 0,
-        householdId: 1
+        householdId: 1,
     },
     {
         id: 2,
@@ -70,7 +70,7 @@ const mockEvents = [
         attendees: [],
         createdById: 1,
         cycle: 0,
-        householdId: 1
+        householdId: 1,
     },
 ];
 
@@ -99,20 +99,15 @@ const createMockFetch = (options = {}) => {
     const responses = { ...defaultResponses, ...options };
 
     return vi.fn().mockImplementation((input: RequestInfo | URL) => {
-        const url = typeof input === 'string'
-            ? input
-            : input instanceof URL
-                ? input.toString()
-                : input.url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
         if (url.includes('/api/user/get')) {
             return Promise.resolve(new Response(JSON.stringify(responses.userResponse)));
         } else if (url.includes('/api/events/get')) {
             if ('error' in responses.eventsResponse) {
-                return Promise.resolve(new Response(
-                    JSON.stringify({ message: responses.eventsResponse.error }),
-                    { status: 500 }
-                ));
+                return Promise.resolve(
+                    new Response(JSON.stringify({ message: responses.eventsResponse.error }), { status: 500 }),
+                );
             }
             return Promise.resolve(new Response(JSON.stringify(responses.eventsResponse)));
         } else if (url.includes('/api/household/users/get')) {
@@ -133,12 +128,12 @@ describe('Events Page Tests', () => {
     });
 
     it('should show loading state initially', async () => {
-        render(<Events/>);
+        render(<Events />);
         expect(screen.getByText(/loading/i)).toBeInTheDocument();
     });
 
     it('should fetch and display events', async () => {
-        render(<Events/>);
+        render(<Events />);
         await waitFor(() => expect(screen.queryByText(/event list/i)).toBeInTheDocument());
         expect(screen.getByText(/test event/i)).toBeInTheDocument();
         expect(screen.getByText(/another event/i)).toBeInTheDocument();
@@ -146,19 +141,19 @@ describe('Events Page Tests', () => {
 
     it('should show no events message when there are no events', async () => {
         global.fetch = createMockFetch({
-            eventsResponse: { events: [], count: 0 }
+            eventsResponse: { events: [], count: 0 },
         });
 
-        render(<Events/>);
+        render(<Events />);
         await waitFor(() => expect(screen.queryByText(/no events/i)).toBeInTheDocument());
     });
 
     it('should show error message when fetch fails', async () => {
         global.fetch = createMockFetch({
-            eventsResponse: { error: 'Failed to fetch events' }
+            eventsResponse: { error: 'Failed to fetch events' },
         });
 
-        render(<Events/>);
+        render(<Events />);
         await waitFor(() => expect(screen.queryByText(/error/i)).toBeInTheDocument());
     });
 
@@ -229,10 +224,10 @@ describe('Events Page Tests', () => {
                 expect.objectContaining({
                     method: 'POST',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });
@@ -254,10 +249,10 @@ describe('Events Page Tests', () => {
                 expect.objectContaining({
                     method: 'DELETE',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });

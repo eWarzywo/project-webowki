@@ -58,8 +58,7 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        if (session.user.id !== userId && 
-            String(session.user.householdId) !== householdId) {
+        if (session.user.id !== userId && String(session.user.householdId) !== householdId) {
             return NextResponse.json({ error: 'Unauthorized to remove this user' }, { status: 403 });
         }
 
@@ -74,9 +73,12 @@ export async function DELETE(req: Request) {
         }
 
         if (household.ownerId === parseInt(userId)) {
-            return NextResponse.json({ 
-                error: 'Household owner cannot leave the household. You must delete the household or transfer ownership first.' 
-            }, { status: 400 });
+            return NextResponse.json(
+                {
+                    error: 'Household owner cannot leave the household. You must delete the household or transfer ownership first.',
+                },
+                { status: 400 },
+            );
         }
 
         await prisma.user.update({

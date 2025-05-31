@@ -133,7 +133,11 @@ export default function ShoppingListHandler({ emitUpdate, refresh, setPage, page
             <div className="flex items-start flex-col self-stretch px-8">{renderContent()}</div>
             {Math.ceil(totalItems / itemsPerPage) > 1 && (
                 <span className="flex justify-center items-center w-full mt-5">
-                    <Pagination totalNumberOfItems={totalItems} itemsPerPage={itemsPerPage} key={`pagination-${currentPage}`} />
+                    <Pagination
+                        totalNumberOfItems={totalItems}
+                        itemsPerPage={itemsPerPage}
+                        key={`pagination-${currentPage}`}
+                    />
                 </span>
             )}
         </div>

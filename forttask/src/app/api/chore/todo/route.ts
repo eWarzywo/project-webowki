@@ -8,18 +8,18 @@ export async function PUT(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json({message: 'You must be logged in to modify chores'}, {status: 401});
+            return NextResponse.json({ message: 'You must be logged in to modify chores' }, { status: 401 });
         }
 
         if (!session.user?.householdId) {
-            return NextResponse.json({message: 'You must be part of a household to modify chores'}, {status: 401});
+            return NextResponse.json({ message: 'You must be part of a household to modify chores' }, { status: 401 });
         }
 
         const body = await req.json();
-        const {choreId} = body;
+        const { choreId } = body;
 
         if (!choreId) {
-            return NextResponse.json({message: 'Chore ID is required'}, {status: 400});
+            return NextResponse.json({ message: 'Chore ID is required' }, { status: 400 });
         }
 
         const chore = await prisma.chore.update({
@@ -33,12 +33,12 @@ export async function PUT(req: Request) {
         });
 
         if (!chore) {
-            return NextResponse.json({message: 'Chore not found'}, {status: 404});
+            return NextResponse.json({ message: 'Chore not found' }, { status: 404 });
         }
 
-        return NextResponse.json({message: 'Chore marked as not done', chore});
+        return NextResponse.json({ message: 'Chore marked as not done', chore });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({error: 'Internal Server Error'}, {status: 500});
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

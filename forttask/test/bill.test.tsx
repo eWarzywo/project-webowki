@@ -52,7 +52,15 @@ vi.mock('next-auth/react', () => ({
 }));
 
 vi.mock('next/image', () => ({
-    default: ({ src, alt, width, height, className, style, onClick }: {
+    default: ({
+        src,
+        alt,
+        width,
+        height,
+        className,
+        style,
+        onClick,
+    }: {
         src: string;
         alt: string;
         width: number | string;
@@ -61,7 +69,17 @@ vi.mock('next/image', () => ({
         className?: string;
         style?: React.CSSProperties;
     }) => {
-        return <img src={src} alt={alt} width={width} height={height} className={className} style={style} onClick={onClick} />;
+        return (
+            <img
+                src={src}
+                alt={alt}
+                width={width}
+                height={height}
+                className={className}
+                style={style}
+                onClick={onClick}
+            />
+        );
     },
 }));
 
@@ -69,7 +87,7 @@ const mockBills = [
     {
         id: 1,
         name: 'Electricity',
-        amount: 75.50,
+        amount: 75.5,
         createdBy: { id: 1, username: 'testuser' },
         createdAt: '2025-05-01T14:30:00.000Z',
         updatedAt: null,
@@ -81,7 +99,7 @@ const mockBills = [
     {
         id: 2,
         name: 'Internet',
-        amount: 50.00,
+        amount: 50.0,
         createdBy: { id: 1, username: 'testuser' },
         createdAt: '2025-05-02T10:15:00.000Z',
         updatedAt: null,
@@ -118,15 +136,16 @@ const createMockFetch = (options = {}) => {
     const responses = { ...defaultResponses, ...options };
 
     return vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
-        const url = typeof input === 'string'
-            ? input
-            : input instanceof URL
-                ? input.toString()
-                : input.url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
         if (url === '/api/user/get') {
             return Promise.resolve(new Response(JSON.stringify(responses.userResponse)));
-        } else if (url.includes('/api/bill') && !url.includes('details') && !url.includes('totalNumber') && !url.includes('paidToggle')) {
+        } else if (
+            url.includes('/api/bill') &&
+            !url.includes('details') &&
+            !url.includes('totalNumber') &&
+            !url.includes('paidToggle')
+        ) {
             if (url === '/api/bill' && init?.method === 'POST') {
                 return Promise.resolve(new Response(JSON.stringify(responses.createBillResponse), { status: 201 }));
             } else if (url.includes('/api/bill?id=') && init?.method === 'DELETE') {
@@ -137,7 +156,7 @@ const createMockFetch = (options = {}) => {
             return Promise.resolve(new Response(JSON.stringify(responses.totalNumberResponse)));
         } else if (url.includes('/api/bill/details')) {
             const id = new URL(url, 'http://localhost').searchParams.get('id');
-            const item = mockBills.find(item => item.id === Number(id)) || responses.billDetailsResponse;
+            const item = mockBills.find((item) => item.id === Number(id)) || responses.billDetailsResponse;
             return Promise.resolve(new Response(JSON.stringify(item)));
         } else if (url.includes('/api/bill/paidToggle')) {
             return Promise.resolve(new Response(JSON.stringify(responses.paidToggleResponse)));
@@ -181,26 +200,23 @@ describe('Bills Page Tests', () => {
 
     it('should handle bill form submission', async () => {
         vi.mock('../src/components/generalUI/datePicker', () => ({
-            default: ({ setSelectedDate, handleShowCalendar }: {
+            default: ({
+                setSelectedDate,
+                handleShowCalendar,
+            }: {
                 setSelectedDate: (date: Date) => void;
                 handleShowCalendar: () => void;
                 selectedDate: Date | null;
             }) => (
                 <div data-testid="mock-date-picker">
-                    <button
-                        onClick={() => setSelectedDate(new Date('2025-05-31'))}
-                        data-testid="select-date-button"
-                    >
+                    <button onClick={() => setSelectedDate(new Date('2025-05-31'))} data-testid="select-date-button">
                         Select
                     </button>
-                    <button
-                        onClick={handleShowCalendar}
-                        data-testid="close-calendar"
-                    >
+                    <button onClick={handleShowCalendar} data-testid="close-calendar">
                         Close
                     </button>
                 </div>
-            )
+            ),
         }));
 
         const { default: BillsWithMockedDatePicker } = await import('../src/app/(app)/bills/page');
@@ -233,13 +249,16 @@ describe('Bills Page Tests', () => {
         fireEvent.click(addButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/bill', expect.objectContaining({
-                method: 'POST',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/bill',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                    body: expect.stringMatching(/.*"name":"Rent".*"amount":800.*"dueDate":"2025-05-31.*/),
                 }),
-                body: expect.stringMatching(/.*"name":"Rent".*"amount":800.*"dueDate":"2025-05-31.*/)
-            }));
+            );
 
             expect(emitUpdateMock).toHaveBeenCalled();
         });
@@ -249,26 +268,23 @@ describe('Bills Page Tests', () => {
 
     it('should validate form input and show error messages', async () => {
         vi.mock('../src/components/generalUI/datePicker', () => ({
-            default: ({ setSelectedDate, handleShowCalendar }: {
+            default: ({
+                setSelectedDate,
+                handleShowCalendar,
+            }: {
                 setSelectedDate: (date: Date) => void;
                 handleShowCalendar: () => void;
                 selectedDate: Date | null;
             }) => (
                 <div data-testid="mock-date-picker">
-                    <button
-                        onClick={() => setSelectedDate(new Date('2025-05-31'))}
-                        data-testid="select-date-button"
-                    >
+                    <button onClick={() => setSelectedDate(new Date('2025-05-31'))} data-testid="select-date-button">
                         Select
                     </button>
-                    <button
-                        onClick={handleShowCalendar}
-                        data-testid="close-calendar"
-                    >
+                    <button onClick={handleShowCalendar} data-testid="close-calendar">
                         Close
                     </button>
                 </div>
-            )
+            ),
         }));
 
         const { default: BillsWithMockedDatePicker } = await import('../src/app/(app)/bills/page');
@@ -374,18 +390,20 @@ describe('BillsHandler Component Tests', () => {
     });
 
     it('should handle pagination when there are more than 6 items', async () => {
-        const manyBills = Array(10).fill(null).map((_, i) => ({
-            id: i + 1,
-            name: `Bill ${i + 1}`,
-            amount: 50 + i * 10,
-            createdBy: { id: 1, username: 'testuser' },
-            createdAt: '2025-05-01T14:30:00.000Z',
-            updatedAt: null,
-            dueDate: '2025-05-30T14:30:00.000Z',
-            cycle: 30,
-            description: `Test bill ${i + 1}`,
-            paidBy: null,
-        }));
+        const manyBills = Array(10)
+            .fill(null)
+            .map((_, i) => ({
+                id: i + 1,
+                name: `Bill ${i + 1}`,
+                amount: 50 + i * 10,
+                createdBy: { id: 1, username: 'testuser' },
+                createdAt: '2025-05-01T14:30:00.000Z',
+                updatedAt: null,
+                dueDate: '2025-05-30T14:30:00.000Z',
+                cycle: 30,
+                description: `Test bill ${i + 1}`,
+                paidBy: null,
+            }));
 
         global.fetch = createMockFetch({
             billsResponse: manyBills.slice(0, 6),
@@ -397,16 +415,17 @@ describe('BillsHandler Component Tests', () => {
         await waitFor(() => {
             expect(screen.getAllByText('Bill 1 - 50$')[0]).toBeInTheDocument();
 
-            const paginationContainer = container.querySelector('.pagination') ||
+            const paginationContainer =
+                container.querySelector('.pagination') ||
                 container.querySelector('[aria-label*="pagination"]') ||
                 screen.queryByText(/Page 1 of \d+/) ||
                 screen.queryByText(/1\/\d+/);
 
-            const nextPageButton = screen.queryByRole('button', { name: /next/i }) ||
-                screen.queryByLabelText(/next page/i);
+            const nextPageButton =
+                screen.queryByRole('button', { name: /next/i }) || screen.queryByLabelText(/next page/i);
 
-            const prevPageButton = screen.queryByRole('button', { name: /previous/i }) ||
-                screen.queryByLabelText(/previous page/i);
+            const prevPageButton =
+                screen.queryByRole('button', { name: /previous/i }) || screen.queryByLabelText(/previous page/i);
 
             expect(paginationContainer || nextPageButton || prevPageButton).toBeTruthy();
 
@@ -435,12 +454,15 @@ describe('BillsHandler Component Tests', () => {
         fireEvent.click(confirmButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/bill?id=1', expect.objectContaining({
-                method: 'DELETE',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
-                })
-            }));
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/bill?id=1',
+                expect.objectContaining({
+                    method: 'DELETE',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                }),
+            );
             expect(emitUpdate).toHaveBeenCalled();
         });
     });
@@ -454,7 +476,7 @@ describe('BillRecord Component Tests', () => {
 
     it('should display bill information correctly', () => {
         const handleDelete = vi.fn();
-        render(<BillRecord id={1} name="Electricity" cost={75.50} addedBy="testuser" onDelete={handleDelete} />);
+        render(<BillRecord id={1} name="Electricity" cost={75.5} addedBy="testuser" onDelete={handleDelete} />);
 
         expect(screen.getAllByText('Electricity - 75.5$')[0]).toBeInTheDocument();
         expect(screen.getAllByText('Added by: testuser')[0]).toBeInTheDocument();
@@ -462,7 +484,7 @@ describe('BillRecord Component Tests', () => {
 
     it('should show details box when details button is clicked', async () => {
         const handleDelete = vi.fn();
-        render(<BillRecord id={1} name="Electricity" cost={75.50} addedBy="testuser" onDelete={handleDelete} />);
+        render(<BillRecord id={1} name="Electricity" cost={75.5} addedBy="testuser" onDelete={handleDelete} />);
 
         const detailsButtons = screen.getAllByAltText('details');
         fireEvent.click(detailsButtons[0]);
@@ -487,7 +509,7 @@ describe('BillRecord Component Tests', () => {
     it('should handle marking a bill as paid', async () => {
         const handleDelete = vi.fn();
         const emitUpdate = vi.fn();
-        render(<BillRecord id={1} name="Electricity" cost={75.50} addedBy="testuser" onDelete={handleDelete} />);
+        render(<BillRecord id={1} name="Electricity" cost={75.5} addedBy="testuser" onDelete={handleDelete} />);
 
         const detailsButtons = screen.getAllByAltText('details');
         fireEvent.click(detailsButtons[0]);
@@ -500,19 +522,22 @@ describe('BillRecord Component Tests', () => {
         fireEvent.click(markAsPaidButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/bill/paidToggle', expect.objectContaining({
-                method: 'PUT',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/bill/paidToggle',
+                expect.objectContaining({
+                    method: 'PUT',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                    body: JSON.stringify({ id: 1, paid: true }),
                 }),
-                body: JSON.stringify({ id: 1, paid: true })
-            }));
+            );
         });
     });
 
     it('should handle delete confirmation', async () => {
         const handleDelete = vi.fn();
-        render(<BillRecord id={1} name="Electricity" cost={75.50} addedBy="testuser" onDelete={handleDelete} />);
+        render(<BillRecord id={1} name="Electricity" cost={75.5} addedBy="testuser" onDelete={handleDelete} />);
 
         const deleteButtons = screen.getAllByAltText('delete');
         fireEvent.click(deleteButtons[0]);
@@ -529,7 +554,7 @@ describe('BillRecord Component Tests', () => {
 
     it('should cancel deletion when cancel button is clicked', async () => {
         const handleDelete = vi.fn();
-        render(<BillRecord id={1} name="Electricity" cost={75.50} addedBy="testuser" onDelete={handleDelete} />);
+        render(<BillRecord id={1} name="Electricity" cost={75.5} addedBy="testuser" onDelete={handleDelete} />);
 
         const deleteButtons = screen.getAllByAltText('delete');
         fireEvent.click(deleteButtons[0]);

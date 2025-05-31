@@ -201,7 +201,7 @@ export async function DELETE(req: Request) {
                     householdId: null,
                 },
             });
-            
+
             await prisma.user.updateMany({
                 where: {
                     householdId: parseInt(householdId),

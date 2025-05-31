@@ -126,9 +126,7 @@ export default function Shopping() {
                 </div>
                 <div className="px-6 pb-6 space-y-4 flex flex-col items-start w-full">
                     <div className="flex flex-col items-start justify-start w-full">
-                        <label htmlFor="name">
-                            Name
-                        </label>
+                        <label htmlFor="name">Name</label>
                         <input
                             onChange={(e) => setName(e.target.value)}
                             value={name}
@@ -140,9 +138,7 @@ export default function Shopping() {
                         />
                     </div>
                     <div className="flex flex-col items-start justify-start w-full">
-                        <label htmlFor="cost">
-                            Cost
-                        </label>
+                        <label htmlFor="cost">Cost</label>
                         <div
                             id="costdiv"
                             className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between w-full"
@@ -178,7 +174,12 @@ export default function Shopping() {
             </form>
             <div className="w-full md:flex-1">
                 {!addedToggle && (
-                    <ShoppingListHandler emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')} refresh={shoppingRefresh} setPage={handlePageChange} page={page} />
+                    <ShoppingListHandler
+                        emitUpdate={() => householdId && emitUpdate(householdId, 'shopping')}
+                        refresh={shoppingRefresh}
+                        setPage={handlePageChange}
+                        page={page}
+                    />
                 )}
             </div>
         </div>

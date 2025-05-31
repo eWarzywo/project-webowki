@@ -20,7 +20,7 @@ describe('Signup Page Tests', () => {
         (global.fetch as jest.Mock).mockResolvedValue({
             ok: true,
             json: async () => ({ success: true }),
-            text: async () => JSON.stringify({ success: true })
+            text: async () => JSON.stringify({ success: true }),
         });
     });
 
@@ -128,18 +128,21 @@ describe('Signup Page Tests', () => {
         fireEvent.click(signupButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/user', expect.objectContaining({
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'test@example.com',
-                    password: 'password123'
-                })
-            }));
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/user',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        email: 'test@example.com',
+                        password: 'password123',
+                    }),
+                }),
+            );
             expect(mockPush).toHaveBeenCalledWith('/login');
         });
     });
@@ -149,8 +152,8 @@ describe('Signup Page Tests', () => {
         (global.fetch as jest.Mock).mockImplementationOnce(() =>
             Promise.resolve({
                 ok: false,
-                text: async () => JSON.stringify({ message: errorMessage })
-            })
+                text: async () => JSON.stringify({ message: errorMessage }),
+            }),
         );
 
         render(<SignupPage />);

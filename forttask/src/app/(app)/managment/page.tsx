@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-
 interface User {
     id: number;
     username: string;
@@ -212,22 +211,27 @@ function AccountContent() {
     );
 }
 
-
 function ProfilePicture() {
     const { data: session } = useSession();
-    const [profilePictures, setProfilePictures] = useState<{ id: number; name: string; imageUrl: string; category: string | null }[]>([]);
+    const [profilePictures, setProfilePictures] = useState<
+        { id: number; name: string; imageUrl: string; category: string | null }[]
+    >([]);
     const [selectedPicture, setSelectedPicture] = useState<number | null>(null);
-    const [currentPicture, setCurrentPicture] = useState<{ id: number; name: string; imageUrl: string; category: string | null } | null>(null);
+    const [currentPicture, setCurrentPicture] = useState<{
+        id: number;
+        name: string;
+        imageUrl: string;
+        category: string | null;
+    } | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState({ text: '', type: '' });
-
 
     const defaultAvatar = {
         id: 0,
         name: 'Default Avatar',
         imageUrl: '/images/avatars/defaultAvatar.png',
-        category: 'default'
+        category: 'default',
     };
 
     useEffect(() => {
@@ -239,9 +243,9 @@ function ProfilePicture() {
                     throw new Error('Failed to fetch profile pictures');
                 }
                 const picData = await picResponse.json();
-                
+
                 if (picData.profilePictures) {
-                    const uniquePictures = picData.profilePictures
+                    const uniquePictures = picData.profilePictures;
                     setProfilePictures(uniquePictures);
                 }
 
@@ -321,7 +325,9 @@ function ProfilePicture() {
                     {message.text && (
                         <div
                             className={`mb-4 p-2 rounded-[6px] ${
-                                message.type === 'error' ? 'bg-red-900/50 text-red-200' : 'bg-green-900/50 text-green-200'
+                                message.type === 'error'
+                                    ? 'bg-red-900/50 text-red-200'
+                                    : 'bg-green-900/50 text-green-200'
                             }`}
                         >
                             {message.text}
@@ -346,15 +352,13 @@ function ProfilePicture() {
 
                     <div className="mb-6">
                         <h3 className="text-lg font-semibold mb-3">Choose a New Avatar</h3>
-                        
+
                         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-4">
                             <div
                                 key="default-avatar"
                                 onClick={() => handleSelectPicture(0)}
                                 className={`cursor-pointer transition-all duration-200 p-1 rounded-lg ${
-                                    selectedPicture === 0
-                                        ? 'bg-blue-500/20 ring-2 ring-blue-500'
-                                        : 'hover:bg-zinc-800'
+                                    selectedPicture === 0 ? 'bg-blue-500/20 ring-2 ring-blue-500' : 'hover:bg-zinc-800'
                                 }`}
                             >
                                 <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full overflow-hidden bg-zinc-800">
@@ -366,7 +370,7 @@ function ProfilePicture() {
                                 </div>
                                 <p className="text-xs text-center mt-1 truncate">{defaultAvatar.name}</p>
                             </div>
-                            
+
                             {profilePictures.map((picture) => (
                                 <div
                                     key={picture.id}
@@ -396,7 +400,11 @@ function ProfilePicture() {
                                 saving ? 'opacity-50 cursor-not-allowed' : ''
                             }`}
                             onClick={handleSaveProfilePicture}
-                            disabled={saving || (selectedPicture === currentPicture?.id || (selectedPicture === 0 && currentPicture === null))}
+                            disabled={
+                                saving ||
+                                selectedPicture === currentPicture?.id ||
+                                (selectedPicture === 0 && currentPicture === null)
+                            }
                         >
                             {saving ? 'Saving...' : 'Save Profile Picture'}
                         </button>
@@ -406,7 +414,6 @@ function ProfilePicture() {
         </div>
     );
 }
-
 
 function HouseholdContent() {
     const { data: session } = useSession();
@@ -703,7 +710,10 @@ function HouseholdContent() {
                             ) : (
                                 <ul className="divide-y divide-zinc-800">
                                     {users.map((user) => (
-                                        <li key={user.id} className="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between">
+                                        <li
+                                            key={user.id}
+                                            className="py-3 flex flex-wrap sm:flex-nowrap items-center justify-between"
+                                        >
                                             <div className="w-full sm:w-auto mb-2 sm:mb-0">
                                                 <span className="break-all">{user.username || user.email}</span>
                                                 {user.id === household.ownerId && (

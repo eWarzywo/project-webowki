@@ -38,7 +38,7 @@ vi.mock('@/lib/socket', () => ({
         billsRefresh: false,
         choresRefresh: false,
         joinHousehold: mockJoinHousehold,
-        leaveHousehold: mockLeaveHousehold
+        leaveHousehold: mockLeaveHousehold,
     }),
 }));
 
@@ -145,16 +145,12 @@ describe('Dashboard Page Tests', () => {
     it('should handle error when fetching household ID fails', async () => {
         console.error = vi.fn();
 
-        (global.fetch as Mock).mockRejectedValueOnce(
-            new Error('Failed to fetch household ID')
-        );
+        (global.fetch as Mock).mockRejectedValueOnce(new Error('Failed to fetch household ID'));
 
         render(<Dashboard />);
 
         await waitFor(() => {
-            expect(console.error).toHaveBeenCalledWith(
-                'Error fetching household ID:', expect.any(Error)
-            );
+            expect(console.error).toHaveBeenCalledWith('Error fetching household ID:', expect.any(Error));
         });
     });
 
@@ -170,7 +166,7 @@ describe('Dashboard Page Tests', () => {
 
         await waitFor(() => {
             expect(console.error).toHaveBeenCalledWith(
-                expect.stringContaining('Failed to fetch household ID, Status: 404')
+                expect.stringContaining('Failed to fetch household ID, Status: 404'),
             );
         });
     });

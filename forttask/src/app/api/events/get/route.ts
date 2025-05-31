@@ -17,7 +17,7 @@ export async function GET(req: Request) {
             return NextResponse.json({ message: 'You must be a part of a household to view events' }, { status: 401 });
         }
 
-        const url = new URL(req.url)
+        const url = new URL(req.url);
         const searchParams = url.searchParams;
         const date = searchParams.get('date');
         const dateObj = date ? new Date(date) : false;
@@ -41,7 +41,7 @@ export async function GET(req: Request) {
         };
 
         const count = await prisma.event.count({
-            where: whereClause
+            where: whereClause,
         });
 
         const events = await prisma.event.findMany({

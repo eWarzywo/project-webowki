@@ -174,7 +174,7 @@ export default function Messages() {
                             } else {
                                 setLoading(false);
                             }
-                            
+
                             householdChannel.off('message.new');
 
                             householdChannel.on('message.new', (event) => {

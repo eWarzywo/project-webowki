@@ -3,11 +3,11 @@ import { render, screen } from '@testing-library/react';
 import Footer from '../src/components/generalUI/footer';
 
 vi.mock('../src/components/generalUI/messageLink', () => ({
-    default: () => <div data-testid="message-link-mock">Message Link Mock</div>
+    default: () => <div data-testid="message-link-mock">Message Link Mock</div>,
 }));
 
 vi.mock('../src/components/generalUI/logoutButton', () => ({
-    default: () => <div data-testid="logout-button-mock">Logout Button Mock</div>
+    default: () => <div data-testid="logout-button-mock">Logout Button Mock</div>,
 }));
 
 describe('Footer Component', () => {
