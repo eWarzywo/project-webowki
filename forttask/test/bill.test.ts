@@ -3,6 +3,8 @@ import { GET, POST, DELETE } from '../src/app/api/bill/route';
 import { GET as GET_Details } from '../src/app/api/bill/details/route';
 import { GET as GET_TotalNumber } from '../src/app/api/bill/totalNumber/route';
 import { PUT } from '../src/app/api/bill/paidToggle/route';
+import { GET as GET_Mobile_Paid } from '../src/app/api/bill/mobile/paid/route';
+import { GET as GET_Mobile_NotPaid } from '../src/app/api/bill/mobile/notpaid/route';
 import prisma from '../libs/__mocks__/prisma';
 import { getServerSession } from 'next-auth/next';
 import { Prisma } from '@prisma/client';
@@ -1046,5 +1048,503 @@ describe('Bill PUT Paid Toggle API', () => {
         expect(response.status).toBe(200);
         const data = await response.json();
         expect(data).toEqual({message: 'Bill updated successfully', bill: serializedBill});
+    });
+});
+
+describe('Bill Mobile GET Paid API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const {searchParams = {}, body = {}} = options;
+
+        const url = new URL('http://localhost:3000/api/bill/mobile/paid');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
+
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data).toEqual({message: 'You must be logged in to get the bills'});
+    });
+
+    it('should return 404 if user is not found', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(404);
+        const data = await response.json();
+        expect(data).toEqual({message: 'User not found'});
+    });
+
+    it('should return 403 if user is not a member of a household', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: null
+        });
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(403);
+        const data = await response.json();
+        expect(data).toEqual({message: 'You must be a member of a household to get the bills'});
+    });
+
+    it('should return 200 and the list of paid bills', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const mockBills = [
+            {
+                id: 1,
+                name: 'Bill 1',
+                amount: Prisma.Decimal(100),
+                cycle: 1,
+                dueDate: new Date('2023-10-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 1',
+                householdId: 1,
+                paidById: 2,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+            {
+                id: 2,
+                name: 'Bill 2',
+                amount: Prisma.Decimal(200),
+                cycle: 1,
+                dueDate: new Date('2023-11-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 2',
+                householdId: 1,
+                paidById: 3,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+        ];
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
+
+        const serializedBills = JSON.parse(JSON.stringify(mockBills));
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data).toEqual(serializedBills);
+        expect(prisma.bill.findMany).toHaveBeenCalledWith({
+            where: {
+                householdId: 1,
+                paidById: { not: null },
+            },
+            skip: 0,
+            take: undefined,
+            orderBy: {
+                dueDate: 'asc',
+            },
+            include: {
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
+    });
+
+    it('should handle skip and limit parameters', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const mockBills = [
+            {
+                id: 1,
+                name: 'Bill 1',
+                amount: Prisma.Decimal(100),
+                cycle: 1,
+                dueDate: new Date('2023-10-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 1',
+                householdId: 1,
+                paidById: 2,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+        ];
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
+
+        const serializedBills = JSON.parse(JSON.stringify(mockBills));
+
+        const request = createMockRequest({ searchParams: { skip: '5', limit: '10' } });
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data).toEqual(serializedBills);
+        expect(prisma.bill.findMany).toHaveBeenCalledWith({
+            where: {
+                householdId: 1,
+                paidById: { not: null },
+            },
+            skip: 5,
+            take: 10,
+            orderBy: {
+                dueDate: 'asc',
+            },
+            include: {
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
+    });
+
+    it('should return 500 if an error occurs', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        vi.mocked(prisma.bill.findMany).mockRejectedValueOnce(new Error('Database error'));
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_Paid(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data).toEqual({error: 'Internal Server Error'});
+    });
+});
+
+describe('Bill Mobile GET NotPaid API', () => {
+    beforeEach(() => {
+        vi.resetAllMocks();
+    });
+
+    const createMockRequest = (options: MockRequestOptions): Request => {
+        const {searchParams = {}, body = {}} = options;
+
+        const url = new URL('http://localhost:3000/api/bill/mobile/notpaid');
+        Object.entries(searchParams).forEach(([key, value]) => {
+            url.searchParams.append(key, value);
+        });
+
+        return {
+            url: url.toString(),
+            json: () => Promise.resolve(body),
+        } as unknown as Request;
+    };
+
+    it('should return 401 if user is not logged in', async () => {
+        vi.mocked(getServerSession).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(401);
+        const data = await response.json();
+        expect(data).toEqual({message: 'You must be logged in to get the bills'});
+    });
+
+    it('should return 404 if user is not found', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(404);
+        const data = await response.json();
+        expect(data).toEqual({message: 'User not found'});
+    });
+
+    it('should return 403 if user is not a member of a household', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const request = createMockRequest({});
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: null
+        });
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(403);
+        const data = await response.json();
+        expect(data).toEqual({message: 'You must be a member of a household to get the bills'});
+    });
+
+    it('should return 200 and the list of unpaid bills', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const mockBills = [
+            {
+                id: 1,
+                name: 'Bill 1',
+                amount: Prisma.Decimal(100),
+                cycle: 1,
+                dueDate: new Date('2023-10-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 1',
+                householdId: 1,
+                paidById: null,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+            {
+                id: 2,
+                name: 'Bill 2',
+                amount: Prisma.Decimal(200),
+                cycle: 1,
+                dueDate: new Date('2023-11-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 2',
+                householdId: 1,
+                paidById: null,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+        ];
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
+
+        const serializedBills = JSON.parse(JSON.stringify(mockBills));
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data).toEqual(serializedBills);
+        expect(prisma.bill.findMany).toHaveBeenCalledWith({
+            where: {
+                householdId: 1,
+                paidById: null,
+            },
+            skip: 0,
+            take: undefined,
+            orderBy: {
+                dueDate: 'asc',
+            },
+            include: {
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
+    });
+
+    it('should handle skip and limit parameters', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        const mockBills = [
+            {
+                id: 1,
+                name: 'Bill 1',
+                amount: Prisma.Decimal(100),
+                cycle: 1,
+                dueDate: new Date('2023-10-01'),
+                createdById: 1,
+                createdAt: new Date('2023-10-01'),
+                updatedAt: new Date('2023-10-01'),
+                description: 'Test bill 1',
+                householdId: 1,
+                paidById: null,
+                createdBy: {
+                    username: 'testuser'
+                }
+            },
+        ];
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
+
+        const serializedBills = JSON.parse(JSON.stringify(mockBills));
+
+        const request = createMockRequest({ searchParams: { skip: '5', limit: '10' } });
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(200);
+        const data = await response.json();
+        expect(data).toEqual(serializedBills);
+        expect(prisma.bill.findMany).toHaveBeenCalledWith({
+            where: {
+                householdId: 1,
+                paidById: null,
+            },
+            skip: 5,
+            take: 10,
+            orderBy: {
+                dueDate: 'asc',
+            },
+            include: {
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+        });
+    });
+
+    it('should return 500 if an error occurs', async () => {
+        const mockSession: MockSession = {
+            user: {id: '1', householdId: '1'},
+        };
+        vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
+
+        vi.mocked(prisma.bill.findMany).mockRejectedValueOnce(new Error('Database error'));
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
+            id: 1,
+            createdAt: new Date('2023-10-01'),
+            username: 'testuser',
+            email: 'test@test.test',
+            passwordHash: 'hashedpassword',
+            profilePictureId: null,
+            householdId: 1
+        });
+
+        const request = createMockRequest({});
+
+        const response = await GET_Mobile_NotPaid(request);
+
+        expect(response.status).toBe(500);
+        const data = await response.json();
+        expect(data).toEqual({error: 'Internal Server Error'});
     });
 });
