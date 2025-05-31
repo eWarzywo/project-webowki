@@ -104,6 +104,12 @@ export default function Shopping() {
     }
     const [name, setName] = useState<string>('');
     const [cost, setCost] = useState<number>();
+
+    const handleReset = () => {
+        setName('');
+        setCost(undefined);
+    };
+
     return (
         <div className="flex flex-col md:flex-row w-full self-stretch gap-3 md:gap-[10px] py-3">
             <form
@@ -111,6 +117,7 @@ export default function Shopping() {
                 autoComplete="off"
                 autoCorrect="off"
                 onSubmit={handleSubmit}
+                onReset={handleReset}
                 className="w-full md:w-1/3 lg:w-1/4 flex flex-col items-center rounded-xl border border-zinc-800 bg-zinc-950 max-h-[400px] mb-4 md:mb-0"
             >
                 <div className="flex p-6 flex-col items-start justify-start w-full">
