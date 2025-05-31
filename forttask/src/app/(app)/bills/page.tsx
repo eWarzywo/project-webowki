@@ -183,8 +183,8 @@ export default function Bills() {
                         <h4 className="text-zinc-400 mt-1.5 text-sm">Add an upcoming bill to pay</h4>
                     </div>
                     <div className="px-6 pb-6 space-y-4 flex flex-col items-start w-full">
-                        <div className="flex flex-col items-start justify-start w-full gap-2.5 mt-1.5">
-                            <label className="text-zinc-50 text-sm px-1" htmlFor="name">
+                        <div className="flex flex-col items-start justify-start w-full">
+                            <label htmlFor="name">
                                 Name
                             </label>
                             <input
@@ -197,8 +197,8 @@ export default function Bills() {
                                 className="py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden w-full"
                             />
                         </div>
-                        <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                            <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
+                        <div className="flex flex-col items-start justify-start w-full">
+                            <label htmlFor="cost">
                                 Cost
                             </label>
                             <div
@@ -219,8 +219,8 @@ export default function Bills() {
                                 <span className="text-zinc-400 ml-2">$</span>
                             </div>
                         </div>
-                        <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                            <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
+                        <div className="flex flex-col items-start justify-start w-full">
+                            <label htmlFor="cost">
                                 Due to
                             </label>
                             <div
@@ -230,8 +230,8 @@ export default function Bills() {
                                 {selectedDate ? selectedDate.toLocaleDateString() : 'Select a date'}
                             </div>
                         </div>
-                        <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                            <label className="text-zinc-50 text-sm px-1" htmlFor="cost">
+                        <div className="flex flex-col items-start justify-start w-full">
+                            <label htmlFor="cost">
                                 Description
                             </label>
                             <textarea
@@ -243,7 +243,7 @@ export default function Bills() {
                                 className="w-full py-2 pl-3 pr-5 border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden min-h-14 max-h-40"
                             />
                         </div>
-                        <div className="flex items-start justify-start w-full mt-1.5 gap-2.5 ">
+                        <div className="flex items-start justify-start w-full">
                             <div className="flex items-center gap-2 px-1">
                                 <div
                                     onClick={() => {
@@ -264,8 +264,8 @@ export default function Bills() {
                             </div>
                         </div>
                         {recurring && (
-                            <div className="flex flex-col items-start justify-start w-full mt-1.5 gap-2.5 ">
-                                <label className="text-zinc-50 text-sm px-1" htmlFor="repeat">
+                            <div className="flex flex-col items-start justify-start w-full">
+                                <label htmlFor="repeat">
                                     Repeat every
                                 </label>
                                 <div className="relative w-full">
@@ -298,7 +298,7 @@ export default function Bills() {
                                 </div>
                             </div>
                         )}
-                        <div className="flex w-full gap-[10px] justify-between items-center">
+                        <div className="flex w-full gap-2 justify-between items-center">
                             <input
                                 type="reset"
                                 value="Cancel"

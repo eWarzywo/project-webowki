@@ -193,7 +193,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                 <label htmlFor="eventDate">Date</label>
                 <div
                     onClick={handleShowCalendar}
-                    className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
+                    className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 flex justify-center align-center border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden cursor-pointer"
                 >
                     {eventDate ? eventDate.toLocaleDateString() : 'Select a date'}
                 </div>
@@ -365,18 +365,18 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                     } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
                 {validationErrors.description && <p className="text-red-500 text-xs mb-2">Description is required</p>}
-                <div className="w-full flex flex-col sm:flex-row justify-between px-0 sm:px-6 pb-2 items-center gap-2">
+                <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-2 mt-2">
                     <input
                         type="reset"
                         value="Cancel"
                         onClick={handleCancel}
-                        className="border rounded-xl gap-2.5 px-4 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
+                        className="border rounded-xl gap-2.5 px-4 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-1/2"
                     />
                     <input
                         type="submit"
                         value="Add"
                         onClick={handleSubmit}
-                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-full sm:w-auto"
+                        className="bg-zinc-50 text-zinc-900 px-4 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-1/2"
                     />
                 </div>
             </form>

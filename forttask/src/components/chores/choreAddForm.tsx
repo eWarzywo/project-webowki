@@ -166,7 +166,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                 <label htmlFor="choreDate">Due to</label>
                 <div
                     onClick={handleShowCalendar}
-                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 ${
+                    className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 flex justify-center items-center ${
                         validationErrors.choreDate ? 'border-red-500' : 'border-zinc-800'
                     } placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden cursor-pointer`}
                 >
@@ -210,7 +210,7 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                     }}
                     className={`py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden`}
                 />
-                <div className="flex flex-row gap-2 py-2 sm:flex-col sm:items-center sm:gap-2 w-full">
+                <div className="flex flex-row gap-2 py-2 sm:items-center sm:gap-2">
                     <label className="cursor-pointer text-zinc-50">Does this chore repeat?</label>
                     <div
                         onClick={() => {
@@ -323,13 +323,13 @@ export default function ChoreAddForm({ onRefresh, emitUpdate }: choreAddFormProp
                         type="reset"
                         value="Cancel"
                         onClick={handleCancel}
-                        className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-full sm:w-auto"
+                        className="border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer w-1/2"
                     />
                     <input
                         type="submit"
                         value="Add"
                         onClick={handleSubmit}
-                        className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-full sm:w-auto"
+                        className="bg-zinc-50 text-zinc-900 px-6 py-2 rounded-xl gap-2.5 hover:bg-zinc-600 hover:text-zinc-200 hover:border hover:border-zinc-200 cursor-pointer text-sm font-medium w-1/2"
                     />
                 </div>
             </form>
