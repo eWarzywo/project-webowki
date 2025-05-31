@@ -193,7 +193,7 @@ export default function EventAddForm({ onRefresh, emitUpdate }: EventAddFormProp
                 <label htmlFor="eventDate">Date</label>
                 <div
                     onClick={handleShowCalendar}
-                    className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 flex justify-center align-center border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden cursor-pointer"
+                    className="py-2 pl-3 pr-5 mb-2 w-full border bg-zinc-950 flex justify-center items-center border-zinc-800 placeholder:text-zinc-400 rounded-xl focus:border-zinc-400 focus:outline-hidden cursor-pointer"
                 >
                     {eventDate ? eventDate.toLocaleDateString() : 'Select a date'}
                 </div>
