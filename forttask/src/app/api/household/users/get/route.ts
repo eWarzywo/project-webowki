@@ -1,5 +1,5 @@
-import {NextResponse} from "next/server";
-import prisma from "../../../../../../libs/prisma";
+import { NextResponse } from 'next/server';
+import prisma from '../../../../../../libs/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../../../auth';
 
@@ -12,7 +12,10 @@ export async function GET() {
         }
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be part of a household to access user info' }, { status: 401 });
+            return NextResponse.json(
+                { message: 'You must be part of a household to access user info' },
+                { status: 401 },
+            );
         }
 
         const householdId = parseInt(session.user.householdId);

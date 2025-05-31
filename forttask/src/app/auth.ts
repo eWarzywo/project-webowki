@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
             const minimalToken = {
                 id: token.id,
                 householdId: token.householdId,
-                username: token.username
+                username: token.username,
             };
 
             if (user) {
@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
                     console.error('Error refreshing household ID:', error);
                 }
             }
-            
+
             if (authOptions.debug) {
                 console.log('JWT callback:', minimalToken);
             }
@@ -94,16 +94,16 @@ export const authOptions: NextAuthOptions = {
                 user: {
                     id: token.id as string,
                     username: '',
-                    householdId: token.householdId as string | null
+                    householdId: token.householdId as string | null,
                 },
-                expires: session.expires 
+                expires: session.expires,
             };
-            
+
             if (!token.username) {
                 try {
                     const user = await prisma.user.findUnique({
                         where: { id: parseInt(token.id as string) },
-                        select: { username: true }
+                        select: { username: true },
                     });
                     minimalSession.user.username = user?.username || '';
                 } catch (error) {
@@ -112,7 +112,7 @@ export const authOptions: NextAuthOptions = {
             } else {
                 minimalSession.user.username = token.username as string;
             }
-            
+
             if (process.env.NODE_ENV === 'development') {
                 console.log('Session callback:', minimalSession);
             }

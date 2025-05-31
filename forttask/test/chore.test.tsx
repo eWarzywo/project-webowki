@@ -151,28 +151,22 @@ const createMockFetch = (options = {}) => {
     const responses = { ...defaultResponses, ...options };
 
     return vi.fn().mockImplementation((input: RequestInfo | URL) => {
-        const url = typeof input === 'string'
-            ? input
-            : input instanceof URL
-                ? input.toString()
-                : input.url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
         if (url.includes('/api/user/get')) {
             return Promise.resolve(new Response(JSON.stringify(responses.userResponse)));
         } else if (url.includes('/api/chores/todo/get')) {
             if ('error' in responses.todoChoresResponse) {
-                return Promise.resolve(new Response(
-                    JSON.stringify({ message: responses.todoChoresResponse.error }),
-                    { status: 500 }
-                ));
+                return Promise.resolve(
+                    new Response(JSON.stringify({ message: responses.todoChoresResponse.error }), { status: 500 }),
+                );
             }
             return Promise.resolve(new Response(JSON.stringify(responses.todoChoresResponse)));
         } else if (url.includes('/api/chores/done/get')) {
             if ('error' in responses.doneChoresResponse) {
-                return Promise.resolve(new Response(
-                    JSON.stringify({ message: responses.doneChoresResponse.error }),
-                    { status: 500 }
-                ));
+                return Promise.resolve(
+                    new Response(JSON.stringify({ message: responses.doneChoresResponse.error }), { status: 500 }),
+                );
             }
             return Promise.resolve(new Response(JSON.stringify(responses.doneChoresResponse)));
         } else if (url.includes('/api/household/users/count-chores-done')) {
@@ -193,7 +187,13 @@ const createMockFetch = (options = {}) => {
 };
 
 vi.mock('next/image', () => ({
-    default: ({ src, alt, width, height, className }: {
+    default: ({
+        src,
+        alt,
+        width,
+        height,
+        className,
+    }: {
         src: string;
         alt: string;
         width: number;
@@ -225,7 +225,7 @@ describe('Chores Page Tests', () => {
 
     it('should show no chores message when there are no to-do chores', async () => {
         global.fetch = createMockFetch({
-            todoChoresResponse: { chores: [], count: 0 }
+            todoChoresResponse: { chores: [], count: 0 },
         });
 
         render(<Chores />);
@@ -234,11 +234,7 @@ describe('Chores Page Tests', () => {
 
     it('should show error message when fetch fails', async () => {
         global.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
-            const url = typeof input === 'string'
-                ? input
-                : input instanceof URL
-                    ? input.toString()
-                    : input.url;
+            const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
             if (url.includes('/api/chores/todo/get')) {
                 return Promise.reject(new Error('Failed to fetch chores'));
@@ -259,13 +255,22 @@ describe('Chores Page Tests', () => {
     });
 
     it('should show chore to-do list', async () => {
-        render(<ChoreToDoList chores={mockChores} totalItems={mockChores.length} toggle={vi.fn()} emitUpdate={vi.fn()} />);
+        render(
+            <ChoreToDoList chores={mockChores} totalItems={mockChores.length} toggle={vi.fn()} emitUpdate={vi.fn()} />,
+        );
         expect(screen.getByText(/chores todo list/i)).toBeInTheDocument();
         expect(screen.getByText(/test chore/i)).toBeInTheDocument();
     });
 
     it('should show chore done list', async () => {
-        render(<ChoreDoneList chores={mockDoneChores} totalItems={mockDoneChores.length} toggle={vi.fn()} emitUpdate={vi.fn()} />);
+        render(
+            <ChoreDoneList
+                chores={mockDoneChores}
+                totalItems={mockDoneChores.length}
+                toggle={vi.fn()}
+                emitUpdate={vi.fn()}
+            />,
+        );
         expect(screen.getByText(/chores done list/i)).toBeInTheDocument();
         expect(screen.getByText(/completed chore/i)).toBeInTheDocument();
     });
@@ -310,10 +315,10 @@ describe('Chores Page Tests', () => {
                 expect.objectContaining({
                     method: 'POST',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });
@@ -335,10 +340,10 @@ describe('Chores Page Tests', () => {
                 expect.objectContaining({
                     method: 'PUT',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });
@@ -384,10 +389,10 @@ describe('Chores Page Tests', () => {
                 expect.objectContaining({
                     method: 'DELETE',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });
@@ -409,10 +414,10 @@ describe('Chores Page Tests', () => {
                 expect.objectContaining({
                     method: 'PUT',
                     headers: expect.objectContaining({
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     }),
-                    body: expect.any(String)
-                })
+                    body: expect.any(String),
+                }),
             );
             expect(emitUpdate).toHaveBeenCalled();
         });

@@ -31,7 +31,7 @@ describe('Shopping List GET API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/shoppingList');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -53,12 +53,12 @@ describe('Shopping List GET API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to view the shopping list'});
+        expect(data).toEqual({ message: 'You must be logged in to view the shopping list' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -70,12 +70,12 @@ describe('Shopping List GET API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -95,12 +95,12 @@ describe('Shopping List GET API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to view the shopping list'});
+        expect(data).toEqual({ message: 'You must be a member of a household to view the shopping list' });
     });
 
     it('should return 400 if skip parameter is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -115,19 +115,19 @@ describe('Shopping List GET API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {skip: '-1', limit: '10'},
+            searchParams: { skip: '-1', limit: '10' },
         });
 
         const response = await GET(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid skip parameter'});
+        expect(data).toEqual({ message: 'Invalid skip parameter' });
     });
 
     it('should return 400 if limit parameter is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -142,19 +142,19 @@ describe('Shopping List GET API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {skip: '0', limit: '0'},
+            searchParams: { skip: '0', limit: '0' },
         });
 
         const response = await GET(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid limit parameter'});
+        expect(data).toEqual({ message: 'Invalid limit parameter' });
     });
 
     it('should return 200 and the shopping list', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -198,7 +198,7 @@ describe('Shopping List GET API', () => {
         const serializedShoppingItems = JSON.parse(JSON.stringify(mockShoppingItems));
 
         const req = createMockRequest({
-            searchParams: {skip: '0', limit: '10'},
+            searchParams: { skip: '0', limit: '10' },
         });
 
         const response = await GET(req);
@@ -210,7 +210,7 @@ describe('Shopping List GET API', () => {
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -227,14 +227,14 @@ describe('Shopping List GET API', () => {
         vi.mocked(prisma.shoppingItem.findMany).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            searchParams: {skip: '0', limit: '10'},
+            searchParams: { skip: '0', limit: '10' },
         });
 
         const response = await GET(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 });
 
@@ -244,7 +244,7 @@ describe('Shopping List POST API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {body = {}} = options;
+        const { body = {} } = options;
 
         return {
             url: 'http://localhost:3000/api/shoppingList',
@@ -261,29 +261,29 @@ describe('Shopping List POST API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to create a shopping item'});
+        expect(data).toEqual({ message: 'You must be logged in to create a shopping item' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
         vi.mocked(prisma.user.findUnique).mockResolvedValueOnce(null);
 
-        const req = createMockRequest({ body: { name: 'Milk', cost: 2 }});
+        const req = createMockRequest({ body: { name: 'Milk', cost: 2 } });
 
         const response = await POST(req);
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -303,12 +303,12 @@ describe('Shopping List POST API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to add items'});
+        expect(data).toEqual({ message: 'You must be a member of a household to add items' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -325,19 +325,19 @@ describe('Shopping List POST API', () => {
         vi.mocked(prisma.shoppingItem.create).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            body: {name: 'Milk', cost: 2},
+            body: { name: 'Milk', cost: 2 },
         });
 
         const response = await POST(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 201 and the created shopping item', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -368,7 +368,7 @@ describe('Shopping List POST API', () => {
         const serializedShoppingItem = JSON.parse(JSON.stringify(mockShoppingItem));
 
         const req = createMockRequest({
-            body: {name: 'Milk', cost: 2},
+            body: { name: 'Milk', cost: 2 },
         });
 
         const response = await POST(req);
@@ -380,7 +380,7 @@ describe('Shopping List POST API', () => {
 
     it('should return 400 if name is empty', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -395,19 +395,19 @@ describe('Shopping List POST API', () => {
         });
 
         const req = createMockRequest({
-            body: {name: '', quantity: 2},
+            body: { name: '', quantity: 2 },
         });
 
         const response = await POST(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Name is required'});
+        expect(data).toEqual({ message: 'Name is required' });
     });
 
     it('should return 400 if cost is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -422,14 +422,14 @@ describe('Shopping List POST API', () => {
         });
 
         const req = createMockRequest({
-            body: {name: 'Milk', cost: -1},
+            body: { name: 'Milk', cost: -1 },
         });
 
         const response = await POST(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Cost must be a positive number'});
+        expect(data).toEqual({ message: 'Cost must be a positive number' });
     });
 });
 
@@ -439,7 +439,7 @@ describe('Shopping List DELETE API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}} = options;
+        const { searchParams = {} } = options;
 
         const url = new URL('http://localhost:3000/api/shoppingList');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -461,12 +461,12 @@ describe('Shopping List DELETE API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to delete an item'});
+        expect(data).toEqual({ message: 'You must be logged in to delete an item' });
     });
 
     it('should return 400 if item ID is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -481,19 +481,19 @@ describe('Shopping List DELETE API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {id: 'invalid'},
+            searchParams: { id: 'invalid' },
         });
 
         const response = await DELETE(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid item ID'});
+        expect(data).toEqual({ message: 'Invalid item ID' });
     });
 
     it('should return 404 if item is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -510,19 +510,19 @@ describe('Shopping List DELETE API', () => {
         vi.mocked(prisma.shoppingItem.findUnique).mockResolvedValueOnce(null);
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await DELETE(req);
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item not found'});
+        expect(data).toEqual({ message: 'Item not found' });
     });
 
     it('should return 403 if user is not authorized to delete the item', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -548,19 +548,19 @@ describe('Shopping List DELETE API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await DELETE(req);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You are not authorized to delete this item'});
+        expect(data).toEqual({ message: 'You are not authorized to delete this item' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -588,19 +588,19 @@ describe('Shopping List DELETE API', () => {
         vi.mocked(prisma.shoppingItem.delete).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await DELETE(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 200 if item is deleted successfully', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -637,14 +637,14 @@ describe('Shopping List DELETE API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await DELETE(req);
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item deleted successfully'});
+        expect(data).toEqual({ message: 'Item deleted successfully' });
     });
 });
 
@@ -654,7 +654,7 @@ describe('Shopping List Bought API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {body = {}} = options;
+        const { body = {} } = options;
 
         return {
             url: 'http://localhost:3000/api/shoppingList/bought',
@@ -671,12 +671,12 @@ describe('Shopping List Bought API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to mark items as bought'});
+        expect(data).toEqual({ message: 'You must be logged in to mark items as bought' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -688,12 +688,12 @@ describe('Shopping List Bought API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -713,12 +713,12 @@ describe('Shopping List Bought API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to mark items as bought'});
+        expect(data).toEqual({ message: 'You must be a member of a household to mark items as bought' });
     });
 
     it('should return 400 if item ID is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -733,19 +733,19 @@ describe('Shopping List Bought API', () => {
         });
 
         const req = createMockRequest({
-            body: {id: 'invalid'},
+            body: { id: 'invalid' },
         });
 
         const response = await PUT_Bought(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid item ID'});
+        expect(data).toEqual({ message: 'Invalid item ID' });
     });
 
     it('should return 404 if item is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -762,19 +762,19 @@ describe('Shopping List Bought API', () => {
         vi.mocked(prisma.shoppingItem.findUnique).mockResolvedValueOnce(null);
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Bought(req);
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item not found'});
+        expect(data).toEqual({ message: 'Item not found' });
     });
 
     it('should return 403 if user is not authorized to mark the item as bought', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -800,19 +800,19 @@ describe('Shopping List Bought API', () => {
         });
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Bought(req);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You do not have permission to mark this item as bought'});
+        expect(data).toEqual({ message: 'You do not have permission to mark this item as bought' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -840,19 +840,19 @@ describe('Shopping List Bought API', () => {
         vi.mocked(prisma.shoppingItem.update).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Bought(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 200 and the updated item if marked as bought successfully', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -893,7 +893,7 @@ describe('Shopping List Bought API', () => {
         const serializedUpdatedItem = JSON.parse(JSON.stringify(updatedItem));
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Bought(req);
@@ -910,7 +910,7 @@ describe('Shopping List Unbought API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {body = {}} = options;
+        const { body = {} } = options;
 
         return {
             url: 'http://localhost:3000/api/shoppingList/unbought',
@@ -927,12 +927,12 @@ describe('Shopping List Unbought API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to mark items as unbought'});
+        expect(data).toEqual({ message: 'You must be logged in to mark items as unbought' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -944,12 +944,12 @@ describe('Shopping List Unbought API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -969,12 +969,12 @@ describe('Shopping List Unbought API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to mark items as unbought'});
+        expect(data).toEqual({ message: 'You must be a member of a household to mark items as unbought' });
     });
 
     it('should return 400 if item ID is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -989,19 +989,19 @@ describe('Shopping List Unbought API', () => {
         });
 
         const req = createMockRequest({
-            body: {id: 'invalid'},
+            body: { id: 'invalid' },
         });
 
         const response = await PUT_Unbought(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid item ID'});
+        expect(data).toEqual({ message: 'Invalid item ID' });
     });
 
     it('should return 404 if item is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1018,19 +1018,19 @@ describe('Shopping List Unbought API', () => {
         vi.mocked(prisma.shoppingItem.findUnique).mockResolvedValueOnce(null);
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Unbought(req);
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item not found'});
+        expect(data).toEqual({ message: 'Item not found' });
     });
 
     it('should return 403 if user is not authorized to mark the item as unbought', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1056,19 +1056,19 @@ describe('Shopping List Unbought API', () => {
         });
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Unbought(req);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You do not have permission to mark this item as unbought'});
+        expect(data).toEqual({ message: 'You do not have permission to mark this item as unbought' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1096,19 +1096,19 @@ describe('Shopping List Unbought API', () => {
         vi.mocked(prisma.shoppingItem.update).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Unbought(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 200 if item is marked as unbought successfully', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1145,14 +1145,14 @@ describe('Shopping List Unbought API', () => {
         });
 
         const req = createMockRequest({
-            body: {id: 1},
+            body: { id: 1 },
         });
 
         const response = await PUT_Unbought(req);
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item marked as unbought successfully'});
+        expect(data).toEqual({ message: 'Item marked as unbought successfully' });
     });
 });
 
@@ -1162,7 +1162,7 @@ describe('Shopping List TotalNumber API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}} = options;
+        const { searchParams = {} } = options;
 
         const url = new URL('http://localhost:3000/api/shoppingList/totalNumber');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -1171,7 +1171,7 @@ describe('Shopping List TotalNumber API', () => {
 
         return {
             url: url.toString(),
-            json: () => Promise.resolve({})
+            json: () => Promise.resolve({}),
         } as unknown as Request;
     };
 
@@ -1184,12 +1184,12 @@ describe('Shopping List TotalNumber API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to view shopping list count'});
+        expect(data).toEqual({ message: 'You must be logged in to view shopping list count' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1201,12 +1201,12 @@ describe('Shopping List TotalNumber API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1226,12 +1226,12 @@ describe('Shopping List TotalNumber API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to view shopping list count'});
+        expect(data).toEqual({ message: 'You must be a member of a household to view shopping list count' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1253,12 +1253,12 @@ describe('Shopping List TotalNumber API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 200 and the count of shopping items', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1280,7 +1280,7 @@ describe('Shopping List TotalNumber API', () => {
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({count: 5});
+        expect(data).toEqual({ count: 5 });
     });
 });
 
@@ -1290,7 +1290,7 @@ describe('Shopping List Details API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}} = options;
+        const { searchParams = {} } = options;
 
         const url = new URL('http://localhost:3000/api/shoppingList/details');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -1299,7 +1299,7 @@ describe('Shopping List Details API', () => {
 
         return {
             url: url.toString(),
-            json: () => Promise.resolve({})
+            json: () => Promise.resolve({}),
         } as unknown as Request;
     };
 
@@ -1312,12 +1312,12 @@ describe('Shopping List Details API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to view item details'});
+        expect(data).toEqual({ message: 'You must be logged in to view item details' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1329,12 +1329,12 @@ describe('Shopping List Details API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1354,12 +1354,12 @@ describe('Shopping List Details API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to view item details'});
+        expect(data).toEqual({ message: 'You must be a member of a household to view item details' });
     });
 
     it('should return 400 if item ID is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1374,19 +1374,19 @@ describe('Shopping List Details API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {id: 'invalid'},
+            searchParams: { id: 'invalid' },
         });
 
         const response = await GET_Details(req);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid item ID'});
+        expect(data).toEqual({ message: 'Invalid item ID' });
     });
 
     it('should return 404 if item is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1403,19 +1403,19 @@ describe('Shopping List Details API', () => {
         vi.mocked(prisma.shoppingItem.findUnique).mockResolvedValueOnce(null);
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await GET_Details(req);
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Item not found'});
+        expect(data).toEqual({ message: 'Item not found' });
     });
 
     it('should return 403 if user is not authorized to view the item', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1441,19 +1441,19 @@ describe('Shopping List Details API', () => {
         });
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await GET_Details(req);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You do not have permission to view this item'});
+        expect(data).toEqual({ message: 'You do not have permission to view this item' });
     });
 
     it('should return 500 if there is an internal server error', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1470,19 +1470,19 @@ describe('Shopping List Details API', () => {
         vi.mocked(prisma.shoppingItem.findUnique).mockRejectedValueOnce(new Error('Internal server error'));
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await GET_Details(req);
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal server error'});
+        expect(data).toEqual({ message: 'Internal server error' });
     });
 
     it('should return 200 and the item details', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1517,7 +1517,7 @@ describe('Shopping List Details API', () => {
         const serializedItem = JSON.parse(JSON.stringify(mockItem));
 
         const req = createMockRequest({
-            searchParams: {id: '1'},
+            searchParams: { id: '1' },
         });
 
         const response = await GET_Details(req);

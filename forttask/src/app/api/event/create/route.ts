@@ -15,7 +15,10 @@ export async function POST(req: Request) {
         const userId = parseInt(session.user.id);
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be a part of a household to create events' }, { status: 401 });
+            return NextResponse.json(
+                { message: 'You must be a part of a household to create events' },
+                { status: 401 },
+            );
         }
 
         const householdId = parseInt(session.user.householdId);
@@ -84,16 +87,16 @@ export async function POST(req: Request) {
 
                 const childEventRecords = await prisma.event.findMany({
                     where: {
-                        parentEventId: newEvent.id
-                    }
+                        parentEventId: newEvent.id,
+                    },
                 });
 
                 for (const event of childEventRecords) {
                     await prisma.eventAttendee.createMany({
                         data: body.attendees.map((userId) => ({
                             eventId: event.id,
-                            userId: userId
-                        }))
+                            userId: userId,
+                        })),
                     });
                 }
             }
@@ -101,16 +104,16 @@ export async function POST(req: Request) {
 
         const childEvents = await prisma.event.findMany({
             where: {
-                parentEventId: newEvent.id
+                parentEventId: newEvent.id,
             },
             include: {
-                attendees: { include: { user: true } }
-            }
+                attendees: { include: { user: true } },
+            },
         });
 
         const completeEvent = {
             ...newEvent,
-            childEvents: childEvents
+            childEvents: childEvents,
         };
 
         return NextResponse.json(completeEvent, { status: 201 });

@@ -20,15 +20,15 @@ vi.mock('next-auth/react', () => ({
                 id: '1',
                 name: 'Test User',
                 email: 'test@example.com',
-            }
+            },
         },
         status: 'authenticated',
-        update: mockUpdate
+        update: mockUpdate,
     }),
 }));
 
 vi.mock('../../components/generalUI/logoutButton', () => ({
-    default: () => <button>Logout</button>
+    default: () => <button>Logout</button>,
 }));
 
 global.fetch = vi.fn();
@@ -54,7 +54,9 @@ describe('Household Page Tests', () => {
         expect(screen.getByText('Create a new household or join an existing one')).toBeInTheDocument();
 
         expect(screen.getAllByText('Create Household')[0]).toBeInTheDocument();
-        expect(screen.getByText('You will become an owner of new household with full administrative privileges.')).toBeInTheDocument();
+        expect(
+            screen.getByText('You will become an owner of new household with full administrative privileges.'),
+        ).toBeInTheDocument();
 
         expect(screen.getAllByText('Join Household')[0]).toBeInTheDocument();
         expect(screen.getByText(/You are required to have a join code/)).toBeInTheDocument();
@@ -118,7 +120,7 @@ describe('AddHousehold Component Tests', () => {
                 id: '1',
                 name: 'Test User',
                 email: 'test@example.com',
-            }
+            },
         };
 
         mockUpdate.mockResolvedValue(undefined);
@@ -141,13 +143,16 @@ describe('AddHousehold Component Tests', () => {
             await Promise.resolve();
         });
 
-        expect(global.fetch).toHaveBeenCalledWith('/api/household/create', expect.objectContaining({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ householdName: 'Test Household' }),
-        }));
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/household/create',
+            expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ householdName: 'Test Household' }),
+            }),
+        );
 
         expect(mockUpdate).toHaveBeenCalledWith({
             ...mockSessionData,
@@ -232,7 +237,7 @@ describe('JoinHousehold Component Tests', () => {
                 id: '1',
                 name: 'Test User',
                 email: 'test@example.com',
-            }
+            },
         };
 
         mockUpdate.mockResolvedValue(undefined);
@@ -255,13 +260,16 @@ describe('JoinHousehold Component Tests', () => {
             await Promise.resolve();
         });
 
-        expect(global.fetch).toHaveBeenCalledWith('/api/household/join', expect.objectContaining({
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ joinCode: 'ABC123' }),
-        }));
+        expect(global.fetch).toHaveBeenCalledWith(
+            '/api/household/join',
+            expect.objectContaining({
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ joinCode: 'ABC123' }),
+            }),
+        );
 
         expect(mockUpdate).toHaveBeenCalledWith({
             ...mockSessionData,

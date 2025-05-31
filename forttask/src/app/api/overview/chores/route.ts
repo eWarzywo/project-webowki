@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
         const user = await prisma.user.findUnique({
             where: { id: parseInt(session.user.id) },
-            include: { household: true }
+            include: { household: true },
         });
 
         if (!user || !user.householdId) {
@@ -29,15 +29,15 @@ export async function GET(request: NextRequest) {
         const dateFilter = {
             dueDate: {
                 gte: startOfDay(date),
-                lte: endOfDay(oneWeekLater)
-            }
+                lte: endOfDay(oneWeekLater),
+            },
         };
 
         const chores = await prisma.chore.findMany({
             where: {
                 householdId: user.householdId,
                 doneById: null,
-                ...dateFilter
+                ...dateFilter,
             },
             select: {
                 id: true,
@@ -47,15 +47,12 @@ export async function GET(request: NextRequest) {
                 priority: true,
                 createdBy: {
                     select: {
-                        username: true
-                    }
-                }
+                        username: true,
+                    },
+                },
             },
-            orderBy: [
-                { dueDate: 'asc' },
-                { priority: 'desc' }
-            ],
-            take: 5
+            orderBy: [{ dueDate: 'asc' }, { priority: 'desc' }],
+            take: 5,
         });
 
         return NextResponse.json({ chores });

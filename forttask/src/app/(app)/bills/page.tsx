@@ -5,7 +5,7 @@ import DatePicker from '@/components/generalUI/datePicker';
 import BillsHandler from '@/components/bills/billsHandler';
 import Image from 'next/image';
 import { useSocket } from '@/lib/socket';
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 export default function Bills() {
     const [showCalendar, setShowCalendar] = React.useState(false);
@@ -184,9 +184,7 @@ export default function Bills() {
                     </div>
                     <div className="px-6 pb-6 space-y-4 flex flex-col items-start w-full">
                         <div className="flex flex-col items-start justify-start w-full">
-                            <label htmlFor="name">
-                                Name
-                            </label>
+                            <label htmlFor="name">Name</label>
                             <input
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -198,9 +196,7 @@ export default function Bills() {
                             />
                         </div>
                         <div className="flex flex-col items-start justify-start w-full">
-                            <label htmlFor="cost">
-                                Cost
-                            </label>
+                            <label htmlFor="cost">Cost</label>
                             <div
                                 id="costdiv"
                                 className="costInput py-2 px-3 border bg-zinc-950 border-zinc-800 rounded-xl flex items-center justify-between w-full"
@@ -220,9 +216,7 @@ export default function Bills() {
                             </div>
                         </div>
                         <div className="flex flex-col items-start justify-start w-full">
-                            <label htmlFor="cost">
-                                Due to
-                            </label>
+                            <label htmlFor="cost">Due to</label>
                             <div
                                 onClick={handleShowCalendar}
                                 className="w-full border rounded-xl gap-2.5 px-6 py-2 border-zinc-800 flex max-h-10 min-h-10 flex-col justify-center items-center hover:bg-zinc-800 hover:border-zinc-400 text-zinc-50 font-medium text-sm cursor-pointer"
@@ -231,9 +225,7 @@ export default function Bills() {
                             </div>
                         </div>
                         <div className="flex flex-col items-start justify-start w-full">
-                            <label htmlFor="cost">
-                                Description
-                            </label>
+                            <label htmlFor="cost">Description</label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
@@ -265,9 +257,7 @@ export default function Bills() {
                         </div>
                         {recurring && (
                             <div className="flex flex-col items-start justify-start w-full">
-                                <label htmlFor="repeat">
-                                    Repeat every
-                                </label>
+                                <label htmlFor="repeat">Repeat every</label>
                                 <div className="relative w-full">
                                     <button
                                         type="button"

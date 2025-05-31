@@ -33,14 +33,14 @@ export async function GET(req: Request) {
             },
         });
 
-        const usersWithProfiles = users.map(user => ({
+        const usersWithProfiles = users.map((user) => ({
             ...user,
             profilePicture: user.profilePicture || {
                 id: 0,
                 name: 'Default Avatar',
                 imageUrl: '/images/avatars/defaultAvatar.png',
-                category: 'default'
-            }
+                category: 'default',
+            },
         }));
 
         return NextResponse.json(usersWithProfiles);

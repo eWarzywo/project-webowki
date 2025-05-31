@@ -34,7 +34,7 @@ export const useSocket = () => {
 
         socketIo.on('update-chores', () => {
             setChoresRefresh((prev) => !prev);
-        })
+        });
 
         setSocket(socketIo);
 
@@ -72,7 +72,7 @@ export const useSocket = () => {
         } else {
             console.error('Socket is not initialized');
         }
-    }
+    };
 
     const leaveHousehold = (householdId: string) => {
         if (socket) {
@@ -80,7 +80,16 @@ export const useSocket = () => {
         } else {
             console.error('Socket is not initialized');
         }
-    }
+    };
 
-    return { isConnected, eventsRefresh, shoppingRefresh, billsRefresh, choresRefresh, emitUpdate, joinHousehold, leaveHousehold };
-}
+    return {
+        isConnected,
+        eventsRefresh,
+        shoppingRefresh,
+        billsRefresh,
+        choresRefresh,
+        emitUpdate,
+        joinHousehold,
+        leaveHousehold,
+    };
+};

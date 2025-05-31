@@ -6,240 +6,237 @@ import { NextRequest } from 'next/server';
 
 vi.mock('../libs/prisma');
 vi.mock('next-auth', () => ({
-  getServerSession: vi.fn()
+    getServerSession: vi.fn(),
 }));
 vi.mock('../src/app/auth', () => ({
-  authOptions: {}
+    authOptions: {},
 }));
 
 describe('Overview Events API Tests', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  function createMockRequest(query = {}): NextRequest {
-    const url = new URL('http://localhost:3000/api/overview/events');
-    Object.entries(query).forEach(([key, value]) => {
-      url.searchParams.append(key, String(value));
-    });
-    return new NextRequest(url);
-  }
-
-  test('GET overview/events should return 401 when user is not authenticated', async () => {
-    const req = createMockRequest();
-    vi.mocked(getServerSession).mockResolvedValue(null);
-
-    const response = await GET(req);
-    const data = await response.json();
-
-    expect(response.status).toBe(401);
-    expect(data).toHaveProperty('error', 'Unauthorized');
-  });
-
-  test('GET overview/events should return 404 when user has no household', async () => {
-    const req = createMockRequest();
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: '1' }
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        householdId: null,
-        createdAt: new Date(),
-        passwordHash: 'hash123',
-        profilePictureId: null
+    function createMockRequest(query = {}): NextRequest {
+        const url = new URL('http://localhost:3000/api/overview/events');
+        Object.entries(query).forEach(([key, value]) => {
+            url.searchParams.append(key, String(value));
+        });
+        return new NextRequest(url);
+    }
+
+    test('GET overview/events should return 401 when user is not authenticated', async () => {
+        const req = createMockRequest();
+        vi.mocked(getServerSession).mockResolvedValue(null);
+
+        const response = await GET(req);
+        const data = await response.json();
+
+        expect(response.status).toBe(401);
+        expect(data).toHaveProperty('error', 'Unauthorized');
     });
 
-    const response = await GET(req);
-    const data = await response.json();
+    test('GET overview/events should return 404 when user has no household', async () => {
+        const req = createMockRequest();
+        vi.mocked(getServerSession).mockResolvedValue({
+            user: { id: '1' },
+        });
 
-    expect(response.status).toBe(404);
-    expect(data).toHaveProperty('error', 'User not in a household');
-  });
+        vi.mocked(prisma.user.findUnique).mockResolvedValue({
+            id: 1,
+            username: 'testuser',
+            email: 'test@example.com',
+            householdId: null,
+            createdAt: new Date(),
+            passwordHash: 'hash123',
+            profilePictureId: null,
+        });
 
-  test('GET overview/events should return upcoming events for the next week', async () => {
-    const today = new Date();
-    const req = createMockRequest({ date: today.toISOString() });
+        const response = await GET(req);
+        const data = await response.json();
 
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: '1' }
+        expect(response.status).toBe(404);
+        expect(data).toHaveProperty('error', 'User not in a household');
     });
 
-    const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        householdId: 1,
-        household: { id: 1, name: 'Test Household' },
-        createdAt: new Date(),
-        passwordHash: 'hash123',
-        profilePictureId: null
-    };
+    test('GET overview/events should return upcoming events for the next week', async () => {
+        const today = new Date();
+        const req = createMockRequest({ date: today.toISOString() });
 
-    const tomorrow = new Date(today.getTime() + 86400000);
-    const dayAfterTomorrow = new Date(today.getTime() + 172800000);
+        vi.mocked(getServerSession).mockResolvedValue({
+            user: { id: '1' },
+        });
 
-    const mockEvents = [
-      {
-        id: 1,
-        name: 'Test Event',
-        description: 'Test Description',
-        date: tomorrow,
-        location: 'Test Location',
-        createdBy: {
-          username: 'testuser'
-        },
-        householdId: 1,
-        createdById: 1,
-        createdAt: today,
-        updatedAt: today,
-        cycle: 0,
-        repeatCount: 0,
-        parentEventId: null
-      },
-      {
-        id: 2,
-        name: 'Test Event',
-        description: 'Test Description',
-        date: dayAfterTomorrow,
-        location: 'Test Location',
-        createdBy: {
-          username: 'testuser'
-        },
-        householdId: 1,
-        createdById: 2,
-        createdAt: today,
-        updatedAt: today,
-        cycle: 0,
-        repeatCount: 0,
-        parentEventId: null
-      }
-    ];
+        const mockUser = {
+            id: 1,
+            username: 'testuser',
+            email: 'test@example.com',
+            householdId: 1,
+            household: { id: 1, name: 'Test Household' },
+            createdAt: new Date(),
+            passwordHash: 'hash123',
+            profilePictureId: null,
+        };
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-    vi.mocked(prisma.event.findMany).mockResolvedValue(mockEvents);
+        const tomorrow = new Date(today.getTime() + 86400000);
+        const dayAfterTomorrow = new Date(today.getTime() + 172800000);
 
-    const response = await GET(req);
-    const data = await response.json();
+        const mockEvents = [
+            {
+                id: 1,
+                name: 'Test Event',
+                description: 'Test Description',
+                date: tomorrow,
+                location: 'Test Location',
+                createdBy: {
+                    username: 'testuser',
+                },
+                householdId: 1,
+                createdById: 1,
+                createdAt: today,
+                updatedAt: today,
+                cycle: 0,
+                repeatCount: 0,
+                parentEventId: null,
+            },
+            {
+                id: 2,
+                name: 'Test Event',
+                description: 'Test Description',
+                date: dayAfterTomorrow,
+                location: 'Test Location',
+                createdBy: {
+                    username: 'testuser',
+                },
+                householdId: 1,
+                createdById: 2,
+                createdAt: today,
+                updatedAt: today,
+                cycle: 0,
+                repeatCount: 0,
+                parentEventId: null,
+            },
+        ];
 
-    expect(response.status).toBe(200);
-    expect(data).toHaveProperty('events');
-    
-    expect(data.events).toHaveLength(2);
-    expect(data.events[0]).toMatchObject({
-      id: 1,
-      name: 'Test Event',
-      description: 'Test Description',
-      location: 'Test Location',
-      createdBy: {
-        username: 'testuser'
-      }
-    });
-    expect(data.events[1]).toMatchObject({
-      id: 2,
-      name: 'Test Event',
-      description: 'Test Description',
-      location: 'Test Location', 
-      createdBy: {
-        username: 'testuser'
-      }
-    });
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+        vi.mocked(prisma.event.findMany).mockResolvedValue(mockEvents);
 
-    expect(typeof data.events[0].date).toBe('string');
-    expect(typeof data.events[1].date).toBe('string');
-    
-    expect(prisma.event.findMany).toHaveBeenCalledWith({
-      where: {
-        householdId: 1,
-        date: {
-          gte: expect.any(Date),
-          lte: expect.any(Date),
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        date: true,
-        location: true,
-        createdBy: {
-          select: {
-            username: true,
-          },
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-      take: 5,
-    });
-  });
+        const response = await GET(req);
+        const data = await response.json();
 
-  test('GET overview/events should use current date when no date is provided', async () => {
-    const req = createMockRequest();
+        expect(response.status).toBe(200);
+        expect(data).toHaveProperty('events');
 
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: '1' }
-    });
+        expect(data.events).toHaveLength(2);
+        expect(data.events[0]).toMatchObject({
+            id: 1,
+            name: 'Test Event',
+            description: 'Test Description',
+            location: 'Test Location',
+            createdBy: {
+                username: 'testuser',
+            },
+        });
+        expect(data.events[1]).toMatchObject({
+            id: 2,
+            name: 'Test Event',
+            description: 'Test Description',
+            location: 'Test Location',
+            createdBy: {
+                username: 'testuser',
+            },
+        });
 
-    const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        householdId: 1,
-        household: { id: 1, name: 'Test Household' },
-        createdAt: new Date(),
-        passwordHash: 'hash123',
-        profilePictureId: null
-    };
+        expect(typeof data.events[0].date).toBe('string');
+        expect(typeof data.events[1].date).toBe('string');
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-    vi.mocked(prisma.event.findMany).mockResolvedValue([]);
-
-    await GET(req);
-
-
-
-
-    expect(prisma.event.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          date: {
-            gte: expect.any(Date),
-            lte: expect.any(Date),
-          },
-        }),
-      })
-    );
-  });
-
-  test('GET overview/events should handle server errors gracefully', async () => {
-    const req = createMockRequest();
-
-    vi.mocked(getServerSession).mockResolvedValue({
-      user: { id: '1' }
+        expect(prisma.event.findMany).toHaveBeenCalledWith({
+            where: {
+                householdId: 1,
+                date: {
+                    gte: expect.any(Date),
+                    lte: expect.any(Date),
+                },
+            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                date: true,
+                location: true,
+                createdBy: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+            orderBy: {
+                date: 'asc',
+            },
+            take: 5,
+        });
     });
 
-    const mockUser = {
-        id: 1,
-        username: 'testuser',
-        email: 'test@example.com',
-        householdId: 1,
-        household: { id: 1, name: 'Test Household' },
-        createdAt: new Date(),
-        passwordHash: 'hash123',
-        profilePictureId: null
-    };
+    test('GET overview/events should use current date when no date is provided', async () => {
+        const req = createMockRequest();
 
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
-    vi.mocked(prisma.event.findMany).mockRejectedValue(new Error('Database error'));
+        vi.mocked(getServerSession).mockResolvedValue({
+            user: { id: '1' },
+        });
 
-    const response = await GET(req);
-    const data = await response.json();
+        const mockUser = {
+            id: 1,
+            username: 'testuser',
+            email: 'test@example.com',
+            householdId: 1,
+            household: { id: 1, name: 'Test Household' },
+            createdAt: new Date(),
+            passwordHash: 'hash123',
+            profilePictureId: null,
+        };
 
-    expect(response.status).toBe(500);
-    expect(data).toHaveProperty('error', 'Failed to fetch events');
-  });
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+        vi.mocked(prisma.event.findMany).mockResolvedValue([]);
+
+        await GET(req);
+
+        expect(prisma.event.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    date: {
+                        gte: expect.any(Date),
+                        lte: expect.any(Date),
+                    },
+                }),
+            }),
+        );
+    });
+
+    test('GET overview/events should handle server errors gracefully', async () => {
+        const req = createMockRequest();
+
+        vi.mocked(getServerSession).mockResolvedValue({
+            user: { id: '1' },
+        });
+
+        const mockUser = {
+            id: 1,
+            username: 'testuser',
+            email: 'test@example.com',
+            householdId: 1,
+            household: { id: 1, name: 'Test Household' },
+            createdAt: new Date(),
+            passwordHash: 'hash123',
+            profilePictureId: null,
+        };
+
+        vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+        vi.mocked(prisma.event.findMany).mockRejectedValue(new Error('Database error'));
+
+        const response = await GET(req);
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data).toHaveProperty('error', 'Failed to fetch events');
+    });
 });

@@ -73,7 +73,7 @@ describe('Bill GET API', () => {
         expect(response.status).toBe(404);
         const data = await response.json();
         expect(data).toEqual({ message: 'User not found' });
-    })
+    });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
@@ -192,7 +192,7 @@ describe('Bill POST API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -214,12 +214,12 @@ describe('Bill POST API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to create a bill'});
+        expect(data).toEqual({ message: 'You must be logged in to create a bill' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -231,12 +231,12 @@ describe('Bill POST API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -256,12 +256,12 @@ describe('Bill POST API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to create a bill'});
+        expect(data).toEqual({ message: 'You must be a member of a household to create a bill' });
     });
 
     it('should return 201 and create a new bill', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -271,7 +271,7 @@ describe('Bill POST API', () => {
             cycle: 1,
             dueDate: new Date('2023-10-01'),
             description: 'Test bill',
-        }
+        };
 
         const mockBill = {
             id: 1,
@@ -297,7 +297,7 @@ describe('Bill POST API', () => {
 
         const serializedBill = JSON.parse(JSON.stringify(mockBill));
 
-        const request = createMockRequest({body});
+        const request = createMockRequest({ body });
 
         const response = await POST(request);
 
@@ -308,7 +308,7 @@ describe('Bill POST API', () => {
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -318,7 +318,7 @@ describe('Bill POST API', () => {
             cycle: 1,
             dueDate: new Date('2023-10-01'),
             description: 'Test bill',
-        }
+        };
 
         vi.mocked(prisma.bill.create).mockRejectedValueOnce(new Error('Database error'));
 
@@ -332,12 +332,12 @@ describe('Bill POST API', () => {
             householdId: 1,
         });
 
-        const request = createMockRequest({body});
+        const request = createMockRequest({ body });
 
         const response = await POST(request);
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({error: 'Internal Server Error'});
+        expect(data).toEqual({ error: 'Internal Server Error' });
     });
 });
 
@@ -347,7 +347,7 @@ describe('Bill DELETE API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -369,12 +369,12 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to delete a bill'});
+        expect(data).toEqual({ message: 'You must be logged in to delete a bill' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -400,12 +400,12 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not authorized to delete', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -439,12 +439,12 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You are not authorized to delete this bill'});
+        expect(data).toEqual({ message: 'You are not authorized to delete this bill' });
     });
 
     it('should return 404 if bill is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -465,12 +465,12 @@ describe('Bill DELETE API', () => {
         const response = await DELETE(request);
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Bill not found'});
+        expect(data).toEqual({ message: 'Bill not found' });
     });
 
     it('should return 400 if bill id is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -504,12 +504,12 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid bill ID'});
+        expect(data).toEqual({ message: 'Invalid bill ID' });
     });
 
     it('should return 200 and delete the bill', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -546,12 +546,12 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({message: 'Bill deleted successfully'});
+        expect(data).toEqual({ message: 'Bill deleted successfully' });
     });
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -587,7 +587,7 @@ describe('Bill DELETE API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({message: 'Internal Server Error'});
+        expect(data).toEqual({ message: 'Internal Server Error' });
     });
 });
 
@@ -597,7 +597,7 @@ describe('Bill GET Details API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill/details');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -619,12 +619,12 @@ describe('Bill GET Details API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({error: 'Unauthorized'});
+        expect(data).toEqual({ error: 'Unauthorized' });
     });
 
     it('should return 400 if id is not provided', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -634,12 +634,12 @@ describe('Bill GET Details API', () => {
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({error: 'ID is required'});
+        expect(data).toEqual({ error: 'ID is required' });
     });
 
     it('should return 404 if bill is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -651,12 +651,12 @@ describe('Bill GET Details API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({error: 'Bill not found'});
+        expect(data).toEqual({ error: 'Bill not found' });
     });
 
     it('should return 200 and bill details', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -689,7 +689,7 @@ describe('Bill GET Details API', () => {
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -701,7 +701,7 @@ describe('Bill GET Details API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({error: 'Internal Server Error'});
+        expect(data).toEqual({ error: 'Internal Server Error' });
     });
 });
 
@@ -711,7 +711,7 @@ describe('Bill GET Total Number API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill/totalNumber');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -733,12 +733,12 @@ describe('Bill GET Total Number API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to get the total number of bills'});
+        expect(data).toEqual({ message: 'You must be logged in to get the total number of bills' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -750,12 +750,12 @@ describe('Bill GET Total Number API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -775,12 +775,12 @@ describe('Bill GET Total Number API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to get the total number of bills'});
+        expect(data).toEqual({ message: 'You must be a member of a household to get the total number of bills' });
     });
 
     it('should return 200 and the total number of bills', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -804,12 +804,12 @@ describe('Bill GET Total Number API', () => {
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({count: mockCount});
+        expect(data).toEqual({ count: mockCount });
     });
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -830,7 +830,7 @@ describe('Bill GET Total Number API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({error: 'Internal Server Error'});
+        expect(data).toEqual({ error: 'Internal Server Error' });
     });
 });
 
@@ -840,7 +840,7 @@ describe('Bill PUT Paid Toggle API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill/paidToggle');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -862,12 +862,12 @@ describe('Bill PUT Paid Toggle API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to mark items as bought'});
+        expect(data).toEqual({ message: 'You must be logged in to mark items as bought' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -879,12 +879,12 @@ describe('Bill PUT Paid Toggle API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -904,12 +904,12 @@ describe('Bill PUT Paid Toggle API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to mark items as bought'});
+        expect(data).toEqual({ message: 'You must be a member of a household to mark items as bought' });
     });
 
     it('should return 400 if request body is invalid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -923,22 +923,22 @@ describe('Bill PUT Paid Toggle API', () => {
             householdId: 1,
         });
 
-        const request = createMockRequest({body: {}});
+        const request = createMockRequest({ body: {} });
 
         const response = await PUT(request);
 
         expect(response.status).toBe(400);
         const data = await response.json();
-        expect(data).toEqual({message: 'Invalid request'});
+        expect(data).toEqual({ message: 'Invalid request' });
     });
 
     it('should return 404 if bill is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-        const request = createMockRequest({body: {id: 1, paid: true}});
+        const request = createMockRequest({ body: { id: 1, paid: true } });
 
         vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
             id: 1,
@@ -956,16 +956,16 @@ describe('Bill PUT Paid Toggle API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'Bill not found'});
+        expect(data).toEqual({ message: 'Bill not found' });
     });
 
     it('should return 403 if user does not have permission to mark the bill as paid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-        const request = createMockRequest({body: {id: 1, paid: true}});
+        const request = createMockRequest({ body: { id: 1, paid: true } });
 
         vi.mocked(prisma.user.findUnique).mockResolvedValueOnce({
             id: 1,
@@ -995,16 +995,16 @@ describe('Bill PUT Paid Toggle API', () => {
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You do not have permission to mark this bill as paid'});
+        expect(data).toEqual({ message: 'You do not have permission to mark this bill as paid' });
     });
 
     it('should return 200 and update the bill as paid', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
-        const request = createMockRequest({body: {id: 1, paid: true}});
+        const request = createMockRequest({ body: { id: 1, paid: true } });
 
         const mockBill = {
             id: 1,
@@ -1037,17 +1037,19 @@ describe('Bill PUT Paid Toggle API', () => {
             updatedAt: new Date('2023-10-01'),
         });
 
-        const serializedBill = JSON.parse(JSON.stringify({
-            ...mockBill,
-            paidById: 1,
-            updatedAt: new Date('2023-10-01'),
-        }));
+        const serializedBill = JSON.parse(
+            JSON.stringify({
+                ...mockBill,
+                paidById: 1,
+                updatedAt: new Date('2023-10-01'),
+            }),
+        );
 
         const response = await PUT(request);
 
         expect(response.status).toBe(200);
         const data = await response.json();
-        expect(data).toEqual({message: 'Bill updated successfully', bill: serializedBill});
+        expect(data).toEqual({ message: 'Bill updated successfully', bill: serializedBill });
     });
 });
 
@@ -1057,7 +1059,7 @@ describe('Bill Mobile GET Paid API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill/mobile/paid');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -1079,12 +1081,12 @@ describe('Bill Mobile GET Paid API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to get the bills'});
+        expect(data).toEqual({ message: 'You must be logged in to get the bills' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1096,12 +1098,12 @@ describe('Bill Mobile GET Paid API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1114,19 +1116,19 @@ describe('Bill Mobile GET Paid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: null
+            householdId: null,
         });
 
         const response = await GET_Mobile_Paid(request);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to get the bills'});
+        expect(data).toEqual({ message: 'You must be a member of a household to get the bills' });
     });
 
     it('should return 200 and the list of paid bills', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1144,8 +1146,8 @@ describe('Bill Mobile GET Paid API', () => {
                 householdId: 1,
                 paidById: 2,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
             {
                 id: 2,
@@ -1160,8 +1162,8 @@ describe('Bill Mobile GET Paid API', () => {
                 householdId: 1,
                 paidById: 3,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
         ];
 
@@ -1172,7 +1174,7 @@ describe('Bill Mobile GET Paid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
@@ -1208,7 +1210,7 @@ describe('Bill Mobile GET Paid API', () => {
 
     it('should handle skip and limit parameters', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1226,8 +1228,8 @@ describe('Bill Mobile GET Paid API', () => {
                 householdId: 1,
                 paidById: 2,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
         ];
 
@@ -1238,7 +1240,7 @@ describe('Bill Mobile GET Paid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
@@ -1274,7 +1276,7 @@ describe('Bill Mobile GET Paid API', () => {
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1287,7 +1289,7 @@ describe('Bill Mobile GET Paid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         const request = createMockRequest({});
@@ -1296,7 +1298,7 @@ describe('Bill Mobile GET Paid API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({error: 'Internal Server Error'});
+        expect(data).toEqual({ error: 'Internal Server Error' });
     });
 });
 
@@ -1306,7 +1308,7 @@ describe('Bill Mobile GET NotPaid API', () => {
     });
 
     const createMockRequest = (options: MockRequestOptions): Request => {
-        const {searchParams = {}, body = {}} = options;
+        const { searchParams = {}, body = {} } = options;
 
         const url = new URL('http://localhost:3000/api/bill/mobile/notpaid');
         Object.entries(searchParams).forEach(([key, value]) => {
@@ -1328,12 +1330,12 @@ describe('Bill Mobile GET NotPaid API', () => {
 
         expect(response.status).toBe(401);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be logged in to get the bills'});
+        expect(data).toEqual({ message: 'You must be logged in to get the bills' });
     });
 
     it('should return 404 if user is not found', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1345,12 +1347,12 @@ describe('Bill Mobile GET NotPaid API', () => {
 
         expect(response.status).toBe(404);
         const data = await response.json();
-        expect(data).toEqual({message: 'User not found'});
+        expect(data).toEqual({ message: 'User not found' });
     });
 
     it('should return 403 if user is not a member of a household', async () => {
         const mockSession: MockSession = {
-            user: {id: '1'},
+            user: { id: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1363,19 +1365,19 @@ describe('Bill Mobile GET NotPaid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: null
+            householdId: null,
         });
 
         const response = await GET_Mobile_NotPaid(request);
 
         expect(response.status).toBe(403);
         const data = await response.json();
-        expect(data).toEqual({message: 'You must be a member of a household to get the bills'});
+        expect(data).toEqual({ message: 'You must be a member of a household to get the bills' });
     });
 
     it('should return 200 and the list of unpaid bills', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1393,8 +1395,8 @@ describe('Bill Mobile GET NotPaid API', () => {
                 householdId: 1,
                 paidById: null,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
             {
                 id: 2,
@@ -1409,8 +1411,8 @@ describe('Bill Mobile GET NotPaid API', () => {
                 householdId: 1,
                 paidById: null,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
         ];
 
@@ -1421,7 +1423,7 @@ describe('Bill Mobile GET NotPaid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
@@ -1457,7 +1459,7 @@ describe('Bill Mobile GET NotPaid API', () => {
 
     it('should handle skip and limit parameters', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1475,8 +1477,8 @@ describe('Bill Mobile GET NotPaid API', () => {
                 householdId: 1,
                 paidById: null,
                 createdBy: {
-                    username: 'testuser'
-                }
+                    username: 'testuser',
+                },
             },
         ];
 
@@ -1487,7 +1489,7 @@ describe('Bill Mobile GET NotPaid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         vi.mocked(prisma.bill.findMany).mockResolvedValueOnce(mockBills);
@@ -1523,7 +1525,7 @@ describe('Bill Mobile GET NotPaid API', () => {
 
     it('should return 500 if an error occurs', async () => {
         const mockSession: MockSession = {
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         };
         vi.mocked(getServerSession).mockResolvedValueOnce(mockSession);
 
@@ -1536,7 +1538,7 @@ describe('Bill Mobile GET NotPaid API', () => {
             email: 'test@test.test',
             passwordHash: 'hashedpassword',
             profilePictureId: null,
-            householdId: 1
+            householdId: 1,
         });
 
         const request = createMockRequest({});
@@ -1545,6 +1547,6 @@ describe('Bill Mobile GET NotPaid API', () => {
 
         expect(response.status).toBe(500);
         const data = await response.json();
-        expect(data).toEqual({error: 'Internal Server Error'});
+        expect(data).toEqual({ error: 'Internal Server Error' });
     });
 });

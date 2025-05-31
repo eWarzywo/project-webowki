@@ -17,7 +17,7 @@ declare module 'next-auth' {
         email: string;
         image?: string | null;
     }
-    
+
     interface CredentialsConfig {
         id: string;
         name: string;

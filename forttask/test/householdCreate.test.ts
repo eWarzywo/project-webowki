@@ -36,11 +36,11 @@ interface HouseholdRequestBody {
 }
 
 vi.mock('next-auth/next', () => ({
-    getServerSession: vi.fn()
+    getServerSession: vi.fn(),
 }));
 
 vi.mock('../src/app/auth', () => ({
-    authOptions: {}
+    authOptions: {},
 }));
 
 vi.mock('../libs/prisma', () => ({
@@ -75,7 +75,7 @@ describe('Household Creation API', () => {
 
         expect(response.status).toBe(401);
         expect(responseBody).toEqual({ message: 'You must be logged in to create a household' });
-        
+
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });
 
@@ -90,7 +90,7 @@ describe('Household Creation API', () => {
 
         expect(response.status).toBe(400);
         expect(responseBody.message).toContain('must be at least 3 characters');
-        
+
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });
 
@@ -115,7 +115,7 @@ describe('Household Creation API', () => {
         expect(responseBody).toEqual({
             message: 'You already own a household. You can only own one household at a time.',
         });
-        
+
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });
 
@@ -180,7 +180,7 @@ describe('Household Creation API', () => {
             where: { id: 1 },
             data: { householdId: 1 },
         });
-        
+
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });
 
@@ -245,7 +245,7 @@ describe('Household Creation API', () => {
         expect(responseBody.household.joinCode).toBe('UNIQUE1');
 
         expect(prisma.household.findUnique).toHaveBeenCalledTimes(3);
-        
+
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });
 
@@ -263,7 +263,7 @@ describe('Household Creation API', () => {
 
         expect(response.status).toBe(500);
         expect(responseBody).toEqual({ message: 'Failed to create household' });
-        
+
         // Verify authOptions was passed
         expect(nextAuthNext.getServerSession).toHaveBeenCalledWith(authOptions);
     });

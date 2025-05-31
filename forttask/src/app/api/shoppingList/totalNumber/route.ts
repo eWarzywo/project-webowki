@@ -8,10 +8,7 @@ export async function GET(req: Request) {
         const session = await getServerSession(authOptions);
 
         if (!session || !session.user?.id) {
-            return NextResponse.json(
-                { message: 'You must be logged in to view shopping list count' },
-                { status: 401 },
-            );
+            return NextResponse.json({ message: 'You must be logged in to view shopping list count' }, { status: 401 });
         }
 
         const userId = parseInt(session.user.id);

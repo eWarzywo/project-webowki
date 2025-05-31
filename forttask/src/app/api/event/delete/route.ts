@@ -12,7 +12,10 @@ export async function DELETE(req: Request) {
         }
 
         if (!session.user?.householdId) {
-            return NextResponse.json({ message: 'You must be a part of a household to delete events' }, { status: 401 });
+            return NextResponse.json(
+                { message: 'You must be a part of a household to delete events' },
+                { status: 401 },
+            );
         }
 
         const householdId = session.user.householdId ? parseInt(session.user.householdId) : null;
@@ -29,7 +32,7 @@ export async function DELETE(req: Request) {
         }
 
         const event = await prisma.event.findUnique({
-            where: { id: parseInt(eventId) }
+            where: { id: parseInt(eventId) },
         });
 
         if (!event) {

@@ -130,9 +130,9 @@ describe('Household Join API', () => {
                     createdAt: new Date(),
                     profilePictureId: null,
                     householdId: 42,
-                    household: null
+                    household: null,
                 },
-                users: []
+                users: [],
             },
         };
 
@@ -286,7 +286,7 @@ describe('Household Join API', () => {
             householdId: 42,
             household: null,
         };
-        
+
         vi.mocked(prisma.user.update).mockResolvedValue(updatedUser);
 
         const req = createMockRequest({ joinCode: 'ABC123' });

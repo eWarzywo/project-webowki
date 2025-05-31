@@ -21,7 +21,7 @@ vi.mock('@/lib/socket', () => ({
         emitUpdate: emitUpdateMock,
         joinHousehold: vi.fn(),
         leaveHousehold: vi.fn(),
-        shoppingRefresh: false
+        shoppingRefresh: false,
     }),
 }));
 
@@ -52,7 +52,15 @@ vi.mock('next-auth/react', () => ({
 }));
 
 vi.mock('next/image', () => ({
-    default: ({ src, alt, width, height, className, style, onClick }: {
+    default: ({
+        src,
+        alt,
+        width,
+        height,
+        className,
+        style,
+        onClick,
+    }: {
         src: string;
         alt: string;
         width: number | string;
@@ -61,7 +69,17 @@ vi.mock('next/image', () => ({
         className?: string;
         style?: React.CSSProperties;
     }) => {
-        return <img src={src} alt={alt} width={width} height={height} className={className} style={style} onClick={onClick} />;
+        return (
+            <img
+                src={src}
+                alt={alt}
+                width={width}
+                height={height}
+                className={className}
+                style={style}
+                onClick={onClick}
+            />
+        );
     },
 }));
 
@@ -107,24 +125,29 @@ const createMockFetch = (options = {}) => {
     const responses = { ...defaultResponses, ...options };
 
     return vi.fn().mockImplementation((input: RequestInfo | URL, init?: RequestInit) => {
-        const url = typeof input === 'string'
-            ? input
-            : input instanceof URL
-                ? input.toString()
-                : input.url;
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
         if (url === '/api/user/get') {
             return Promise.resolve(new Response(JSON.stringify(responses.userResponse)));
-        } else if (url.includes('/api/shoppingList') && !url.includes('details') && !url.includes('totalNumber') && !url.includes('bought') && !url.includes('unbought')) {
+        } else if (
+            url.includes('/api/shoppingList') &&
+            !url.includes('details') &&
+            !url.includes('totalNumber') &&
+            !url.includes('bought') &&
+            !url.includes('unbought')
+        ) {
             if (url === '/api/shoppingList' && init?.method === 'POST') {
-                return Promise.resolve(new Response(JSON.stringify(responses.createShoppingItemResponse), { status: 201 }));
+                return Promise.resolve(
+                    new Response(JSON.stringify(responses.createShoppingItemResponse), { status: 201 }),
+                );
             }
             return Promise.resolve(new Response(JSON.stringify(responses.shoppingListResponse)));
         } else if (url.includes('/api/shoppingList/totalNumber')) {
             return Promise.resolve(new Response(JSON.stringify(responses.totalNumberResponse)));
         } else if (url.includes('/api/shoppingList/details')) {
             const id = new URL(url, 'http://localhost').searchParams.get('id');
-            const item = mockShoppingItems.find(item => item.id === Number(id)) || responses.shoppingItemDetailsResponse;
+            const item =
+                mockShoppingItems.find((item) => item.id === Number(id)) || responses.shoppingItemDetailsResponse;
             return Promise.resolve(new Response(JSON.stringify(item)));
         } else if (url.includes('/api/shoppingList/bought')) {
             return Promise.resolve(new Response(JSON.stringify(responses.boughtShoppingItemResponse)));
@@ -189,13 +212,16 @@ describe('Shopping Page Tests', () => {
         fireEvent.click(addButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/shoppingList', expect.objectContaining({
-                method: 'POST',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/shoppingList',
+                expect.objectContaining({
+                    method: 'POST',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                    body: JSON.stringify({ name: 'Chocolate', cost: 5 }),
                 }),
-                body: JSON.stringify({ name: 'Chocolate', cost: 5 })
-            }));
+            );
 
             expect(emitUpdateMock).toHaveBeenCalled();
         });
@@ -292,12 +318,15 @@ describe('ShoppingListHandler Component Tests', () => {
         vi.clearAllMocks();
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/shoppingList/details?id=1', expect.objectContaining({
-                method: 'GET',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
-                })
-            }));
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/shoppingList/details?id=1',
+                expect.objectContaining({
+                    method: 'GET',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                }),
+            );
         });
     });
 
@@ -315,14 +344,16 @@ describe('ShoppingListHandler Component Tests', () => {
     });
 
     it('should handle pagination when there are more than 6 items', async () => {
-        const manyItems = Array(10).fill(null).map((_, i) => ({
-            id: i + 1,
-            name: `Item ${i + 1}`,
-            cost: 1.99,
-            createdBy: { id: 1, username: 'testuser' },
-            boughtBy: null,
-            updatedAt: null,
-        }));
+        const manyItems = Array(10)
+            .fill(null)
+            .map((_, i) => ({
+                id: i + 1,
+                name: `Item ${i + 1}`,
+                cost: 1.99,
+                createdBy: { id: 1, username: 'testuser' },
+                boughtBy: null,
+                updatedAt: null,
+            }));
 
         global.fetch = createMockFetch({
             shoppingListResponse: manyItems.slice(0, 6),
@@ -332,16 +363,17 @@ describe('ShoppingListHandler Component Tests', () => {
         const { container } = render(<ShoppingListHandler refresh={false} page={1} />);
 
         await waitFor(() => {
-            const paginationContainer = container.querySelector('.pagination') ||
-                                       container.querySelector('[aria-label*="pagination"]') ||
-                                       screen.queryByText(/Page 1 of \d+/) ||
-                                       screen.queryByText(/1\/\d+/);
+            const paginationContainer =
+                container.querySelector('.pagination') ||
+                container.querySelector('[aria-label*="pagination"]') ||
+                screen.queryByText(/Page 1 of \d+/) ||
+                screen.queryByText(/1\/\d+/);
 
-            const nextPageButton = screen.queryByRole('button', { name: /next/i }) ||
-                                  screen.queryByLabelText(/next page/i);
+            const nextPageButton =
+                screen.queryByRole('button', { name: /next/i }) || screen.queryByLabelText(/next page/i);
 
-            const prevPageButton = screen.queryByRole('button', { name: /previous/i }) ||
-                                  screen.queryByLabelText(/previous page/i);
+            const prevPageButton =
+                screen.queryByRole('button', { name: /previous/i }) || screen.queryByLabelText(/previous page/i);
 
             expect(paginationContainer || nextPageButton || prevPageButton).toBeTruthy();
 
@@ -409,13 +441,16 @@ describe('ShoppingListItem Component Tests', () => {
         fireEvent.click(checkbox!);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/shoppingList/bought?id=1', expect.objectContaining({
-                method: 'PUT',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/shoppingList/bought?id=1',
+                expect.objectContaining({
+                    method: 'PUT',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                    body: JSON.stringify({ id: 1 }),
                 }),
-                body: JSON.stringify({ id: 1 })
-            }));
+            );
             expect(emitUpdate).toHaveBeenCalled();
         });
     });
@@ -450,7 +485,7 @@ describe('ShoppingListItem Component Tests', () => {
                 createdBy: { id: 2, username: 'anotheruser' },
                 boughtBy: { id: 1, username: 'testuser' },
                 updatedAt: '2025-05-30T14:30:00.000Z',
-            }
+            },
         }) as unknown as typeof fetch;
 
         render(<ShoppingListItem id={3} handleDelete={vi.fn()} emitUpdate={emitUpdate} />);
@@ -473,13 +508,16 @@ describe('ShoppingListItem Component Tests', () => {
         fireEvent.click(unboughtButton);
 
         await waitFor(() => {
-            expect(global.fetch).toHaveBeenCalledWith('/api/shoppingList/unbought?id=3', expect.objectContaining({
-                method: 'PUT',
-                headers: expect.objectContaining({
-                    'Content-Type': 'application/json'
+            expect(global.fetch).toHaveBeenCalledWith(
+                '/api/shoppingList/unbought?id=3',
+                expect.objectContaining({
+                    method: 'PUT',
+                    headers: expect.objectContaining({
+                        'Content-Type': 'application/json',
+                    }),
+                    body: JSON.stringify({ id: 3 }),
                 }),
-                body: JSON.stringify({ id: 3 })
-            }));
+            );
             expect(emitUpdate).toHaveBeenCalled();
         });
     });
@@ -493,7 +531,7 @@ describe('ShoppingListItem Component Tests', () => {
                 createdBy: { id: 2, username: 'anotheruser' },
                 boughtBy: { id: 1, username: 'testuser' },
                 updatedAt: '2025-05-30T14:30:00.000Z',
-            }
+            },
         }) as unknown as typeof fetch;
 
         render(<ShoppingListItem id={3} handleDelete={vi.fn()} />);

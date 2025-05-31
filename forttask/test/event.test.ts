@@ -38,7 +38,7 @@ describe('Event GET API', () => {
 
         return {
             url: url.toString(),
-            json: () => Promise.resolve(body)
+            json: () => Promise.resolve(body),
         } as unknown as Request;
     };
 
@@ -64,7 +64,7 @@ describe('Event GET API', () => {
         expect(response.status).toBe(401);
         const data = await response.json();
         expect(data).toEqual({ message: 'You must be a part of a household to view events' });
-    })
+    });
 
     it('should return events for the authenticated user', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
@@ -135,7 +135,7 @@ describe('Event POST API', () => {
 
         return {
             url: url.toString(),
-            json: () => Promise.resolve(body)
+            json: () => Promise.resolve(body),
         } as unknown as Request;
     };
 
@@ -161,11 +161,11 @@ describe('Event POST API', () => {
         expect(response.status).toBe(401);
         const data = await response.json();
         expect(data).toEqual({ message: 'You must be a part of a household to create events' });
-    })
+    });
 
     it('should create an event for the authenticated user', async () => {
         vi.mocked(getServerSession).mockResolvedValue({
-            user: {id: '1', householdId: '1'},
+            user: { id: '1', householdId: '1' },
         } as MockSession);
 
         const requestBody = {
@@ -176,7 +176,7 @@ describe('Event POST API', () => {
             cycle: 1,
             repeatCount: 0,
             attendees: [1],
-        }
+        };
 
         const request = createMockRequest({ body: requestBody });
 
@@ -248,7 +248,7 @@ describe('Event DELETE API', () => {
 
         return {
             url: url.toString(),
-            json: () => Promise.resolve(body)
+            json: () => Promise.resolve(body),
         } as unknown as Request;
     };
 
