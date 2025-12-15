@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZSK Cheat Sheet - INF04 Exam</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>📚 ZSK Cheat Sheet - Egzamin INF04</h1>
+        <p class="subtitle">Wszystkie ważne informacje do egzaminu zawodowego</p>
+    </header>
+
+    <nav class="quick-links">
+        <a href="#databases">Bazy danych</a>
+        <a href="#web">Technologie webowe</a>
+        <a href="#programming">Programowanie</a>
+        <a href="#networking">Sieci komputerowe</a>
+        <a href="#security">Bezpieczeństwo</a>
+    </nav>
+
+    <main>
+        <section id="databases" class="content-section">
+            <h2>🗄️ Bazy danych (SQL)</h2>
+            
+            <div class="subsection">
+                <h3>Podstawowe komendy SQL</h3>
+                <div class="code-block">
+                    <code>
+-- SELECT - pobieranie danych<br>
+SELECT kolumna1, kolumna2 FROM tabela WHERE warunek;<br>
+SELECT * FROM users WHERE age > 18;<br><br>
+
+-- INSERT - dodawanie danych<br>
+INSERT INTO tabela (kolumna1, kolumna2) VALUES (wartość1, wartość2);<br><br>
+
+-- UPDATE - aktualizacja danych<br>
+UPDATE tabela SET kolumna1 = wartość WHERE warunek;<br><br>
+
+-- DELETE - usuwanie danych<br>
+DELETE FROM tabela WHERE warunek;<br><br>
+
+-- JOIN - łączenie tabel<br>
+SELECT * FROM tabela1 INNER JOIN tabela2 ON tabela1.id = tabela2.id;<br>
+                    </code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>Funkcje agregujące</h3>
+                <ul>
+                    <li><strong>COUNT()</strong> - zlicza wiersze</li>
+                    <li><strong>SUM()</strong> - suma wartości</li>
+                    <li><strong>AVG()</strong> - średnia</li>
+                    <li><strong>MAX()</strong> - wartość maksymalna</li>
+                    <li><strong>MIN()</strong> - wartość minimalna</li>
+                    <li><strong>GROUP BY</strong> - grupowanie wyników</li>
+                    <li><strong>HAVING</strong> - filtrowanie grup</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Typy danych SQL</h3>
+                <ul>
+                    <li><strong>INT</strong> - liczby całkowite</li>
+                    <li><strong>VARCHAR(n)</strong> - tekst o zmiennej długości</li>
+                    <li><strong>TEXT</strong> - długi tekst</li>
+                    <li><strong>DATE</strong> - data</li>
+                    <li><strong>DATETIME</strong> - data i czas</li>
+                    <li><strong>BOOLEAN</strong> - wartość logiczna</li>
+                    <li><strong>DECIMAL(p,s)</strong> - liczby dziesiętne</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="web" class="content-section">
+            <h2>🌐 Technologie webowe</h2>
+            
+            <div class="subsection">
+                <h3>HTML - Podstawowe tagi</h3>
+                <div class="code-block">
+                    <code>
+&lt;!DOCTYPE html&gt;<br>
+&lt;html&gt;<br>
+&lt;head&gt;<br>
+  &lt;title&gt;Tytuł strony&lt;/title&gt;<br>
+  &lt;meta charset="UTF-8"&gt;<br>
+  &lt;link rel="stylesheet" href="style.css"&gt;<br>
+&lt;/head&gt;<br>
+&lt;body&gt;<br>
+  &lt;h1&gt;Nagłówek&lt;/h1&gt;<br>
+  &lt;p&gt;Paragraf&lt;/p&gt;<br>
+  &lt;a href="url"&gt;Link&lt;/a&gt;<br>
+  &lt;img src="obraz.jpg" alt="opis"&gt;<br>
+  &lt;div&gt;Kontener blokowy&lt;/div&gt;<br>
+  &lt;span&gt;Kontener inline&lt;/span&gt;<br>
+&lt;/body&gt;<br>
+&lt;/html&gt;<br>
+                    </code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>CSS - Selektory i właściwości</h3>
+                <div class="code-block">
+                    <code>
+/* Selektor elementu */<br>
+p { color: blue; }<br><br>
+
+/* Selektor klasy */<br>
+.klasa { background-color: yellow; }<br><br>
+
+/* Selektor ID */<br>
+#id { font-size: 20px; }<br><br>
+
+/* Box model */<br>
+margin: 10px; /* zewnętrzny margines */<br>
+padding: 10px; /* wewnętrzny margines */<br>
+border: 1px solid black;<br>
+width: 100px;<br>
+height: 100px;<br><br>
+
+/* Flexbox */<br>
+display: flex;<br>
+justify-content: center;<br>
+align-items: center;<br>
+                    </code>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3>JavaScript - Podstawy</h3>
+                <div class="code-block">
+                    <code>
+// Zmienne<br>
+let zmienna = "wartość";<br>
+const stala = 100;<br><br>
+
+// Funkcje<br>
+function nazwa(parametr) {<br>
+  return parametr * 2;<br>
+}<br><br>
+
+// Arrow function<br>
+const func = (x) => x * 2;<br><br>
+
+// DOM manipulation<br>
+document.getElementById("id");<br>
+document.querySelector(".klasa");<br>
+element.addEventListener("click", funkcja);<br><br>
+
+// Tablice<br>
+let arr = [1, 2, 3];<br>
+arr.push(4); // dodaj<br>
+arr.pop(); // usuń ostatni<br>
+arr.map(x => x * 2); // transformacja<br>
+arr.filter(x => x > 2); // filtrowanie<br>
+                    </code>
+                </div>
+            </div>
+        </section>
+
+        <section id="programming" class="content-section">
+            <h2>💻 Programowanie</h2>
+            
+            <div class="subsection">
+                <h3>Podstawowe koncepcje OOP</h3>
+                <ul>
+                    <li><strong>Klasa</strong> - szablon obiektu</li>
+                    <li><strong>Obiekt</strong> - instancja klasy</li>
+                    <li><strong>Dziedziczenie</strong> - przejmowanie właściwości klasy bazowej</li>
+                    <li><strong>Polimorfizm</strong> - wiele form tego samego interfejsu</li>
+                    <li><strong>Enkapsulacja</strong> - ukrywanie danych</li>
+                    <li><strong>Abstrakcja</strong> - uproszczenie złożoności</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Struktury danych</h3>
+                <ul>
+                    <li><strong>Tablica</strong> - liniowa struktura danych</li>
+                    <li><strong>Lista</strong> - dynamiczna kolekcja elementów</li>
+                    <li><strong>Stos (Stack)</strong> - LIFO (Last In, First Out)</li>
+                    <li><strong>Kolejka (Queue)</strong> - FIFO (First In, First Out)</li>
+                    <li><strong>Drzewo</strong> - hierarchiczna struktura</li>
+                    <li><strong>Graf</strong> - węzły połączone krawędziami</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Złożoność algorytmów (Big O)</h3>
+                <ul>
+                    <li><strong>O(1)</strong> - stała</li>
+                    <li><strong>O(log n)</strong> - logarytmiczna</li>
+                    <li><strong>O(n)</strong> - liniowa</li>
+                    <li><strong>O(n log n)</strong> - liniowo-logarytmiczna</li>
+                    <li><strong>O(n²)</strong> - kwadratowa</li>
+                    <li><strong>O(2ⁿ)</strong> - wykładnicza</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="networking" class="content-section">
+            <h2>🌐 Sieci komputerowe</h2>
+            
+            <div class="subsection">
+                <h3>Model OSI (7 warstw)</h3>
+                <ol>
+                    <li><strong>Fizyczna</strong> - transmisja bitów (kable, hub)</li>
+                    <li><strong>Łącza danych</strong> - ramki, MAC (switch, bridge)</li>
+                    <li><strong>Sieciowa</strong> - routing, IP (router)</li>
+                    <li><strong>Transportowa</strong> - segmenty, TCP/UDP</li>
+                    <li><strong>Sesji</strong> - zarządzanie sesjami</li>
+                    <li><strong>Prezentacji</strong> - format danych, szyfrowanie</li>
+                    <li><strong>Aplikacji</strong> - protokoły aplikacji (HTTP, FTP)</li>
+                </ol>
+            </div>
+
+            <div class="subsection">
+                <h3>Protokoły sieciowe</h3>
+                <ul>
+                    <li><strong>HTTP/HTTPS</strong> - przeglądanie stron www</li>
+                    <li><strong>FTP</strong> - transfer plików</li>
+                    <li><strong>SMTP</strong> - wysyłanie e-mail</li>
+                    <li><strong>POP3/IMAP</strong> - odbieranie e-mail</li>
+                    <li><strong>DNS</strong> - tłumaczenie nazw na IP</li>
+                    <li><strong>DHCP</strong> - automatyczne przydzielanie IP</li>
+                    <li><strong>TCP</strong> - niezawodny protokół transportowy</li>
+                    <li><strong>UDP</strong> - szybki, niezawodny protokół</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Klasy adresów IP (IPv4)</h3>
+                <ul>
+                    <li><strong>Klasa A</strong> - 0.0.0.0 - 127.255.255.255 (maska /8)</li>
+                    <li><strong>Klasa B</strong> - 128.0.0.0 - 191.255.255.255 (maska /16)</li>
+                    <li><strong>Klasa C</strong> - 192.0.0.0 - 223.255.255.255 (maska /24)</li>
+                    <li><strong>Adresy prywatne:</strong>
+                        <ul>
+                            <li>10.0.0.0 - 10.255.255.255</li>
+                            <li>172.16.0.0 - 172.31.255.255</li>
+                            <li>192.168.0.0 - 192.168.255.255</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="security" class="content-section">
+            <h2>🔒 Bezpieczeństwo</h2>
+            
+            <div class="subsection">
+                <h3>Zagrożenia bezpieczeństwa</h3>
+                <ul>
+                    <li><strong>Malware</strong> - złośliwe oprogramowanie</li>
+                    <li><strong>Virus</strong> - replikuje się i zaraża pliki</li>
+                    <li><strong>Trojan</strong> - udaje legalne oprogramowanie</li>
+                    <li><strong>Ransomware</strong> - szyfruje dane i żąda okupu</li>
+                    <li><strong>Phishing</strong> - wyłudzanie danych</li>
+                    <li><strong>SQL Injection</strong> - atak na bazę danych</li>
+                    <li><strong>XSS</strong> - Cross-Site Scripting</li>
+                    <li><strong>DDoS</strong> - atak przeciążenia</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Metody zabezpieczeń</h3>
+                <ul>
+                    <li><strong>Firewall</strong> - filtrowanie ruchu sieciowego</li>
+                    <li><strong>Antivirus</strong> - ochrona przed malware</li>
+                    <li><strong>Szyfrowanie</strong> - kodowanie danych (AES, RSA)</li>
+                    <li><strong>SSL/TLS</strong> - szyfrowanie transmisji</li>
+                    <li><strong>VPN</strong> - wirtualna sieć prywatna</li>
+                    <li><strong>2FA/MFA</strong> - uwierzytelnianie wieloskładnikowe</li>
+                    <li><strong>Backup</strong> - kopie zapasowe danych</li>
+                    <li><strong>Haszowanie</strong> - jednostronne kodowanie (MD5, SHA)</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>RODO - Podstawowe zasady</h3>
+                <ul>
+                    <li>Przetwarzanie danych tylko za zgodą</li>
+                    <li>Minimalizacja zbieranych danych</li>
+                    <li>Prawo do usunięcia danych</li>
+                    <li>Prawo do przenoszenia danych</li>
+                    <li>Obowiązek zabezpieczenia danych</li>
+                    <li>Zgłaszanie naruszeń w ciągu 72h</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="content-section tips">
+            <h2>💡 Wskazówki do egzaminu</h2>
+            <ul class="tips-list">
+                <li>Zawsze czytaj dokładnie polecenia</li>
+                <li>Sprawdzaj składnię SQL i nazwy kolumn</li>
+                <li>W zadaniach praktycznych testuj kod na bieżąco</li>
+                <li>Pamiętaj o walidacji danych użytkownika</li>
+                <li>Dbaj o czytelność i komentarze w kodzie</li>
+                <li>Zwracaj uwagę na wielkość liter (case sensitivity)</li>
+                <li>Zarządzaj czasem - nie spędzaj zbyt długo na jednym zadaniu</li>
+                <li>Zachowaj pliki w odpowiednim formacie i lokalizacji</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>ZSKCheatSheet v1.0 | Materiały pomocnicze do egzaminu INF04</p>
+        <p>Powodzenia na egzaminie! 🎓</p>
+    </footer>
+</body>
+</html>
